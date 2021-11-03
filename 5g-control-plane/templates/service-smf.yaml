@@ -1,0 +1,44 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.smf.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smf
+  labels:
+{{ tuple "smf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  type: {{ .Values.config.smf.serviceType }}
+  selector:
+{{ tuple "smf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+  ports:
+  - name: pfcp
+    port: {{ .Values.config.smf.n4.port }}
+    protocol: UDP
+{{- if eq .Values.config.smf.serviceType "NodePort" }}
+{{- if .Values.config.smf.n4.nodePort }}
+    nodePort: {{ .Values.config.smf.n4.nodePort }}
+{{- end }}
+{{- end }}
+  - name: prometheus-exporter
+    port: {{ .Values.config.smf.prometheus.port }}
+    protocol: TCP
+{{- if eq .Values.config.smf.serviceType "NodePort" }}
+{{- if .Values.config.smf.prometheus.nodePort }}
+    nodePort: {{ .Values.config.smf.prometheus.nodePort }}
+{{- end }}
+{{- end }}
+  - name: sbi
+    port: {{ .Values.config.smf.sbi.port }}
+    protocol: TCP
+{{- if eq .Values.config.smf.serviceType "NodePort" }}
+{{- if .Values.config.smf.sbi.nodePort }}
+    nodePort: {{ .Values.config.smf.sbi.nodePort }}
+{{- end }}
+{{- end }}
+{{- end }}

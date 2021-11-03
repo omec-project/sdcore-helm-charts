@@ -1,0 +1,52 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.simapp.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simapp
+  labels:
+{{ tuple "simapp" . | include "omec-sub-provision.metadata_labels" | indent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+{{ tuple "simapp" . | include "omec-sub-provision.metadata_labels" | indent 4 }}
+  ports:
+  - name: prometheus-exporter
+    port: {{ .Values.config.simapp.prometheus.port }}
+    protocol: TCP
+  - name: config-exporter
+    port: {{ .Values.config.simapp.config.port }}
+    protocol: TCP
+{{- if .Values.config.simapp.prometheus.nodePort.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simapp-external
+  labels:
+{{ tuple "simapp" . | include "omec-sub-provision.metadata_labels" | indent 4 }}
+spec:
+  type: NodePort
+  selector:
+{{ tuple "simapp" . | include "omec-sub-provision.metadata_labels" | indent 4 }}
+  ports:
+{{- if .Values.config.simapp.prometheus.nodePort.enabled }}
+  - name: prometheus-exporter
+    port: {{ .Values.config.simapp.prometheus.port }}
+    protocol: TCP
+    nodePort: {{ .Values.config.simapp.prometheus.nodePort.port }}
+{{- end }}
+{{- if .Values.config.simapp.config.nodePort.enabled }}
+  - name: config-exporter
+    port: {{ .Values.config.simapp.config.port }}
+    protocol: TCP
+    nodePort: {{ .Values.config.simapp.config.nodePort.port }}
+{{- end }}
+{{- end }}
+{{- end }}

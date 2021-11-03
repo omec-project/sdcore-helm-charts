@@ -1,0 +1,26 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+ # SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+---
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: enb-net
+{{- if $.Values.config.gnbsim.sriov.enabled }}
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: intel.com/sriov_vfio_access_net
+{{- end }}
+spec:
+  config: '{
+{{- if semverCompare ">=1.16-0" .Capabilities.KubeVersion.GitVersion }}
+    "cniVersion": "0.3.1",
+{{- end }}
+    "type": {{ .Values.config.gnbsim.cniPlugin | quote }},
+    "ipam": {
+        "type": {{ .Values.config.gnbsim.ipam | quote }}
+    }
+  }'
+---

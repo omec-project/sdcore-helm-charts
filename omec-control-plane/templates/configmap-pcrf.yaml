@@ -1,0 +1,120 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+
+Default values for mcord-vepc-helm.
+This is a YAML-formatted file.
+Declare variables to be passed into your templates.
+*/}}
+
+{{- if .Values.config.pcrf.deploy }}
+{{- if not .Values.config.useExistingConfigMap }}
+{{- $pcrfJson := index .Values.config.pcrf.cfgFiles "pcrf.json" }}
+{{- $pcrfJsonCommon := index $pcrfJson "common" }}
+{{- $pcrfJsonHss := index $pcrfJson "pcrf" }}
+
+{{- $_ := .Values.config.pcrf.prometheus.port | set $pcrfJsonCommon "prom_port" -}}
+{{- if not (hasKey $pcrfJsonCommon "originhost") -}}
+{{- $_ := tuple "pcrf" "identity" . | include "omec-control-plane.diameter_endpoint" | set $pcrfJsonCommon "originhost" -}}
+{{- end }}
+{{- if not (hasKey $pcrfJsonCommon "originrealm") -}}
+{{- $_ := tuple "pcrf" "realm" . | include "omec-control-plane.diameter_endpoint" | set $pcrfJsonCommon "originrealm" -}}
+{{- end }}
+{{- if not (hasKey $pcrfJsonHss "casssrv") -}}
+{{- $_ := .Values.cassandra.fullnameOverride | set $pcrfJsonHss "casssrv" -}}
+{{- end }}
+{{- if not (hasKey $pcrfJsonHss "restport") -}}
+{{- $_ := .Values.config.pcrf.configPort.port | set $pcrfJsonHss "restport" -}}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pcrf-configs
+  labels:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+data:
+  acl.conf: |
+  {{- if hasKey .Values.config.pcrf.acl "oldTls" }}
+    ALLOW_OLD_TLS {{ .Values.config.pcrf.acl.oldTls }}
+  {{- end }}
+  {{- if hasKey .Values.config.pcrf.acl "ipSec" }}
+    ALLOW_IPSEC {{ .Values.config.pcrf.acl.ipSec }}
+  {{- end }}
+  pcrf.conf: |
+    Identity = {{ tuple "pcrf" "identity" . | include "omec-control-plane.diameter_endpoint" | quote }};
+    Realm = {{ tuple "pcrf" "realm" . | include "omec-control-plane.diameter_endpoint" | quote }};
+    TLS_Cred = "/opt/c3po/pcrf/conf/{{ tuple "pcrf" "host" . | include "omec-control-plane.diameter_endpoint" }}.cert.pem",
+               "/opt/c3po/pcrf/conf/{{ tuple "pcrf" "host" . | include "omec-control-plane.diameter_endpoint" }}.key.pem";
+    TLS_CA = "/opt/c3po/pcrf/conf/cacert.pem";
+    No_SCTP;
+    Prefer_TCP;
+    No_IPv6;
+    SCTP_streams = 3;
+    NoRelay;
+    AppServThreads = 4;
+    Port = 3868;
+    SecPort = 5868;
+    LoadExtension = "/usr/local/lib/freeDiameter/acl_wl.fdx" : "/opt/c3po/pcrf/conf/acl.conf";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_3gpp2_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_draftload_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_etsi283034_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4004_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4006bis_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4072_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4590_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5447_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5580_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5777_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5778_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6734_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6942_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7155_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7683_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7944_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29061_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29128_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29154_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29173_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29212_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29214_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29215_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29217_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29229_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29272_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29273_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29329_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29336_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29337_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29338_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29343_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29344_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29345_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29368_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29468_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts32299_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_CreditControl.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_Gx.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_NAS.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_Rx.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_Sd.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_St.fdx";
+{{- range $key, $value := .Values.config.pcrf.cfgFiles }}
+  {{ $key }}: |-
+{{ toPrettyJson $value | indent 4 }}
+{{- end }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pcrf-scripts
+  labels:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+data:
+  pcrf-run.sh: |
+{{ tuple "bin/_pcrf-run.sh.tpl" . | include "omec-control-plane.template" | indent 4 }}
+  pcrf-bootstrap.sh: |
+{{ tuple "bin/_pcrf-bootstrap.sh.tpl" . | include "omec-control-plane.template" | indent 4 }}
+{{- end }}

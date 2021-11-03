@@ -1,0 +1,112 @@
+{{/*
+# Copyright 2019-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.spgwc.deploy }}
+{{- if not .Values.config.useExistingConfigMap }}
+{{- $cpJson := index .Values.config.spgwc.cfgFiles "cp.json" }}
+{{- $global := index $cpJson "global" }}
+{{- $configJson := index .Values.config.spgwc.cfgFiles "config.json" }}
+{{- $configJsonSpgwc := index $configJson "spgwc" }}
+{{- $configJsonGx := index $configJson "gx" }}
+
+{{- if not (hasKey $configJsonGx "host") -}}
+{{- $_ := tuple "pcrf" "identity" . | include "omec-control-plane.diameter_endpoint" | set $configJsonGx "host" -}}
+{{- end }}
+{{- if not (hasKey $configJsonGx "realm") -}}
+{{- $_ := tuple "pcrf" "realm" . | include "omec-control-plane.diameter_endpoint" | set $configJsonGx "realm" -}}
+{{- end }}
+{{- if not (hasKey $global "httpPort") -}}
+{{- $_ := .Values.config.spgwc.rest.port | set $global "httpPort" -}}
+{{- end }}
+{{- if not (hasKey $global "pfcpPort") -}}
+{{- $_ := .Values.config.spgwc.n4.port | set $global "pfcpPort" -}}
+{{- end }}
+{{- if not (hasKey $global "s11Port") -}}
+{{- $_ := .Values.config.spgwc.s11.port | set $global "s11Port" -}}
+{{- end }}
+{{- if not (hasKey $global "prometheusPort") -}}
+{{- $_ := .Values.config.spgwc.prometheus.port | set $global "prometheusPort" -}}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spgwc-configs
+  labels:
+{{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+data:
+  gx.conf: |
+    Identity = {{ tuple "spgwc" "identity" . | include "omec-control-plane.diameter_endpoint" | quote }};
+    Realm = {{ tuple "spgwc" "realm" . | include "omec-control-plane.diameter_endpoint" | quote }};
+    TLS_Cred = "config/{{ tuple "spgwc" "host" . | include "omec-control-plane.diameter_endpoint" }}.cert.pem",
+               "config/{{ tuple "spgwc" "host" . | include "omec-control-plane.diameter_endpoint" }}.key.pem";
+    TLS_CA = "config/cacert.pem";
+    AppServThreads = 40;
+    SCTP_streams = 3;
+    NoRelay;
+    No_IPv6;
+    #Port = 3868;
+    #SecPort = 3869;
+
+    ConnectPeer = {{ tuple "pcrf" "identity" . | include "omec-control-plane.diameter_endpoint" | quote }} { No_TLS; port = 3868; };
+
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_3gpp2_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_draftload_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_etsi283034_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4004_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4006bis_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4072_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4590_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5447_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5580_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5777_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5778_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6734_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6942_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7155_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7683_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7944_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29061_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29128_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29154_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29173_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29212_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29214_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29215_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29217_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29229_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29272_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29273_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29329_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29336_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29337_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29338_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29343_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29344_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29345_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29368_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29468_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts32299_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_CreditControl.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_Gx.fdx";
+{{- range $key, $value := .Values.config.spgwc.cfgFiles }}
+  {{ $key }}: |-
+{{ toPrettyJson $value | indent 4 }}
+{{- end }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spgwc-scripts
+  labels:
+{{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+data:
+  spgwc-run.sh: |
+{{ tuple "bin/_spgwc-run.sh.tpl" . | include "omec-control-plane.template" | indent 4 }}
+  spgwc-init.sh: |
+{{ tuple "bin/_spgwc-init.sh.tpl" . | include "omec-control-plane.template" | indent 4 }}
+{{- end }}

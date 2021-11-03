@@ -1,0 +1,269 @@
+{{/*
+# Copyright 2019-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.mme.deploy }}
+{{ tuple "mme" . | include "omec-control-plane.service_account" }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mme
+  labels:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: 1
+  serviceName: mme-headless
+  selector:
+    matchLabels:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 8 }}
+    {{- with .Values.config.mme.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    spec:
+    {{- if .Values.nodeSelectors.enabled }}
+      nodeSelector:
+        {{ .Values.nodeSelectors.mme.label }}: {{ .Values.nodeSelectors.mme.value }}
+    {{- end }}
+      serviceAccountName: mme
+    {{- if hasKey .Values.images "pullSecrets" }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecrets | indent 8 }}
+    {{- end }}
+      initContainers:
+      - name: mme-load-sctp-module
+        image: {{ .Values.images.tags.init | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        command: ["sh", "-xc"]
+        args:
+        - |
+          if chroot /mnt/host-rootfs modinfo nf_conntrack_proto_sctp > /dev/null 2>&1; then \
+              chroot /mnt/host-rootfs modprobe nf_conntrack_proto_sctp; \
+          fi;
+          chroot /mnt/host-rootfs modprobe tipc
+        volumeMounts:
+        - name: host-rootfs
+          mountPath: /mnt/host-rootfs
+    {{- if .Values.config.hss.deploy }}
+      - name: mme-dep-check
+        image: {{ .Values.images.tags.depCheck | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsUser: 0
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: PATH
+            value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/
+          - name: COMMAND
+            value: "echo done"
+          - name: DEPENDENCY_POD_JSON
+            value: '[{"labels": {"app": "hss"}, "requireSameNode": false}]'
+          # add dependency job for make_certs.sh
+        command:
+          - kubernetes-entrypoint
+        volumeMounts:
+          []
+    {{- end }}
+      - name: mme-init
+        image: {{ .Values.images.tags.mme | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        command: ["/opt/mme/scripts/mme-init.sh"]
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/mme/scripts
+        - name: configs
+          mountPath: /opt/mme/config
+        - name: shared-data
+          mountPath: /opt/mme/config/shared
+    {{- if .Values.config.coreDump.enabled }}
+{{ tuple "mme" . | include "omec-control-plane.coredump_init" | indent 6 }}
+    {{- end }}
+      containers:
+      - name: mme-app
+        image: {{ .Values.images.tags.mme | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+      {{- end }}
+        command: ["bash", "-xc"]
+        args:
+        - /opt/mme/scripts/mme-run.sh mme-app
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.mme | indent 10 }}
+      {{- end }}
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: MMERUNENV
+          value: "container"
+      {{- if .Values.config.managedByConfigPod.enabled }}
+        - name: MANAGED_BY_CONFIG_POD
+          value: "true"
+      {{- end }}
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/mme/scripts
+        - name: shared-data
+          mountPath: /opt/mme/config/shared
+        - name: shared-app
+          mountPath: /tmp
+        - name: configs
+          mountPath: /opt/mme/config
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      - name: s1ap-app
+        image: {{ .Values.images.tags.mme | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+      {{- end }}
+        command: ["bash", "-xc"]
+        args:
+        - /opt/mme/scripts/mme-run.sh s1ap-app
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.mme | indent 10 }}
+      {{- end }}
+        env:
+        - name: MMERUNENV
+          value: "container"
+      {{- if .Values.config.managedByConfigPod.enabled }}
+        - name: MANAGED_BY_CONFIG_POD
+          value: "true"
+      {{- end }}
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/mme/scripts
+        - name: shared-data
+          mountPath: /opt/mme/config/shared
+        - name: shared-app
+          mountPath: /tmp
+        - name: configs
+          mountPath: /opt/mme/config
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      - name: s6a-app
+        image: {{ .Values.images.tags.mme | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+      {{- end }}
+        command: ["bash", "-xc"]
+        args:
+        - /opt/mme/scripts/mme-run.sh s6a-app
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.mme | indent 10 }}
+      {{- end }}
+        env:
+        - name: MMERUNENV
+          value: "container"
+      {{- if .Values.config.managedByConfigPod.enabled }}
+        - name: MANAGED_BY_CONFIG_POD
+          value: "true"
+      {{- end }}
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/mme/scripts
+        - name: shared-data
+          mountPath: /opt/mme/config/shared
+        - name: shared-app
+          mountPath: /tmp
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      - name: s11-app
+        image: {{ .Values.images.tags.mme | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+      {{- end }}
+        command: ["bash", "-xc"]
+        args:
+        - /opt/mme/scripts/mme-run.sh s11-app
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.mme | indent 10 }}
+      {{- end }}
+        env:
+        - name: MMERUNENV
+          value: "container"
+      {{- if .Values.config.managedByConfigPod.enabled }}
+        - name: MANAGED_BY_CONFIG_POD
+          value: "true"
+      {{- end }}
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/mme/scripts
+        - name: shared-data
+          mountPath: /opt/mme/config/shared
+        - name: shared-app
+          mountPath: /tmp
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      volumes:
+      - name: scripts
+        configMap:
+          name: mme-scripts
+          defaultMode: 493
+      - name: configs
+        configMap:
+          name: mme-configs
+          defaultMode: 420
+      - name: shared-data
+        emptyDir: {}
+      - name: shared-app
+        emptyDir: {}
+      - name: host-rootfs
+        hostPath:
+          path: /
+    {{- if .Values.config.coreDump.enabled }}
+      - name: coredump
+        hostPath:
+          path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+{{- end }}

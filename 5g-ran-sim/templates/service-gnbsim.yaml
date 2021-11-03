@@ -1,0 +1,23 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.gnbsim.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gnbsim
+  labels:
+{{ tuple "gnbsim" . | include "5g-ransim-plane.metadata_labels" | indent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+{{ tuple "gnbsim" . | include "5g-ransim-plane.metadata_labels" | indent 4 }}
+  ports:
+  - name: ngapp
+    port: {{ .Values.config.gnbsim.ngapp.port }}
+    protocol: SCTP
+{{- end }}

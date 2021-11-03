@@ -1,0 +1,24 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.simapp.deploy }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simapp
+  labels:
+{{ tuple "simapp" . | include "omec-sub-provision.metadata_labels" | indent 4 }}
+data:
+  simapp-run.sh: |
+{{ tuple "bin/_simapp-run.sh.tpl" . | include "omec-sub-provision.template" | indent 4 }}
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- range $key, $value := .Values.config.simapp.cfgFiles }}
+  {{ $key }}: |-
+{{ toYaml $value | indent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

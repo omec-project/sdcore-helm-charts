@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: aether-helm-charts
+Upstream-Contact: Open Networking Foundation <info@opennetworking.org>
+Source: https://gerrit.opencord.org/aether-helm-charts
+
+Files: VERSION .gitreview
+Copyright: 2021 Open Networking Foundation
+License: Apache-2.0

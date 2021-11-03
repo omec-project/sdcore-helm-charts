@@ -1,0 +1,96 @@
+{{/*
+# Copyright 2019-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.mme.deploy }}
+{{- $configJson := index .Values.config.mme.cfgFiles "config.json" }}
+{{- $configJsonS11 := index $configJson "s11" }}
+{{- $configJsonS1ap := index $configJson "s1ap" }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mme
+  labels:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  selector:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+  type: ClusterIP
+  ports:
+    - name: s11
+      port: {{ index $configJsonS11 "egtp_default_port" }}
+      protocol: UDP
+    - name: s6a
+      port: 3868
+      protocol: TCP
+    - name: s1ap
+      port: {{ index $configJsonS1ap "sctp_port" }}
+      protocol: SCTP
+    - name: prometheus-exporter
+      port: {{ .Values.config.mme.prometheus.port }}
+      protocol: TCP
+    - name: mme-app-config
+      port: 8080
+      protocol: TCP
+    - name: mme-s1ap-config
+      port: 8081
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mme-headless
+  labels:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  selector:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+  clusterIP: None
+  ports:
+    - name: s11
+      port: {{ index $configJsonS11 "egtp_default_port" }}
+      protocol: UDP
+    - name: s6a
+      port: 3868
+      protocol: TCP
+    - name: s1ap
+      port: {{ index $configJsonS1ap "sctp_port" }}
+      protocol: SCTP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mme-external
+  labels:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  selector:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+  type: NodePort
+  ports:
+  {{- if .Values.config.mme.prometheus.nodePort.enabled }}
+    - name: prometheus-exporter
+      port: {{ .Values.config.mme.prometheus.port }}
+      protocol: TCP
+      nodePort: {{ .Values.config.mme.prometheus.nodePort.port }}
+  {{- end }}
+  {{- if .Values.config.mme.s11.nodePort.enabled }}
+    - name: s11
+      port: {{ index $configJsonS11 "egtp_default_port" }}
+      protocol: UDP
+      nodePort: {{ .Values.config.mme.s11.nodePort.port }}
+  {{- end }}
+  {{- if .Values.config.mme.s6a.nodePort.enabled }}
+    - name: s6a
+      port: 3868
+      protocol: TCP
+      nodePort: {{ .Values.config.mme.s6a.nodePort.port }}
+  {{- end }}
+    - name: s1ap
+      port: {{ index $configJsonS1ap "sctp_port" }}
+      nodePort: {{ index $configJsonS1ap "sctp_port_external" }}
+      protocol: SCTP
+{{- end }}

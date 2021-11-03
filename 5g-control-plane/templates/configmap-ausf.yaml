@@ -1,0 +1,39 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.ausf.deploy }}
+
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- $ausfcfg := index .Values.config.ausf.cfgFiles "ausfcfg.conf" }}
+{{- $sbi := index $ausfcfg.configuration "sbi" }}
+
+{{- if not (hasKey $ausfcfg "logger") -}}
+{{- $_ := .Values.config.logger | set $ausfcfg "logger" -}}
+{{- end }}
+
+
+{{- if not (hasKey $sbi "port") -}}
+{{- $_ := .Values.config.ausf.sbi.port | set $sbi "port" -}}
+{{- end }}
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ausf
+  labels:
+{{ tuple "ausf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+data:
+  ausf-run.sh: |
+{{ tuple "bin/_ausf-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- range $key, $value := .Values.config.ausf.cfgFiles }}
+  {{ $key }}: |-
+{{ toYaml $value | indent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

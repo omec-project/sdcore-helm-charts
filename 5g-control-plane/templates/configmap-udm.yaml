@@ -1,0 +1,38 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.udm.deploy }}
+
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- $udmcfg := index .Values.config.udm.cfgFiles "udmcfg.conf" }}
+{{- $sbi := index $udmcfg.configuration "sbi" }}
+
+{{- if not (hasKey $udmcfg "logger") -}}
+{{- $_ := .Values.config.logger | set $udmcfg "logger" -}}
+{{- end }}
+
+{{- if not (hasKey $sbi "port") -}}
+{{- $_ := .Values.config.udm.sbi.port | set $sbi "port" -}}
+{{- end }}
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: udm
+  labels:
+{{ tuple "udm" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+data:
+  udm-run.sh: |
+{{ tuple "bin/_udm-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- range $key, $value := .Values.config.udm.cfgFiles }}
+  {{ $key }}: |-
+{{ toYaml $value | indent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

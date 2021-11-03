@@ -1,0 +1,102 @@
+{{/*
+# Copyright 2019-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.mme.deploy }}
+{{- if not .Values.config.useExistingConfigMap }}
+{{- $configJson := index .Values.config.mme.cfgFiles "config.json" }}
+{{- $configJsonMme := index $configJson "mme" }}
+{{- $configJsonS6a := index $configJson "s6a" }}
+
+{{- $_ := .Values.config.mme.prometheus.port | set $configJsonMme "prom_port" -}}
+{{- if not (hasKey $configJsonS6a "host") -}}
+{{- $_ := tuple "hss" "identity" . | include "omec-control-plane.diameter_endpoint" | set $configJsonS6a "host" -}}
+{{- end }}
+{{- if not (hasKey $configJsonS6a "realm") -}}
+{{- $_ := tuple "hss" "realm" . | include "omec-control-plane.diameter_endpoint" | set $configJsonS6a "realm" -}}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mme-configs
+  labels:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+data:
+  s6a_fd.conf: |
+    Identity = {{ tuple "mme" "identity" . | include "omec-control-plane.diameter_endpoint" | quote }};
+    Realm = {{ tuple "mme" "realm" . | include "omec-control-plane.diameter_endpoint" | quote }};
+    TLS_Cred = "conf/{{ tuple "mme" "host" . | include "omec-control-plane.diameter_endpoint" }}.cert.pem",
+               "conf/{{ tuple "mme" "host" . | include "omec-control-plane.diameter_endpoint" }}.key.pem";
+    TLS_CA = "conf/cacert.pem";
+    AppServThreads = 40;
+    SCTP_streams = 3;
+    NoRelay;
+    No_IPv6;
+    #Port = 3868;
+    #SecPort = 3869;
+
+    ConnectPeer = {{ tuple "hss" "identity" . | include "omec-control-plane.diameter_endpoint" | quote }} { No_TLS; port = 3868; };
+
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_3gpp2_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_draftload_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_etsi283034_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4004_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4006bis_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4072_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4590_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5447_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5580_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5777_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5778_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6734_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6942_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7155_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7683_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7944_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29061_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29128_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29154_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29173_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29212_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29214_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29215_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29217_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29229_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29272_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29273_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29329_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29336_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29337_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29338_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29343_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29344_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29345_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29368_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29468_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts32299_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_S6as6d.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_S6c.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_S6t.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_SGd.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_T6aT6bT7.fdx";
+{{- range $key, $value := .Values.config.mme.cfgFiles }}
+  {{ $key }}: |-
+{{ toPrettyJson $value | indent 4 }}
+{{- end }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mme-scripts
+  labels:
+{{ tuple "mme" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+data:
+  mme-init.sh: |
+{{ tuple "bin/_mme-init.sh.tpl" . | include "omec-control-plane.template" | indent 4 }}
+  mme-run.sh: |
+{{ tuple "bin/_mme-run.sh.tpl" . | include "omec-control-plane.template" | indent 4 }}
+{{- end }}

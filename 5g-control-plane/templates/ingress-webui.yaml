@@ -1,0 +1,26 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.webui.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webui
+  labels:
+{{ tuple "webui" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  rules:
+    - host: {{ .Values.config.webui.ingress.hostname }}
+      http:
+        paths:
+          - path: {{ .Values.config.webui.ingress.path }}
+            pathType: {{ .Values.config.webui.ingress.pathType }}
+            backend:
+              service:
+                name: webui
+                port:
+                  number: {{ .Values.config.webui.urlport.port }}
+{{- end }}

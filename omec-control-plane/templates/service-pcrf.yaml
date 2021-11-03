@@ -1,0 +1,81 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.pcrf.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcrf
+  labels:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  selector:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+  ports:
+  - name: gx
+    port: 3868
+    protocol: TCP
+  - name: prometheus-exporter
+    port: {{ .Values.config.pcrf.prometheus.port }}
+    protocol: TCP
+  - name: config-port
+    port: {{ .Values.config.pcrf.configPort.port }}
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcrf-headless
+  labels:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  selector:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+  clusterIP: None
+  ports:
+  - name: gx
+    port: 3868
+    protocol: TCP
+  - name: prometheus-exporter
+    port: {{ .Values.config.pcrf.prometheus.port }}
+    protocol: TCP
+  - name: config-port
+    port: {{ .Values.config.pcrf.configPort.port }}
+    protocol: TCP
+{{- if or (.Values.config.pcrf.prometheus.nodePort.enabled) (.Values.config.pcrf.gx.nodePort.enabled) }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcrf-external
+  labels:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  selector:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+  type: NodePort
+  ports:
+  {{- if .Values.config.pcrf.prometheus.nodePort.enabled }}
+    - name: prometheus-exporter
+      port: {{ .Values.config.pcrf.prometheus.port }}
+      protocol: TCP
+      nodePort: {{ .Values.config.pcrf.prometheus.nodePort.port }}
+  {{- end }}
+  {{- if .Values.config.pcrf.gx.nodePort.enabled }}
+  - name: gx
+    port: 3868
+    protocol: TCP
+    nodePort: {{ .Values.config.pcrf.gx.nodePort.port }}
+  {{- end }}
+  {{- if .Values.config.pcrf.configPort.nodePort.enabled }}
+    - name: config-port
+      port: {{ .Values.config.pcrf.configPort.port }}
+      protocol: TCP
+      nodePort: {{ .Values.config.pcrf.configPort.nodePort.port }}
+  {{- end }}
+{{- end }}
+{{- end }}

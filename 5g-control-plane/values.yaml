@@ -1,0 +1,595 @@
+# Copyright 2020-present Open Networking Foundation
+#
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+
+images:
+  tags:
+    init: docker.io/omecproject/pod-init:1.0.0
+    amf: registry.aetherproject.org/omecproject/5gc-amf:onf-release3.0.5-03d3c6d
+    nrf: registry.aetherproject.org/omecproject/5gc-nrf:onf-release3.0.5-13304e8
+    smf: registry.aetherproject.org/omecproject/5gc-smf:onf-release3.0.5-bcbcd33
+    ausf: registry.aetherproject.org/omecproject/5gc-ausf:onf-release3.0.5-be7d4ac
+    nssf: registry.aetherproject.org/omecproject/5gc-nssf:onf-release3.0.5-aa3a60b
+    pcf: registry.aetherproject.org/omecproject/5gc-pcf:onf-release3.0.5-9f7734b
+    udr: registry.aetherproject.org/omecproject/5gc-udr:onf-release3.0.5-deef506
+    udm: registry.aetherproject.org/omecproject/5gc-udm:onf-release3.0.5-c28433a
+    webui: registry.aetherproject.org/omecproject/5gc-webui:onf-release3.0.5-0534804
+  pullPolicy: IfNotPresent
+  # Optionally specify an array of imagePullSecrets.
+  # Secrets must be manually created in the namespace.
+  pullSecrets:
+    - name: aether.registry
+
+resources:
+  enabled: false
+  amf:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  nrf:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  smf:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  ausf:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  nssf:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  pcf:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  udr:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  udm:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  webui:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+mongodb:
+  deploy: true
+  fullnameOverride: mongodb
+  persistence:
+    enabled: false
+  auth:
+    enabled: false
+  serviceAccount:
+    create: false
+  #clusterDomain: cluster.local
+  #architecture: replicaset
+  #replicaCount: 3
+
+config:
+  managedByConfigPod:      # config comes from helm by default, if enabled true, then discard
+    enabled: false         # helm chart config and use the config from config Pod
+    syncUrl: ""            # Get the config from adapater in case control plane is down
+  useExistingConfigMap: false
+  coreDump:
+    enabled: false
+    path: /tmp/coredump
+  mongodb:
+    name: free5gc
+    url: mongodb://mongodb
+  grpc:
+    golog_verbosity: "99"
+    severity: "info"
+    trace: "all"
+    verbosity: "debug"
+  logger:
+    # network function
+    AMF:
+      debugLevel: info
+      ReportCaller: false
+    SMF:
+      debugLevel: info
+      ReportCaller: false
+    UDR:
+      debugLevel: info
+      ReportCaller: false
+    UDM:
+      debugLevel: info
+      ReportCaller: false
+    NRF:
+      debugLevel: info
+      ReportCaller: false
+    PCF:
+      debugLevel: info
+      ReportCaller: false
+    AUSF:
+      debugLevel: info
+      ReportCaller: false
+    N3IWF:
+      debugLevel: info
+      ReportCaller: false
+  # library
+    NAS:
+      debugLevel: info
+      ReportCaller: false
+    FSM:
+      debugLevel: info
+      ReportCaller: false
+    NGAP:
+      debugLevel: info
+      ReportCaller: false
+    NamfComm:
+      debugLevel: info
+      ReportCaller: false
+    NamfEventExposure:
+      debugLevel: info
+      ReportCaller: false
+    NsmfPDUSession:
+      debugLevel: info
+      ReportCaller: false
+    NudrDataRepository:
+      debugLevel: info
+      ReportCaller: false
+    OpenApi:
+      debugLevel: info
+      ReportCaller: false
+    Aper:
+      debugLevel: info
+      ReportCaller: false
+    CommonConsumerTest:
+      debugLevel: info
+      ReportCaller: false
+    PFCP:
+      debugLevel: info
+      ReportCaller: false
+    MongoDBLibrary:
+      debugLevel: info
+      ReportCaller: false
+    PathUtil:
+      debugLevel: info
+      ReportCaller: false
+  # webui
+    WEBUI:
+      debugLevel: info
+      ReportCaller: false
+  webui:
+    deploy: true
+    #podAnnotations:
+    serviceType: ClusterIP
+    urlport:
+      port: 5000
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 35000
+    grpc:
+      port: 9876
+    ingress:
+      enabled: false
+      hostname: free5gc.local
+      path: /
+      pathType: Prefix
+      # extraHosts:
+        # - host: free5gc.local
+        #   path: /
+    cfgFiles:
+      # https://github.com/free5gc/free5gc/blob/main/config/webuicfg.yaml
+      webuicfg.conf:
+        info:
+          version: 1.0.0
+          description: WebUI initial local configuration
+        configuration: {}
+  udm:
+    deploy: true
+    #podAnnotations:
+    serviceType: ClusterIP
+    sbi:
+      port: 29503
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30074
+    cfgFiles:
+      # https://github.com/free5gc/free5gc/blob/main/config/udmcfg.yaml
+      udmcfg.conf:
+        info:
+          version: 1.0.0
+          description: UDM initial local configuration
+        configuration:
+          nrfUri: http://nrf:29510
+          plmnList:
+            - plmnId:
+                mcc: 208
+                mnc: 93
+            - plmnId:
+                mcc: 222
+                mnc: 88
+          serviceNameList:
+            - nudm-sdm
+            - nudm-uecm
+            - nudm-ueau
+            - nudm-ee
+            - nudm-pp
+          sbi:
+            scheme: http
+            bindingIPv4: "0.0.0.0"
+            registerIPv4: udm
+            tls:
+              log: free5gc/udmsslkey.log
+              pem: free5gc/support/TLS/udm.pem
+              key: free5gc/support/TLS/udm.key
+          keys:
+                udmProfileAHNPublicKey: 5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650
+                udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
+                udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
+                udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
+  udr:
+    deploy: true
+    #podAnnotations:
+    serviceType: ClusterIP
+    sbi:
+      port: 29504
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30074
+    cfgFiles:
+      # https://github.com/free5gc/free5gc/blob/main/config/udrcfg.yaml
+      udrcfg.conf:
+        info:
+          version: 1.0.0
+          description: UDR initial local configuration
+        configuration:
+          nrfUri: http://nrf:29510
+          plmnSupportList:
+            - plmnId:
+                mcc: 208
+                mnc: 93
+            - plmnId:
+                mcc: 333
+                mnc: 88
+          sbi:
+            scheme: http
+            bindingIPv4: "0.0.0.0"
+            registerIPv4: udr
+  pcf:
+    deploy: true
+    #podAnnotations:
+    serviceType: ClusterIP
+    sbi:
+      port: 29507
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30077
+    cfgFiles:
+      # https://github.com/free5gc/free5gc/blob/main/config/pcfcfg.yaml
+      pcfcfg.conf:
+        info:
+          version: 1.0.0
+          description: PCF initial local configuration
+        configuration:
+          pcfName: PCF
+          nrfUri: http://nrf:29510
+          sbi:
+            scheme: http
+            bindingIPv4: "0.0.0.0"
+            registerIPv4: pcf
+          defaultBdtRefId: BdtPolicyId-
+          plmnList:
+            - plmnId:
+                mcc: 208
+                mnc: 93
+            - plmnId:
+                mcc: 333
+                mnc: 88
+          serviceList:
+            - serviceName: npcf-am-policy-control
+            - serviceName: npcf-smpolicycontrol
+              suppFeat: 3fff
+            - serviceName: npcf-bdtpolicycontrol
+            - serviceName: npcf-policyauthorization
+              suppFeat: 3
+            - serviceName: npcf-eventexposure
+            - serviceName: npcf-ue-policy-control
+  nssf:
+    deploy: true
+    #podAnnotations:
+    serviceType: ClusterIP
+    sbi:
+      port: 29531
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30081
+    cfgFiles:
+      # https://github.com/free5gc/free5gc/blob/main/config/nssfcfg.yaml
+      nssfcfg.conf:
+        info:
+          version: 1.0.0
+          description: NSSF initial local configuration
+        configuration:
+          nssfName: NSSF
+          nrfUri: http://nrf:29510
+          sbi:
+            scheme: http
+            bindingIPv4: "0.0.0.0"
+            registerIPv4: nssf
+          serviceNameList:
+            - nnssf-nsselection
+            - nnssf-nssaiavailability
+          supportedPlmnList:
+            - mcc: 208
+              mnc: 93
+          supportedNssaiInPlmnList:
+            - plmnId:
+                mcc: 208
+                mnc: 93
+              supportedSnssaiList:
+                - sst: 1
+                  sd: "010203"
+          nsiList:
+            - snssai:
+                sst: 1
+                sd: "010203"
+              nsiInformationList:
+                - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                  nsiId: 22
+  amf:
+    deploy: true
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    serviceType: ClusterIP
+    prometheus:
+      port: 9089
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30084
+    sbi:
+      port: 29518
+      #nodePort: 30088
+    ngapp:
+      #externalIp:
+      port: 38412
+      #nodePort: 30071
+    cfgFiles:
+      # https://github.com/free5gc/free5gc/blob/main/config/amfcfg.yaml
+      amfcfg.conf:
+        info:
+          version: 1.0.0
+          description: AMF initial local configuration
+        configuration:
+          ngapIpList:
+            - "0.0.0.0"
+          amfName: AMF
+          nrfUri: http://nrf:29510
+          sbi:
+            scheme: http
+            bindingIPv4: "0.0.0.0"
+            registerIPv4: amf
+          serviceNameList:
+            - namf-comm
+            - namf-evts
+            - namf-mt
+            - namf-loc
+            - namf-oam
+          servedGuamiList:
+            - plmnId:
+                mcc: 208
+                mnc: 93
+              amfId: cafe00
+          supportTaiList:
+            - plmnId:
+                mcc: 208
+                mnc: 93
+              tac: 1
+          plmnSupportList:
+            - plmnId:
+                mcc: 208
+                mnc: 93
+              snssaiList:
+                - sst: 1
+                  sd: "010203"
+          supportDnnList:
+            - internet
+          security:
+            integrityOrder:
+              - NIA2
+            cipheringOrder:
+              - NEA0
+          networkName:
+            full: Aether5G
+            short: Aether
+          networkFeatureSupport5GS: # 5gs Network Feature Support IE, refer to TS 24.501
+            enable: true # append this IE in Registration accept or not
+            imsVoPS: 0 # IMS voice over PS session indicator (uinteger, range: 0~1)
+            emc: 0 # Emergency service support indicator for 3GPP access (uinteger, range: 0~3)
+            emf: 0 # Emergency service fallback indicator for 3GPP access (uinteger, range: 0~3)
+            iwkN26: 0 # Interworking without N26 interface indicator (uinteger, range: 0~1)
+            mpsi: 0 # MPS indicator (uinteger, range: 0~1)
+            emcN3: 0 # Emergency service support indicator for Non-3GPP access (uinteger, range: 0~1)
+            mcsi: 0 # MCS indicator (uinteger, range: 0~1)
+          t3502Value: 720  # timer value (seconds) at UE side
+          t3512Value: 3600 # timer value (seconds) at UE side
+          non3gppDeregistrationTimerValue: 3240 # timer value (seconds) at UE side
+          # retransmission timer for paging message
+          t3513:
+            enable: true     # true or false
+            expireTime: 6s   # default is 6 seconds
+            maxRetryTimes: 4 # the max number of retransmission
+          # retransmission timer for NAS Deregistration Request message
+          t3522:
+            enable: true     # true or false
+            expireTime: 6s   # default is 6 seconds
+            maxRetryTimes: 4 # the max number of retransmission
+          # retransmission timer for NAS Registration Accept message
+          t3550:
+            enable: true     # true or false
+            expireTime: 6s   # default is 6 seconds
+            maxRetryTimes: 4 # the max number of retransmission
+          # retransmission timer for NAS Authentication Request/Security Mode Command message
+          t3560:
+            enable: true     # true or false
+            expireTime: 6s   # default is 6 seconds
+            maxRetryTimes: 4 # the max number of retransmission
+          # retransmission timer for NAS Notification message
+          t3565:
+            enable: true     # true or false
+            expireTime: 6s   # default is 6 seconds
+            maxRetryTimes: 4 # the max number of retransmission
+  nrf:
+    deploy: true
+    #podAnnotations:
+    serviceType: ClusterIP
+    sbi:
+      port: 29510
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30070
+    cfgFiles:
+      # https://github.com/free5gc/free5gc/blob/main/config/nrfcfg.yaml
+      nrfcfg.conf:
+        info:
+          version: 1.0.0
+          description: NRF initial local configuration
+        configuration:
+          sbi:
+            scheme: http
+            bindingIPv4: "0.0.0.0"
+            registerIPv4: nrf
+          DefaultPlmnId:
+            mcc: 208
+            mnc: 93
+          serviceNameList:
+            - nnrf-nfm
+            - nnrf-disc
+  smf:
+    deploy: true
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    serviceType: ClusterIP
+    n4:
+      port: 8805
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30021
+    prometheus:
+      port: 9089
+      #nodePort: 30084
+    sbi:
+      port: 29502
+      #nodePort: 30080
+    cfgFiles:
+      uerouting.conf:
+        info:
+          version: 1.0.0
+          description: Routing information for UE
+      # https://github.com/free5gc/free5gc/blob/main/config/smfcfg.yaml
+      smfcfg.conf:
+        info:
+          version: 1.0.0
+          description: SMF initial local configuration
+        configuration:
+          pfcp:
+             addr: "POD_IP"
+          smfName: SMF
+          nrfUri: http://nrf:29510
+          sbi:
+            scheme: http
+            bindingIPv4: "0.0.0.0"
+            registerIPv4: smf
+            tls:
+              key: gofree5gc/support/TLS/smf.key
+              pem: gofree5gc/support/TLS/smf.pem
+          serviceNameList:
+            - nsmf-pdusession
+            - nsmf-event-exposure
+          snssaiInfos:
+            - dnnInfos:
+              - dnn: internet
+                dns: # the IP address of DNS
+                   ipv4: 8.8.8.8
+                   ipv6: 2001:4860:4860::8888
+                ueSubnet: 172.250.0.0/16 # should be CIDR type
+              sNssai:
+                sd: "010203"
+                sst: 1
+          userplane_information:
+            up_nodes:
+              gNB1:
+                type: AN
+              UPF:
+                type: UPF
+                node_id: upf
+                sNssaiUpfInfos: # S-NSSAI information list for this UPF
+                  - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
+                      sst: 1 # Slice/Service Type (uinteger, range: 0~255)
+                      sd: "010203" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
+                    dnnUpfInfoList: # DNN information list for this S-NSSAI
+                      - dnn: internet
+                    plmnId:
+                      mcc: "208"
+                      mnc: "93"
+                  - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
+                      sst: 1 # Slice/Service Type (uinteger, range: 0~255)
+                      sd: "112233" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
+                    dnnUpfInfoList: # DNN information list for this S-NSSAI
+                      - dnn: internet
+                    plmnId:
+                      mcc: "208"
+                      mnc: "93"
+                interfaces: # Interface list for this UPF
+                  - interfaceType: N3 # the type of the interface (N3 or N9)
+                    endpoints: # the IP address of this N3/N9 interface on this UPF
+                      - upf
+                    networkInstance: internet # Data Network Name (DNN)
+
+            links:
+              - A: gNB1
+                B: UPF
+  ausf:
+    deploy: true
+    #podAnnotations:
+    serviceType: ClusterIP
+    sbi:
+      port: 29509
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30082
+    cfgFiles:
+      # https://github.com/free5gc/free5gc/blob/main/config/ausfcfg.yaml
+      ausfcfg.conf:
+        info:
+          version: 1.0.0
+          description: AUSF initial local configuration
+        configuration:
+          nrfUri: http://nrf:29510
+          sbi:
+            scheme: http
+            bindingIPv4: "0.0.0.0"
+            registerIPv4: ausf
+          serviceNameList:
+            - nausf-auth
+          plmnSupportList:
+            - mcc: 208
+              mnc: 93
+          groupId: ausfGroup001

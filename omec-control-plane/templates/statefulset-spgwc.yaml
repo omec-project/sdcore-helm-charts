@@ -1,0 +1,178 @@
+{{/*
+# Copyright 2019-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.spgwc.deploy }}
+{{ tuple "spgwc" . | include "omec-control-plane.service_account" }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: spgwc
+  labels:
+{{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: 1
+  serviceName: spgwc-headless
+  selector:
+    matchLabels:
+{{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 8 }}
+    {{- with .Values.config.spgwc.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    spec:
+    {{- if .Values.nodeSelectors.enabled }}
+      nodeSelector:
+        {{ .Values.nodeSelectors.spgwc.label }}: {{ .Values.nodeSelectors.spgwc.value }}
+    {{- end }}
+      serviceAccountName: spgwc
+    {{- if hasKey .Values.images "pullSecrets" }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecrets | indent 8 }}
+    {{- end }}
+    {{- if .Values.config.coreDump.enabled }}
+      initContainers:
+{{ tuple "spgwc" . | include "omec-control-plane.coredump_init" | indent 6 }}
+    {{- end }}
+      containers:
+      - name: spgwc
+        image: {{ .Values.images.tags.spgwc }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+      {{- end }}
+        stdin: true
+        tty: true
+        command: ["bash", "-xc"]
+        args: 
+        - /opt/cp/scripts/spgwc-run.sh ngic_controlplane
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: {{ .Values.config.spgwc.rest.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: {{ .Values.config.spgwc.rest.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 3
+{{- if semverCompare ">=1.16-0" .Capabilities.KubeVersion.GitVersion }}
+        startupProbe:
+          #looks like available only in 1.16 K8s version and above
+          httpGet:
+            path: /startup
+            port: {{ .Values.config.spgwc.rest.port }}
+          failureThreshold: 30
+          periodSeconds: 10
+{{- end }}
+        env:
+        - name: MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: spgwc
+              resource: limits.memory
+              divisor: 1Mi
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      {{- if .Values.config.managedByConfigPod.enabled }}
+        - name: MANAGED_BY_CONFIG_POD
+          value: "true"
+      {{- end }}
+      {{- if .Values.config.spgwc.managedByRoc.enabled }}
+        - name: DISABLE_CONFIG_WATCHER  # If the variable has a value then changes
+          value: "true"                 # to subscriber_mapping.json are ignored
+      {{- end }}
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.spgwc | indent 10 }}
+      {{- end }}
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/cp/scripts
+        - name: configs
+          mountPath: /etc/cp/config
+        - name: shared-app
+          mountPath: /tmp
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      - name: gx-app
+        image: {{ .Values.images.tags.spgwc }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+      {{- end }}
+        stdin: true
+        tty: true
+        command: ["bash", "-xc"]
+        args:
+        - /opt/cp/scripts/spgwc-run.sh gx-app
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.spgwc | indent 10 }}
+      {{- end }}
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/cp/scripts
+        - name: configs
+          mountPath: /etc/cp/config
+        - name: shared-app
+          mountPath: /tmp
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+    {{- if .Values.config.spgwc.managedByRoc.enabled }}
+      - name: init-sync
+        image: curlimages/curl:7.77.0
+        imagePullPolicy: IfNotPresent
+        stdin: true
+        tty: true
+        command: ["sh", "-c"]
+        args:
+        - /opt/cp/scripts/spgwc-init.sh
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/cp/scripts
+      volumes:
+      - name: scripts
+        configMap:
+          name: spgwc-scripts
+          defaultMode: 493
+    {{- end }}
+      volumes:
+      - name: scripts
+        configMap:
+          name: spgwc-scripts
+          defaultMode: 493
+      - name: configs
+        configMap:
+          name: spgwc-configs
+          defaultMode: 420
+      - name: shared-app
+        emptyDir: {}
+      - name: host-rootfs
+        hostPath:
+          path: /
+    {{- if .Values.config.coreDump.enabled }}
+      - name: coredump
+        hostPath:
+          path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+{{- end }}

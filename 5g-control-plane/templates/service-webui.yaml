@@ -1,0 +1,36 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.webui.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webui
+  labels:
+{{ tuple "webui" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  type: {{ .Values.config.webui.serviceType }}
+  selector:
+{{ tuple "webui" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+  ports:
+  - name: urlport-http
+    port: {{ .Values.config.webui.urlport.port }}
+    protocol: TCP
+{{- if eq .Values.config.webui.serviceType "NodePort" }}
+{{- if .Values.config.webui.urlport.nodePort }}
+    nodePort: {{ .Values.config.webui.urlport.nodePort }}
+{{- end }}
+{{- end }}
+  - name: grpc
+    port: {{ .Values.config.webui.grpc.port }}
+    protocol: TCP
+{{- if eq .Values.config.webui.serviceType "NodePort" }}
+{{- if .Values.config.webui.grpc.nodePort }}
+    nodePort: {{ .Values.config.webui.grpc.nodePort }}
+{{- end }}
+{{- end }}
+{{- end }}

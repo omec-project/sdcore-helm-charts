@@ -1,0 +1,52 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.config4g.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config4g
+  labels:
+{{ tuple "config4g" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+{{ tuple "config4g" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+  ports:
+  - name: prometheus-exporter
+    port: {{ .Values.config.config4g.prometheus.port }}
+    protocol: TCP
+  - name: urlport-http
+    port: {{ .Values.config.config4g.urlport.port }}
+    protocol: TCP
+{{- if or .Values.config.config4g.urlport.nodePort.enabled .Values.config.config4g.prometheus.nodePort.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config4g-external
+  labels:
+{{ tuple "config4g" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  type: NodePort
+  selector:
+{{ tuple "config4g" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+  ports:
+{{- if .Values.config.config4g.prometheus.nodePort.enabled }}
+  - name: prometheus-exporter
+    port: {{ .Values.config.config4g.prometheus.port }}
+    protocol: TCP
+    nodePort: {{ .Values.config.config4g.prometheus.nodePort.port }}
+{{- end }}
+{{- if .Values.config.config4g.urlport.nodePort.enabled }}
+  - name: urlport-http
+    port: {{ .Values.config.config4g.urlport.port }}
+    protocol: TCP
+    nodePort: {{ .Values.config.config4g.urlport.nodePort.port }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,22 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.gnbsim.deploy }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gnbsim
+  labels:
+{{ tuple "gnbsim" . | include "5g-ransim-plane.metadata_labels" | indent 4 }}
+data:
+  gnbsim-run.sh: |
+{{ tuple "bin/_gnbsim-run.sh.tpl" . | include "5g-ransim-plane.template" | indent 4 }}
+{{- range $key, $value := .Values.config.gnbsim.yamlCfgFiles }}
+  {{ $key }}: |
+{{ $value | indent 4 }}
+{{- end }}
+{{- end }}

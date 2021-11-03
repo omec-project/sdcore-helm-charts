@@ -1,0 +1,103 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.nssf.deploy }}
+{{ tuple "nssf" . | include "5g-control-plane.service_account" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nssf
+  labels:
+{{ tuple "nssf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: 1
+  #serviceName: nssf-headless
+  selector:
+    matchLabels:
+{{ tuple "nssf" . | include "5g-control-plane.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "nssf" . | include "5g-control-plane.metadata_labels" | indent 8 }}
+    {{- with .Values.config.nssf.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    spec:
+      serviceAccountName: nssf
+    {{- if hasKey .Values.images "pullSecrets" }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecrets | indent 8 }}
+    {{- end }}
+      initContainers:
+      - name: wait-nssf-module
+        image: {{ .Values.images.tags.init | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        command: ['sh', '-c', 'until nslookup nssf; do echo waiting for nssf; sleep 4; done;']
+    {{- if .Values.config.coreDump.enabled }}
+{{ tuple "nssf" . | include "5g-control-plane.coredump_init" | indent 6 }}
+    {{- end }}
+      containers:
+      - name: nssf
+        image: {{ .Values.images.tags.nssf }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          runAsUser: 0
+      {{- end }}
+        stdin: true
+        tty: true
+        command: ["/free5gc/script/nssf-run.sh"]
+        env:
+        - name: GRPC_GO_LOG_VERBOSITY_LEVEL
+          value: {{ .Values.config.grpc.golog_verbosity | quote }}
+        - name: GRPC_GO_LOG_SEVERITY_LEVEL
+          value: {{ .Values.config.grpc.severity | quote }}
+        - name: GRPC_TRACE
+          value: {{ .Values.config.grpc.trace | quote }}
+        - name: GRPC_VERBOSITY
+          value: {{ .Values.config.grpc.verbosity | quote }}
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      {{- if .Values.config.managedByConfigPod.enabled }}
+        - name: MANAGED_BY_CONFIG_POD 
+          value: "true"
+      {{- end }}
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.nssf | indent 10 }}
+      {{- end }}
+        volumeMounts:
+        - name: run-script
+          mountPath: /free5gc/script/nssf-run.sh
+          subPath: nssf-run.sh
+        - name: nf-config
+          mountPath: /free5gc/config
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      volumes:
+      - name: run-script
+        configMap:
+          name: nssf
+          defaultMode: 493
+      - name: nf-config
+        configMap:
+          name: nssf
+          defaultMode: 493
+    {{- if .Values.config.coreDump.enabled }}
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+{{- end }}

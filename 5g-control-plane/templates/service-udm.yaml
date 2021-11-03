@@ -1,0 +1,28 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.udm.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udm
+  labels:
+{{ tuple "udm" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  type: {{ .Values.config.udm.serviceType }}
+  selector:
+{{ tuple "udm" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+  ports:
+  - name: sbi
+    port: {{ .Values.config.udm.sbi.port }}
+    protocol: TCP
+{{- if eq .Values.config.udm.serviceType "NodePort" }}
+{{- if .Values.config.udm.sbi.nodePort }}
+    nodePort: {{ .Values.config.udm.sbi.nodePort }}
+{{- end }}
+{{- end }}
+{{- end }}

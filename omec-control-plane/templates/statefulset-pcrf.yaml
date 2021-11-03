@@ -1,0 +1,93 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+
+Default values for mcord-vepc-helm.
+This is a YAML-formatted file.
+Declare variables to be passed into your templates.
+*/}}
+
+{{- if .Values.config.pcrf.deploy }}
+{{ tuple "pcrf" . | include "omec-control-plane.service_account" }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pcrf
+  labels:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: 1
+  serviceName: pcrf-headless
+  selector:
+    matchLabels:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "pcrf" . | include "omec-control-plane.metadata_labels" | indent 8 }}
+    spec:
+    {{- if .Values.nodeSelectors.enabled }}
+      nodeSelector:
+        {{ .Values.nodeSelectors.pcrf.label }}: {{ .Values.nodeSelectors.pcrf.value }}
+    {{- end }}
+    {{- if hasKey .Values.images "pullSecrets" }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecrets | indent 8 }}
+    {{- end }}
+      serviceAccountName: pcrf
+      initContainers:
+      - name: pcrf-bootstrap
+        image: {{ .Values.images.tags.pcrfdb }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        command: ["/opt/c3po/pcrf/pcrf-bootstrap.sh"]
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/c3po/pcrf
+    {{- if .Values.config.coreDump.enabled }}
+{{ tuple "pcrf" . | include "omec-control-plane.coredump_init" | indent 6 }}
+    {{- end }}
+      containers:
+      - name: pcrf
+        image: {{ .Values.images.tags.pcrf }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+      {{- end }}
+        stdin: true
+        tty: true
+        command: ["bash", "-c", "/opt/c3po/pcrf/scripts/pcrf-run.sh"]
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.pcrf | indent 10 }}
+      {{- end }}
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/c3po/pcrf/scripts
+        - name: configs
+          mountPath: /etc/pcrf/conf
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      volumes:
+      - name: scripts
+        configMap:
+          name: pcrf-scripts
+          defaultMode: 493
+      - name: configs
+        configMap:
+          name: pcrf-configs
+          defaultMode: 420
+    {{- if .Values.config.coreDump.enabled }}
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+{{- end }}

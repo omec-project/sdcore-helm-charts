@@ -1,0 +1,85 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.config4g.deploy }}
+{{ tuple "config4g" . | include "omec-control-plane.service_account" }}
+---
+apiVersion: apps/v1
+kind: StatefulSet 
+metadata:
+  name: config4g
+  labels:
+{{ tuple "config4g" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: 1
+  serviceName: config4g-headless
+  selector:
+    matchLabels:
+{{ tuple "config4g" . | include "omec-control-plane.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "config4g" . | include "omec-control-plane.metadata_labels" | indent 8 }}
+    {{- with .Values.config.config4g.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    spec:
+      serviceAccountName: config4g
+    {{- if hasKey .Values.images "pullSecrets" }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecrets | indent 8 }}
+    {{- end }}
+      containers:
+      - name: config-4g
+        image: {{ .Values.images.tags.config4g }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          runAsUser: 0
+      {{- end }}
+        stdin: true
+        tty: true
+        command: ["/free5gc/script/config4g-run.sh"]
+        env:
+        - name: CONFIGPOD_DEPLOYMENT
+          value: "4G"
+      {{- if .Values.config.managedByConfigPod.enabled }}
+        - name: MANAGED_BY_CONFIG_POD
+          value: "true"
+      {{- end }}
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.config4g | indent 10 }}
+      {{- end }}
+        volumeMounts:
+        - name: run-script
+          mountPath: /free5gc/script/config4g-run.sh
+          subPath: config4g-run.sh
+        - name: nf-config
+          mountPath: /free5gc/config
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      volumes:
+      - name: run-script
+        configMap:
+          name: config4g
+          defaultMode: 493
+      - name: nf-config
+        configMap:
+          name: config4g
+          defaultMode: 493
+    {{- if .Values.config.coreDump.enabled }}
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+{{- end }}

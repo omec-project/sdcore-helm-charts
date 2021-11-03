@@ -1,0 +1,40 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.config4g.deploy }}
+
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- $config4gcfg := index .Values.config.config4g.cfgFiles "webuicfg.conf" }}
+{{- $config := index $config4gcfg "configuration" }}
+
+{{- if not (hasKey $config4gcfg "logger") -}}
+{{- $_ := .Values.config.logger | set $config4gcfg "logger" -}}
+{{- end }}
+
+{{- if not (hasKey $config "managedByConfigPod") -}}
+{{- $_ := .Values.config.managedByConfigPod | set $config "managedByConfigPod" -}}
+{{- end }}
+
+
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config4g
+  labels:
+{{ tuple "config4g" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+data:
+  config4g-run.sh: |
+{{ tuple "bin/_config4g-run.sh.tpl" . | include "omec-control-plane.template" | indent 4 }}
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- range $key, $value := .Values.config.config4g.cfgFiles }}
+  {{ $key }}: |-
+{{ toYaml $value | indent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,594 @@
+# Copyright 2018 Intel Corporation
+# Copyright 2018-present Open Networking Foundation
+#
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+
+images:
+  tags:
+    init: registry.aetherproject.org/tools/busybox:stable
+    depCheck: quay.io/stackanetes/kubernetes-entrypoint:v0.3.1
+    hssdb: registry.aetherproject.org/proxy/omecproject/c3po-hssdb:master-771c0c3
+    hss: registry.aetherproject.org/proxy/omecproject/c3po-hss:master-771c0c3
+    mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-5f0a821
+    spgwc: registry.aetherproject.org/omecproject/spgw:master-86f31e4
+    pcrf: registry.aetherproject.org/proxy/omecproject/c3po-pcrf:pcrf-b29af70
+    pcrfdb: registry.aetherproject.org/proxy/omecproject/c3po-pcrfdb:pcrf-b29af70
+    config4g: registry.aetherproject.org/omecproject/5gc-webui:onf-release3.0.5-0534804
+  pullPolicy: IfNotPresent
+  # Secrets must be manually created in the namespace.
+  pullSecrets:
+    - name: aether.registry
+
+nodeSelectors:
+  enabled: false
+  hss:
+    label: omec-cp
+    value: enabled
+  pcrf:
+    label: omec-cp
+    value: enabled
+  mme:
+    label: omec-cp
+    value: enabled
+  spgwc:
+    label: omec-cp
+    value: enabled
+  config4g:
+    label: omec-cp
+    value: enabled
+
+resources:
+  enabled: true
+  pcrf:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  hss:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  mme:
+    # Note that MME pod is composed of 4 containers
+    # Provide resources for a container, not a pod total
+    requests:
+      cpu: 0.5
+      memory: 1Gi
+    limits:
+      cpu: 0.5
+      memory: 1Gi
+  spgwc:
+    requests:
+      cpu: 2
+      memory: 5Gi
+    limits:
+      cpu: 2
+      memory: 5Gi
+  config4g:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+cassandra:
+  deploy: true
+  fullnameOverride: cassandra
+  image:
+    tag: 2.1.20
+  #selector:
+  #  nodeSelector:
+  #    cassandra: enabled
+  persistence:
+    enabled: false
+  config:
+    #cluster_size: 1
+    #seed_size: 1
+    endpoint_snitch: GossipingPropertyFileSnitch
+  readinessProbe:
+    initialDelaySeconds: 10
+  resources: {}
+    #requests:
+    #  memory: 4Gi
+    #  cpu: 2
+    #limits:
+    #  memory: 4Gi
+    #  cpu: 2
+
+config:
+  clusterDomain: cluster.local
+  coreDump:
+    enabled: true
+    path: /tmp/coredump
+  managedByConfigPod:      # config comes from helm by default, if enabled true, then discard
+    enabled: false         # helm chart config and use the config from config Pod
+  useExistingConfigMap: false
+  logger:
+    WEBUI:
+      debugLevel: info
+      ReportCaller: false
+  config4g:
+    deploy: false
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    prometheus:
+      port: 9089
+      nodePort:
+        enabled: false
+        port: 30084
+    urlport:
+      port: 5000
+      nodePort:
+        enabled: false
+        port: 35000
+    ingress:
+      enabled: false
+      hostname: free5gc.local
+      path: /
+      pathType: Prefix
+    cfgFiles:
+      webuicfg.conf:
+        info:
+          version: 1.0.0
+          description: WebUI initial local configuration
+        configuration:
+          endpoints:
+            - type: spgw
+              configPushUrl: "http://spgwc:8080/v1/config"
+              configCheckUrl: "http://spgwc:8080/v1/config-check"
+            #- type: mmeapp
+            #  configPushUrl: "http://mme-app-config:8080/v1/config/slice"
+            #  configCheckUrl: "http://mme-app-config:8080/v1/config-check"
+            - type: mme-s1ap
+              configPushUrl: "http://mme:8081/v1/config/slice"
+              configCheckUrl: "http://mme:8081/v1/config-check"
+            - type: hss
+              configPushUrl: "http://hss:8080/v2/config/imsis"
+              configCheckUrl: "http://hss:8080/v2/config-check"
+            - type: pcrf
+              configPushUrl: "http://pcrf:8080/v1/config/policies"
+              configCheckUrl: "http://pcrf:8080/v1/config-check"
+  pcrf:
+    deploy: true
+    podAnnotations:
+      fluentbit.io/parser: pcrf
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    pcrfdb: cassandra
+    configPort:
+      port: 8080
+      nodePort:
+        enabled: false
+        port: 30081
+    gx:
+      nodePort:
+        enabled: false
+        port: 33868
+    prometheus:
+      port: 9089
+      nodePort:
+        enabled: false
+        port: 30086
+    # Provide the peer whitelist extension
+    # The peer name must be a fqdn. We allow also a special "*" character as the
+    # first label of the fqdn, to allow all fqdn with the same domain name.
+    # Example: *.example.net will allow host1.example.net and host2.example.net
+    acl:
+      oldTls: "*.cluster.local"
+      #ipSec:
+    bootstrap:
+      enabled: false
+    # See https://github.com/omec-project/c3po for details of config options
+    cfgFiles:
+      subscriber_mapping.json:
+        Policies:
+          service-groups:
+            internet:
+              default-activate-service:
+              - be-internet-access
+          services:
+            be-internet-access:
+              qci: 9
+              arp: 1
+              AMBR_UL: 1024000
+              AMBR_DL: 10240000
+              service-activation-rules:
+              - best-effort-internet-access
+              #activate-conditions:
+              #  timer: 50
+              #deactivate-conditions:
+              #  timer: 60
+          rules:
+            best-effort-internet-access:
+              definition:
+                Charging-Rule-Name: "best-effort-internet-access"
+                Flow-Status: 2
+                QoS-Information:
+                  QoS-Class-Identifier: 9
+                  Max-Requested-Bandwidth-UL: 512000
+                  Max-Requested-Bandwidth-DL: 5120000
+                  Guaranteed-Bitrate-UL: 0
+                  Guaranteed-Bitrate-DL: 0
+                  Allocation-Retention-Priority:
+                    Priority-Level: 1
+                    Pre-emption-Capability: 1
+                    Pre-emption-Vulnerability: 1
+                Flow-Information:
+                  Flow-Direction: 3
+                  Flow-Description: "permit out ip from 0.0.0.0/0 to assigned"
+      pcrf.json:
+        common:
+          fdcfg: conf/pcrf.conf
+          # Origin host and realm will be set automatically if unset
+          #originhost: ""
+          #originrealm: ""
+        pcrf:
+          gtwhost: "*"
+          gtwport: 9080
+          #restport will be set by configmap
+          #restport: ""
+          ossport: 9082
+          # casssrv will be set to cassandra in the same cluster if unset
+          #casssrv: ""
+          casskeyspace: vpcrf
+          casshost: "cassandra"
+          cassusr: root
+          casspwd: root
+          cassdb: vpcrf
+          casscoreconnections: 2
+          cassmaxconnections: 8
+          cassioqueuesize: 32768
+          cassiothreads: 2
+          randv: true
+          optkey: "63bfa50ee6523365ff14c1f45f88737d"
+          reloadkey: false
+          logsize: 20
+          lognumber: 5
+          logname: logs/pcrf.log
+          logqsize: 8192
+          statlogsize: 20
+          statlognumber: 5
+          statlogname: logs/pcrf_stat.log
+          auditlogsize: 20
+          auditlognumber: 5
+          auditlogname: logs/pcrf_audit.log
+          statfreq: 2000
+          numworkers: 4
+          concurrent: 10
+          ossfile: conf/oss.json
+          verifyroamingsubscribers: false
+          rulesfile: conf/subscriber_mapping.json
+      oss.json:
+        option:
+          id: url
+          type: string
+        services:
+          - id: logger
+            commands:
+              - id: describe_loggers
+              - id: set_logger_level
+                options:
+                  - id: name
+                    type: string
+                  - id: level
+                    type: integer
+          - id: stats
+            commands:
+              - id: describe_stats_frequency
+              - id: describe_stats_live
+              - id: set_stats_frequency
+                options:
+                  - id: frequency
+                    type: integer
+  hss:
+    deploy: true
+    podAnnotations:
+      fluentbit.io/parser: hss
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    hssdb: cassandra
+    s6a:
+      nodePort:
+        enabled: false
+        port: 33868
+    configPort:
+      port: 8080
+      nodePort:
+        enabled: false
+        port: 30081
+    prometheus:
+      port: 9089
+      nodePort:
+        enabled: false
+        port: 30086
+    # Provide the peer whitelist extension
+    # The peer name must be a fqdn. We allow also a special "*" character as the
+    # first label of the fqdn, to allow all fqdn with the same domain name.
+    # Example: *.example.net will allow host1.example.net and host2.example.net
+    acl:
+      oldTls: "*.cluster.local"
+      #ipSec:
+    bootstrap:
+      enabled: true
+      users:
+        - apn: internet
+          key: "465b5ce8b199b49faa5f0a2ee238a6bc"
+          opc: "d4416644f6154936193433dd20a0ace0"
+          sqn: 96
+          imsiStart: "208014567891200"
+          msisdnStart: "1122334455"
+          mme_identity: mme.omec.svc.cluster.local
+          mme_realm: omec.svc.cluster.local
+          count: 10
+      staticusers:
+        - apn: internet
+          key: "465b5ce8b199b49faa5f0a2ee238a6bc"
+          opc: "d4416644f6154936193433dd20a0ace0"
+          sqn: 96
+          imsi: "208014567891200"
+          msisdn: "1122334455"
+          staticAddr: 0.0.0.0
+          mme_identity: mme.omec.svc.cluster.local
+          mme_realm: omec.svc.cluster.local
+      mmes:
+        - id: 1
+          mme_identity: mme.omec.svc.cluster.local
+          mme_realm: omec.svc.cluster.local
+          isdn: "19136246000"
+          unreachability: 1
+    # See https://github.com/omec-project/c3po for details of config options
+    cfgFiles:
+      hss.json:
+        common:
+          fdcfg: conf/hss.conf
+          # Origin host and realm will be set automatically if unset
+          #originhost: ""
+          #originrealm: ""
+        hss:
+          gtwhost: "*"
+          gtwport: 9080
+          #restport will be set by configmap
+          #restport: ""
+          ossport: 9082
+          # casssrv will be set to cassandra in the same cluster if unset
+          #casssrv: ""
+          cassusr: root
+          casspwd: root
+          cassdb: vhss
+          casscoreconnections: 2
+          cassmaxconnections: 8
+          cassioqueuesize: 32768
+          cassiothreads: 2
+          randv: true
+          optkey: "63bfa50ee6523365ff14c1f45f88737d"
+          reloadkey: false
+          logsize: 20
+          lognumber: 5
+          logname: logs/hss.log
+          logqsize: 8192
+          statlogsize: 20
+          statlognumber: 5
+          statlogname: logs/hss_stat.log
+          auditlogsize: 20
+          auditlognumber: 5
+          auditlogname: logs/hss_audit.log
+          statfreq: 2000
+          numworkers: 4
+          concurrent: 10
+          ossfile: conf/oss.json
+          verifyroamingsubscribers: false
+      oss.json:
+        option:
+          id: url
+          type: string
+        services:
+          - id: logger
+            commands:
+              - id: describe_loggers
+              - id: set_logger_level
+                options:
+                  - id: name
+                    type: string
+                  - id: level
+                    type: integer
+          - id: stats
+            commands:
+              - id: describe_stats_frequency
+              - id: describe_stats_live
+              - id: set_stats_frequency
+                options:
+                  - id: frequency
+                    type: integer
+  mme:
+    deploy: true
+    podAnnotations:
+      fluentbit.io/parser: mme
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":3081,"schema":"HTTP"}]'
+    spgwAddr: spgwc
+    s11:
+      nodePort:
+        enabled: false
+        port: 32124
+    s6a:
+      nodePort:
+        enabled: false
+        port: 33869
+    prometheus:
+      port: 3081
+      nodePort:
+        enabled: false
+        port: 30085
+    # See https://github.com/omec-project/openmme/blob/master/README.txt for more config options
+    cfgFiles:
+      config.json:
+        mme:
+          name: vmmestandalone
+          group_id: 1
+          code: 1
+          logging: debug
+          plmnlist:
+            #plmn1 is aether common plmn, plmn2 is for aether-in-a-box
+            plmn1: "mcc=315,mnc=010"
+            plmn2: "mcc=208,mnc=01"
+          apnlist:
+            internet: "spgwc"
+            default: "spgwc" #default spgwc to be used
+          feature_list:
+            dcnr_support: "disabled"
+          security:
+            #int_alg_list: "[EIA0]"
+            int_alg_list: "[EIA1, EIA2, EIA0]"
+            sec_alg_list: "[EEA0, EEA1, EEA2]"
+        s1ap:
+          sctp_port: 36412
+          sctp_port_external: 36412
+        s11:
+          egtp_default_port: 2123
+          # sgw_addr and pgw_addr will be set dynamically if unset
+          #sgw_addr:
+          #pgw_addr:
+        s6a:
+          host_type: freediameter
+          # host and realm will be set dynamically if unset
+          #host:
+          #realm:
+  spgwc:
+    deploy: true
+    managedByRoc:
+      enabled: false
+      syncUrl: ""
+    podAnnotations:
+      fluentbit.io/parser: spgwc
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    s11:
+      port: 2123
+      nodePort:
+        enabled: false
+        port: 32123
+    n4:
+      port: 8805
+      nodePort:
+        enabled: false
+        port: 30021
+    prometheus:
+      port: 9089
+      nodePort:
+        enabled: false
+        port: 30084
+    rest:
+      port: 8080
+      nodePort:
+        enabled: false
+        port: 30080
+    cfgFiles:
+      cp.json:
+        global:
+          transmitTimerSec: 2
+          periodicTimerSec: 10
+          transmitCount: 5
+          requestTimeoutMilliSec: 5000
+          requestTries: 3
+          gxConfig: 0
+          urrConfig: 0
+          loggingLevel: "LOG_DEBUG"
+          heartbeatFailure: false
+        #DNS Server - 3gpp compliant DNS server
+        dns:
+          cache:
+            concurrent: 25
+            percentage: 80
+            intervalSec: 60
+            queryTimeoutMilliSec: 1000
+            queryTries: 1
+          app:
+            frequencySec: 3
+            filename: "appqueries.json"
+            nameserver: "127.0.0.1"
+          ops:
+            frequencySec: 3
+            filename: "opsqueries.json"
+            nameserver: "127.0.0.1"
+        ip_pool_config:
+          ueIpPool:
+            ip: "10.250.0.0"
+            mask: "255.255.0.0"
+          staticUeIpPool:
+            ip: "10.249.1.0"
+            mask: "255.255.255.0"
+      config.json:
+        gx:
+          host_type: freediameter
+          # host and realm will be set dynamically if unset
+          #host:
+          #realm:
+      subscriber_mapping.json:
+        subscriber-selection-rules:
+          - priority: 5
+            keys:
+              serving-plmn:
+                mcc: 208
+                mnc: 10
+                tac: 1
+              imsi-range:
+                from: 200000000000000
+                to: 299999999999999
+            selected-apn-profile: apn-profile1
+            selected-qos-profile: qos-profile1
+            selected-access-profile:
+              - access-all
+            selected-user-plane-profile: user-plane1
+          - priority: 10
+            keys:
+              match-all: true
+            selected-apn-profile: apn-profile1
+            selected-qos-profile: qos-profile1
+            selected-access-profile:
+              - access-all
+            selected-user-plane-profile: user-plane1
+        apn-profiles:
+          apn-profile1:
+            apn-name: internet
+            usage: 1
+            network: lbo
+            gx_enabled: true
+            dns_primary: 8.8.8.4
+            dns_secondary: 8.8.8.8
+            mtu: 1460
+        user-plane-profiles:
+          user-plane1:
+            user-plane: upf
+            global-address: true
+            qos-tags:
+              tag1: BW
+            access-tags:
+              tag1: ACC
+        qos-profiles:
+          mobile:
+            qci: 9
+            arp: 1
+            apn-ambr:
+              - 12345678
+              - 12345678
+        access-profiles:
+          access-all:
+            type: allow-all
+          internet-only:
+            type: internet-only
+            filter: No_private_network
+          intranet-only:
+            type: intranet-only
+            filter: only_private_network
+          apps-only:
+            type: specific-network
+            filter: only_apps_network
+          specific-app:
+            type: specific-destination-only
+            filter: allow-app-name
+          excluding-app:
+            type: excluding-this-app
+            filter: exclude-app-name

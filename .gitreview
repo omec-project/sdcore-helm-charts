@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2020 Open Networking Foundation <info@opennetworking.org>
+#
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+
+[gerrit]
+host=gerrit.opencord.org
+port=29418
+project=sdcore-helm-charts.git
+defaultremote=origin

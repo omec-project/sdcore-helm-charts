@@ -1,0 +1,28 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.nssf.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nssf
+  labels:
+{{ tuple "nssf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  type: {{ .Values.config.nssf.serviceType }}
+  selector:
+{{ tuple "nssf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+  ports:
+  - name: sbi
+    port: {{ .Values.config.nssf.sbi.port }}
+    protocol: TCP
+{{- if eq .Values.config.nssf.serviceType "NodePort" }}
+{{- if .Values.config.nssf.sbi.nodePort }}
+    nodePort: {{ .Values.config.nssf.sbi.nodePort }}
+{{- end }}
+{{- end }}
+{{- end }}

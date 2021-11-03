@@ -1,0 +1,124 @@
+# Copyright 2020-present Open Networking Foundation
+#
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+
+images:
+  tags:
+    init: docker.io/omecproject/pod-init:1.0.0
+    simapp: "registry.aetherproject.org/omecproject/simapp:main-bff796a"
+  pullPolicy: IfNotPresent
+  # Optionally specify an array of imagePullSecrets.
+  # Secrets must be manually created in the namespace.
+  pullSecrets:
+    - name: aether.registry
+
+resources:
+  enabled: false
+  simapp:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+config:
+  coreDump:
+    enabled: false
+    path: /tmp/coredump
+  simapp:
+    deploy: true
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    prometheus:
+      port: 9089
+      nodePort:
+        enabled: false
+        port: 30080
+    config:
+      port: 8080
+      nodePort:
+        enabled: false
+        port: 30081
+    cfgFiles:
+      simapp.yaml:
+        info:
+          version: 1.0.0
+          description: SIMAPP initial local configuration
+        logger:
+          # network function
+          APP:
+            debugLevel: info
+            ReportCaller: false
+        configuration:
+          provision-network-slice: false
+          subscribers:
+          - ueId-start: 208014567891201 #4G User for aiab setup
+            ueId-end: 208014567891201
+            plmnId: 20893
+            opc: d4416644f6154936193433dd20a0ace0
+            key: 465b5ce8b199b49faa5f0a2ee238a6bc
+            sequenceNumber: 96
+          - ueId-start: 123456789123458
+            ueId-end: 123456789123458
+            plmnId: 20893
+            opc: 8e27b6af0e692e750f32667a3b14605d
+            key: 8baf473f2f8fd09487cccbd7097c6862
+            sequenceNumber: 16f3b3f70fc2
+          - ueId-start: 123456789123460
+            ueId-end: 123456789123465
+            plmnId: 20893
+            opc: 8e27b6af0e692e750f32667a3b14605d
+            key: 8baf473f2f8fd09487cccbd7097c6862
+            sequenceNumber: 16f3b3f70fc2
+          sub-provision-endpt:
+            addr: webui
+            port: 5000
+          device-groups:
+          - name:  "iot-camera"
+            imsis:
+              - "123456789123458"
+              - "208014567891201"
+            ip-domain-name: "pool1"
+            ip-domain-expanded:
+              dnn: internet
+              dns-primary: "8.8.8.8"
+              mtu: 1460
+              ue-ip-pool: "10.91.0.0/16"
+              ue-dnn-qos:
+                uplink: 2000000
+                downlink: 8000000
+                traffic-class:
+                  name: "gold"
+                  qci: 9
+                  arp: 6
+            site-info: "menlo"
+          network-slices:
+          - name: "slice1"
+            slice-id:
+              sd: 65565
+              sst: 255
+            site-device-group: 
+            - "iot-camera"
+            applications-information:
+            - app-name: "iot-app"
+              end-port: 40000
+              endpoint: "1.1.1.1/32"
+              protocol: 17
+              start-port: 40000
+            deny-applications:
+            - "iot-app-deny"
+            permit-applications:
+            - "iot-app1-permit"
+            - "iot-app2-permit"
+            site-info:
+              gNodeBs:
+              - name: "menlo-gnb1"
+                tac: 1
+              plmn:
+                mcc: "315"
+                mnc: "010"
+              site-name: "menlo"
+              upf:
+                upf-name: "upf"
+                upf-port: 8805

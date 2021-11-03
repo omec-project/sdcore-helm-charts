@@ -1,0 +1,97 @@
+{{/*
+# Copyright 2019-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+
+Default values for mcord-vepc-helm.
+This is a YAML-formatted file.
+Declare variables to be passed into your templates.
+*/}}
+
+{{- if .Values.config.hss.deploy }}
+{{ tuple "hss" . | include "omec-control-plane.service_account" }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hss
+  labels:
+{{ tuple "hss" . | include "omec-control-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: 1
+  serviceName: hss-headless
+  selector:
+    matchLabels:
+{{ tuple "hss" . | include "omec-control-plane.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "hss" . | include "omec-control-plane.metadata_labels" | indent 8 }}
+    {{- with .Values.config.hss.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    spec:
+    {{- if .Values.nodeSelectors.enabled }}
+      nodeSelector:
+        {{ .Values.nodeSelectors.hss.label }}: {{ .Values.nodeSelectors.hss.value }}
+    {{- end }}
+      serviceAccountName: hss
+    {{- if hasKey .Values.images "pullSecrets" }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecrets | indent 8 }}
+    {{- end }}
+      initContainers:
+      - name: hss-bootstrap
+        image: {{ .Values.images.tags.hssdb }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        command: ["/opt/c3po/hss/scripts/hss-bootstrap.sh"]
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/c3po/hss/scripts
+    {{- if .Values.config.coreDump.enabled }}
+{{ tuple "hss" . | include "omec-control-plane.coredump_init" | indent 6 }}
+    {{- end }}
+      containers:
+      - name: hss
+        image: {{ .Values.images.tags.hss }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+      {{- end }}
+        stdin: true
+        tty: true
+        command: ["bash", "-c", "/opt/c3po/hss/scripts/hss-run.sh; sleep 3600"]
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.hss | indent 10 }}
+      {{- end }}
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/c3po/hss/scripts
+        - name: configs
+          mountPath: /etc/hss/conf
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      volumes:
+      - name: scripts
+        configMap:
+          name: hss-scripts
+          defaultMode: 493
+      - name: configs
+        configMap:
+          name: hss-configs
+          defaultMode: 420
+    {{- if .Values.config.coreDump.enabled }}
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,21 @@
+{{- /*
+
+# Copyright 2018 Intel Corporation
+# Copyright 2018-present Open Networking Foundation
+#
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+
+*/ -}}
+
+This is the instruction to configure your eNodeB to work with ONF M-CORD. You can find architecture illustration in assets/mcord-architecture.png.
+
+1. Configure eNodeB with the correct MME information.
+    export MMEIP=[node IP]
+    export MMEPORT="36412"
+
+    You can change MMEPORT by overriding "Values.config.mme.s1ap.sctp_port_external".
+
+2. Make sure UE's SIM card information is configured in hss.yaml.
+
+3. Attach UE to OMEC.
