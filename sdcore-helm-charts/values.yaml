@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2021-present Open Networking Foundation <info@opennetworking.org>
+#
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+
+# Default values for all SD-CORE Helm charts.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+#Images tagged for the release
+omec-control-plane:
+  enable4G: false
+  #images:
+  #  tags:
+      #4G control Plane images
+  #config:
+  #  config4g:
+  #    deploy: true
+
+omec-user-plane:
+  enable: true
+  #images:
+  #  tags:
+      #4G/5G user plane images
+  #config:
+  #  upf:
+  #    cfgFiles:
+  #      upf.json:
+  #        cpiface:
+
+omec-sub-provision:
+  enable: true
+  #images:
+  #  tags:
+
+5g-control-plane:
+  enable5G: true
+  #images:
+  #  tags:
+      #5G NF images
