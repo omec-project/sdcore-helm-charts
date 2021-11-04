@@ -8,7 +8,7 @@ description: Free5G control plane services
 name: 5g-control-plane
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 0.3.14
+version: 0.4.0
 
 dependencies:
   - name: mongodb

@@ -10,4 +10,4 @@ description: OMEC control plane services
 name: omec-control-plane
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 0.7.14
+version: 0.8.0
