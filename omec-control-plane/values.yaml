@@ -10,7 +10,7 @@ images:
     depCheck: quay.io/stackanetes/kubernetes-entrypoint:v0.3.1
     hssdb: registry.aetherproject.org/proxy/omecproject/c3po-hssdb:master-771c0c3
     hss: registry.aetherproject.org/proxy/omecproject/c3po-hss:master-771c0c3
-    mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-3142d86
+    mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-05a8a58
     spgwc: registry.aetherproject.org/omecproject/spgw:master-062f264
     pcrf: registry.aetherproject.org/proxy/omecproject/c3po-pcrf:pcrf-1f89f48
     pcrfdb: registry.aetherproject.org/proxy/omecproject/c3po-pcrfdb:pcrf-1f89f48
@@ -493,26 +493,10 @@ config:
           transmitCount: 5
           requestTimeoutMilliSec: 5000
           requestTries: 3
-          gxConfig: 0
+          gxConfig: 1
           urrConfig: 0
           loggingLevel: "LOG_DEBUG"
-          heartbeatFailure: false
-        #DNS Server - 3gpp compliant DNS server
-        dns:
-          cache:
-            concurrent: 25
-            percentage: 80
-            intervalSec: 60
-            queryTimeoutMilliSec: 1000
-            queryTries: 1
-          app:
-            frequencySec: 3
-            filename: "appqueries.json"
-            nameserver: "127.0.0.1"
-          ops:
-            frequencySec: 3
-            filename: "opsqueries.json"
-            nameserver: "127.0.0.1"
+          heartbeatFailure: true
         ip_pool_config:
           ueIpPool:
             ip: "10.250.0.0"

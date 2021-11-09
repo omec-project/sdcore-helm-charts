@@ -5,7 +5,7 @@
 images:
   tags:
     init: docker.io/omecproject/pod-init:1.0.0
-    amf: registry.aetherproject.org/omecproject/5gc-amf:onf-release3.0.5-03d3c6d
+    amf: registry.aetherproject.org/omecproject/5gc-amf:onf-release3.0.5-236ec6e
     nrf: registry.aetherproject.org/omecproject/5gc-nrf:onf-release3.0.5-13304e8
     smf: registry.aetherproject.org/omecproject/5gc-smf:onf-release3.0.5-46da14d
     ausf: registry.aetherproject.org/omecproject/5gc-ausf:onf-release3.0.5-be7d4ac
