@@ -11,7 +11,7 @@ images:
     hssdb: registry.aetherproject.org/proxy/omecproject/c3po-hssdb:master-771c0c3
     hss: registry.aetherproject.org/proxy/omecproject/c3po-hss:master-771c0c3
     mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-ffd26e7
-    spgwc: registry.aetherproject.org/omecproject/spgw:master-062f264
+    spgwc: registry.aetherproject.org/omecproject/spgw:master-83b086d
     pcrf: registry.aetherproject.org/proxy/omecproject/c3po-pcrf:pcrf-1f89f48
     pcrfdb: registry.aetherproject.org/proxy/omecproject/c3po-pcrfdb:pcrf-1f89f48
     config4g: registry.aetherproject.org/omecproject/5gc-webui:onf-release3.0.5-d9b3c1b
