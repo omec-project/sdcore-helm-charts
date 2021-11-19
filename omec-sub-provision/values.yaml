@@ -86,12 +86,15 @@ config:
               mtu: 1460
               ue-ip-pool: "10.91.0.0/16"
               ue-dnn-qos:
-                uplink: 2000000
-                downlink: 8000000
+                dnn-mbr-downlink: 5000000
+                dnn-mbr-uplink: 2000000
+                bitrate-unit: bps
                 traffic-class:
                   name: "gold"
                   qci: 9
                   arp: 6
+                  pdb: 300
+                  pelr: 6
             site-info: "menlo"
           network-slices:
           - name: "slice1"
