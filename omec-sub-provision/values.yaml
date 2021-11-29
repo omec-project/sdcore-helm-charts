@@ -5,7 +5,7 @@
 images:
   tags:
     init: docker.io/omecproject/pod-init:1.0.0
-    simapp: "registry.aetherproject.org/omecproject/simapp:main-a6841f5"
+    simapp: "registry.aetherproject.org/omecproject/simapp:main-329c82d"
   pullPolicy: IfNotPresent
   # Optionally specify an array of imagePullSecrets.
   # Secrets must be manually created in the namespace.
@@ -45,6 +45,7 @@ config:
         info:
           version: 1.0.0
           description: SIMAPP initial local configuration
+          http-version: 1
         logger:
           # network function
           APP:

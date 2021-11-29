@@ -11,10 +11,10 @@ images:
     hssdb: registry.aetherproject.org/proxy/omecproject/c3po-hssdb:master-771c0c3
     hss: registry.aetherproject.org/proxy/omecproject/c3po-hss:master-771c0c3
     mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-ffd26e7
-    spgwc: registry.aetherproject.org/omecproject/spgw:master-8ba127f
+    spgwc: registry.aetherproject.org/omecproject/spgw:master-fa933db
     pcrf: registry.aetherproject.org/proxy/omecproject/c3po-pcrf:pcrf-16bdea2
     pcrfdb: registry.aetherproject.org/proxy/omecproject/c3po-pcrfdb:pcrf-16bdea2
-    config4g: registry.aetherproject.org/omecproject/5gc-webui:onf-release3.0.5-3cd0e81
+    config4g: registry.aetherproject.org/omecproject/5gc-webui:onf-release3.0.5-fb80f40
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.
   pullSecrets:
