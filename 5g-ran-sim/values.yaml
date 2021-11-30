@@ -5,7 +5,7 @@
 images:
   tags:
     init: docker.io/omecproject/pod-init:1.0.0
-    gnbsim: registry.aetherproject.org/omecproject/5gc-gnbsim:dev-new-gnbsim-5f0cac4
+    gnbsim: registry.aetherproject.org/omecproject/5gc-gnbsim:dev-new-gnbsim-37d5cb4
     depCheck: quay.io/stackanetes/kubernetes-entrypoint:v0.3.1
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.
@@ -59,12 +59,27 @@ config:
               n3IpAddr: 192.168.251.5 # gNB N3 interface IP address used to connect to UPF
               n3Port: 2152 # gNB N3 Port used to connect to UPF
               name: gnb1 # gNB name that uniquely identify a gNB within application
-              gnbId: 000102 # gNB identifier (3 bytes hex string, range: 000000~FFFFFF)
-              tac: 000001 # Tracking Area Code (3 bytes hex string, range: 000000~FFFFFF)
+              globalRanId:
+                plmnId:
+                  mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+                  mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+                gNbId: 
+                  bitLength: 24
+                  gNBValue: 000102 # gNB identifier (3 bytes hex string, range: 000000~FFFFFF)
+              supportedTaList:
+              - tac: 000001 # Tracking Area Code (3 bytes hex string, range: 000000~FFFFFF)
+                broadcastPlmnList:
+                  - plmnId:
+                      mcc: 208 
+                      mnc: 93
+                    taiSliceSupportList:
+                        - sst: 1 # Slice/Service Type (uinteger, range: 0~255)
+                          sd: 010203 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
               defaultAmf:
                 hostName: amf # Host name of AMF
                 ipAddr: # AMF IP address
                 port: 38412 # AMF port
+ 
           profiles: # profile information
             - profileType: register # profile type
               profileName: profile1 # uniqely identifies a profile within application
@@ -92,7 +107,7 @@ config:
               startImsi: 2089300007497
               ueCount: 5
               plmnId:
-              mcc: 208
-              mnc: 93
+                mcc: 208
+                mnc: 93
         logger:
           logLevel: info # how detailed the log will be, values: trace, debug, info, warn, error, fatal, panic 
