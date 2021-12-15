@@ -10,8 +10,8 @@ images:
     depCheck: quay.io/stackanetes/kubernetes-entrypoint:v0.3.1
     hssdb: registry.aetherproject.org/proxy/omecproject/c3po-hssdb:master-771c0c3
     hss: registry.aetherproject.org/proxy/omecproject/c3po-hss:master-771c0c3
-    mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-1225da6
-    spgwc: registry.aetherproject.org/omecproject/spgw:master-282dc78
+    mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-ccdbf69
+    spgwc: registry.aetherproject.org/omecproject/spgw:master-144bd86
     pcrf: registry.aetherproject.org/proxy/omecproject/c3po-pcrf:pcrf-a6bdc3d
     pcrfdb: registry.aetherproject.org/proxy/omecproject/c3po-pcrfdb:pcrf-a6bdc3d
     config4g: registry.aetherproject.org/omecproject/5gc-webui:onf-release3.0.5-e29f159
@@ -104,6 +104,8 @@ cassandra:
 
 config:
   clusterDomain: cluster.local
+  valgrind:
+    enabled: false
   coreDump:
     enabled: true
     path: /tmp/coredump

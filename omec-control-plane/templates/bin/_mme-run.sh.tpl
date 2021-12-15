@@ -27,7 +27,11 @@ case $APPLICATION in
       echo "Starting s1ap-app"
       echo "conf/s1ap.json"
       cat conf/s1ap.json
+      {{- if .Values.config.valgrind.enabled }}
+      valgrind --log-file=/bin/valgrind_output_s1ap.txt --tool=memcheck -v --leak-check=full --show-leak-kinds=all ./bin/s1ap-app
+      {{- else }}
       ./bin/s1ap-app
+      {{- end }}
       ;;
     "s6a-app")
       echo "Starting s6a-app"
