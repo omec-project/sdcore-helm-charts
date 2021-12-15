@@ -1,0 +1,85 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+*/}}
+
+{{- if .Values.config.dbtestapp.deploy }}
+{{ tuple "dbtestapp" . | include "5g-test-apps.service_account" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbtestapp
+  labels:
+{{ tuple "dbtestapp" . | include "5g-test-apps.metadata_labels" | indent 4 }}
+spec:
+  replicas: {{ .Values.config.dbtestapp.replica }}
+  #serviceName: dbtestapp-headless
+  selector:
+    matchLabels:
+{{ tuple "dbtestapp" . | include "5g-test-apps.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "dbtestapp" . | include "5g-test-apps.metadata_labels" | indent 8 }}
+    {{- with .Values.config.dbtestapp.podAnnotations }}
+      annotations:
+        helm.sh/hook: pre-install
+        helm.sh/hook-weight: "5"
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    spec:
+      serviceAccountName: dbtestapp
+    {{- if hasKey .Values.images "pullSecrets" }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecrets | indent 8 }}
+    {{- end }}
+      containers:
+      - name: dbtestapp
+        image: {{ .Values.images.tags.dbtestapp }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          runAsUser: 0
+      {{- end }}
+        stdin: true
+        tty: true
+        command: ["/dbtestapp/script/dbtestapp-run.sh"]
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.dbtestapp | indent 10 }}
+      {{- end }}
+        volumeMounts:
+        - name: run-script
+          mountPath: /dbtestapp/script/dbtestapp-run.sh
+          subPath: dbtestapp-run.sh
+        - name: nf-config
+          mountPath: /dbtestapp/config
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      volumes:
+      - name: run-script
+        configMap:
+          name: dbtestapp
+          defaultMode: 493
+      - name: nf-config
+        configMap:
+          name: dbtestapp
+          defaultMode: 493
+    {{- if .Values.config.coreDump.enabled }}
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+{{- end }}

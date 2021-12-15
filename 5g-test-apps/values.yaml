@@ -1,0 +1,31 @@
+# Copyright 2020-present Open Networking Foundation
+#
+# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+
+images:
+  tags:
+    init: docker.io/omecproject/pod-init:1.0.0
+    dbtestapp: "dbtestapp:osman1"
+  pullPolicy: IfNotPresent
+  # Optionally specify an array of imagePullSecrets.
+  # Secrets must be manually created in the namespace.
+  pullSecrets:
+    - name: aether.registry
+
+resources:
+  enabled: false
+  dbtestapp:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+config:
+  coreDump:
+    enabled: false
+    path: /tmp/coredump
+  dbtestapp:
+    deploy: true
+    replica: 1
