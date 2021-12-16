@@ -8,4 +8,4 @@ description: This is the dbtestapp
 name: 5g-test-apps
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 0.0.1
+version: 0.1.0
