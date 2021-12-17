@@ -5,8 +5,7 @@
 images:
   tags:
     init: docker.io/omecproject/pod-init:1.0.0
-    gnbsim: registry.aetherproject.org/omecproject/5gc-gnbsim:dev-new-gnbsim-37d5cb4
-    depCheck: quay.io/stackanetes/kubernetes-entrypoint:v0.3.1
+    gnbsim: registry.aetherproject.org/omecproject/5gc-gnbsim:dev-new-gnbsim-025ae2b
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.
   pullSecrets:
@@ -100,8 +99,17 @@ config:
                 mcc: 208
                 mnc: 93
               dataPktCount: 5 # Number of UL user data packets to be transmitted. Common for all UEs
-            - profileType: deregister
+            - profileType: anrelease
               profileName: profile3
+              enable: false
+              gnbName: gnb1
+              startImsi: 2089300007497
+              ueCount: 5
+              plmnId:
+                mcc: 208
+                mnc: 93
+            - profileType: deregister
+              profileName: profile4
               enable: false
               gnbName: gnb1
               startImsi: 2089300007497
