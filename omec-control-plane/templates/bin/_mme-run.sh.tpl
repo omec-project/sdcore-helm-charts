@@ -26,9 +26,12 @@ case $APPLICATION in
     "s1ap-app")
       echo "Starting s1ap-app"
       echo "conf/s1ap.json"
+      today=`date '+%Y_%m_%d__%H_%M_%S'`;
+      filename="/tmp/valgrind_output_s1ap_$today.txt"
+      echo $filename
       cat conf/s1ap.json
       {{- if .Values.config.valgrind.enabled }}
-      valgrind --log-file=/bin/valgrind_output_s1ap.txt --tool=memcheck -v --leak-check=full --show-leak-kinds=all ./bin/s1ap-app
+      valgrind --log-file=$filename --tool=memcheck -v --leak-check=full --show-leak-kinds=all ./bin/s1ap-app
       {{- else }}
       ./bin/s1ap-app
       {{- end }}
