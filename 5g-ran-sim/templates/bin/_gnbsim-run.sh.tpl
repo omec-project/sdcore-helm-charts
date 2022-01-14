@@ -7,11 +7,10 @@
 set -xe
 
 {{- if .Values.config.coreDump.enabled }}
-cp /free5gc/amf/amf /tmp/coredump/
+cp /gnbsim/bin/gnbsim /tmp/coredump/
 {{- end }}
 
-#cat config files
-cd /free5gc
+cd /gnbsim
 cat ./config/gnb.conf
 cat /etc/hosts
 ip route add 192.168.252.0/24 via 192.168.251.1

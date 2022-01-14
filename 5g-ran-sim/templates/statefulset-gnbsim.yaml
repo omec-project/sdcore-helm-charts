@@ -84,7 +84,7 @@ spec:
           mountPath: /opt/cp/scripts/gnbsim-run.sh
           subPath: gnbsim-run.sh
         - name: cp-config
-          mountPath: /free5gc/config
+          mountPath: /gnbsim/config
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
