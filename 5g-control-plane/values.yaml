@@ -104,6 +104,7 @@ config:
     enabled: false         # helm chart config and use the config from config Pod
     syncUrl: ""            # Get the config from adapater in case control plane is down
   useExistingConfigMap: false
+  imagePath: /free5gc
   coreDump:
     enabled: false
     path: /tmp/coredump

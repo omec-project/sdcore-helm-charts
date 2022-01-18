@@ -6,11 +6,12 @@
 
 set -xe
 
+IMGPATH={{ .Values.config.imagePath }}
 {{- if .Values.config.coreDump.enabled }}
-cp /free5gc/amf/amf /tmp/coredump/
+cp $IMGPATH/amf/amf /tmp/coredump/
 {{- end }}
 
-cd /free5gc
+cd $IMGPATH
 cat config/amfcfg.conf
 
 GOTRACEBACK=crash ./amf/amf -amfcfg config/amfcfg.conf

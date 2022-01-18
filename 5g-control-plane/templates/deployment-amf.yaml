@@ -3,7 +3,6 @@
 
 # SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
 */}}
-
 {{- if .Values.config.amf.deploy }}
 {{ tuple "amf" . | include "5g-control-plane.service_account" }}
 ---
@@ -51,7 +50,7 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: ["/free5gc/script/amf-run.sh"]
+        command: [ {{ .Values.config.imagePath }}/script/amf-run.sh ]
         env:
         - name: GRPC_GO_LOG_VERBOSITY_LEVEL
           value: {{ .Values.config.grpc.golog_verbosity | quote }}
@@ -75,10 +74,10 @@ spec:
       {{- end }}
         volumeMounts:
         - name: run-script
-          mountPath: /free5gc/script/amf-run.sh
+          mountPath: {{ .Values.config.imagePath }}/script/amf-run.sh
           subPath: amf-run.sh
         - name: amf-config
-          mountPath: /free5gc/config
+          mountPath: {{ .Values.config.imagePath }}/config
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
