@@ -37,3 +37,9 @@ omec-sub-provision:
   #images:
   #  tags:
       #5G NF images
+
+5g-ran-sim:
+  enable: false
+  #images:
+  #  tags:
+      #RAN SIM image
