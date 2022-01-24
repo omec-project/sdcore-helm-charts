@@ -12,6 +12,16 @@ images:
   pullSecrets:
     - name: aether.registry
 
+mongodb:
+  deploy: true
+  fullnameOverride: mongodb
+  persistence:
+    enabled: false
+  auth:
+    enabled: false
+  serviceAccount:
+    create: false
+
 resources:
   enabled: false
   dbtestapp:
