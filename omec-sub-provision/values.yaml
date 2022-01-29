@@ -5,7 +5,7 @@
 images:
   tags:
     init: docker.io/omecproject/pod-init:1.0.0
-    simapp: "registry.aetherproject.org/omecproject/simapp:main-329c82d"
+    simapp: "registry.aetherproject.org/omecproject/simapp:main-552bbec"
   pullPolicy: IfNotPresent
   # Optionally specify an array of imagePullSecrets.
   # Secrets must be manually created in the namespace.
@@ -110,11 +110,6 @@ config:
               endpoint: "1.1.1.1/32"
               protocol: 17
               start-port: 40000
-            deny-applications:
-            - "iot-app-deny"
-            permit-applications:
-            - "iot-app1-permit"
-            - "iot-app2-permit"
             site-info:
               gNodeBs:
               - name: "menlo-gnb1"
