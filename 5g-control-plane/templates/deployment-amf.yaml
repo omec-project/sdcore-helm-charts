@@ -33,10 +33,10 @@ spec:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
       initContainers:
-      - name: wait-nrf-module
+      - name: wait-amf-module
         image: {{ .Values.images.tags.init | quote }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup nrf; do echo waiting for nrf; sleep 4; done;']
+        command: ['sh', '-c', 'until nslookup amf; do echo waiting for amf; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
 {{ tuple "amf" . | include "5g-control-plane.coredump_init" | indent 6 }}
     {{- end }}
@@ -50,7 +50,7 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: [ {{ .Values.config.imagePath }}/script/amf-run.sh ]
+        command: ["/free5gc/script/amf-run.sh", "/sdcore/script/amf-run.sh"]
         env:
         - name: GRPC_GO_LOG_VERBOSITY_LEVEL
           value: {{ .Values.config.grpc.golog_verbosity | quote }}
@@ -73,21 +73,34 @@ spec:
 {{ toYaml .Values.resources.amf | indent 10 }}
       {{- end }}
         volumeMounts:
-        - name: run-script
-          mountPath: {{ .Values.config.imagePath }}/script/amf-run.sh
+        - name: run-script-tmp
+          mountPath: /free5gc/script/amf-run.sh
           subPath: amf-run.sh
-        - name: amf-config
-          mountPath: {{ .Values.config.imagePath }}/config
+        - name: nf-config-tmp
+          mountPath: /free5gc/config
+        - name: run-script
+          mountPath: /sdcore/script/amf-run.sh
+          subPath: amf-run.sh
+        - name: nf-config
+          mountPath: /sdcore/config
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
       volumes:
+      - name: run-script-tmp
+        configMap:
+          name: amf
+          defaultMode: 493
+      - name: nf-config-tmp
+        configMap:
+          name: amf
+          defaultMode: 493
       - name: run-script
         configMap:
           name: amf
           defaultMode: 493
-      - name: amf-config
+      - name: nf-config
         configMap:
           name: amf
           defaultMode: 493
