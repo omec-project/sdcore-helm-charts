@@ -4,11 +4,11 @@
 # SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
 
 apiVersion: v2
-description: Free5G control plane services
+description: SD-Core 5G control plane services
 name: 5g-control-plane
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 0.6.4
+version: 0.6.5
 
 dependencies:
   - name: mongodb

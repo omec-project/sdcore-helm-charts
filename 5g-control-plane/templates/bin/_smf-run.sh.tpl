@@ -6,21 +6,11 @@
 
 set -xe
 
-DIR=""
-if [ -d "/free5gc/smf" ]; then
-  DIR="/free5gc"
-  echo "free5gc directory exist"
-fi
-if [ -d "/sdcore/smf" ]; then
-  DIR="/sdcore"
-  echo "sdcore directory exist"
-fi
-
 {{- if .Values.config.coreDump.enabled }}
-cp $DIR/smf/smf /tmp/coredump/
+cp /free5gc/smf/smf /tmp/coredump/
 {{- end }}
 
-cd $DIR
+cd /free5gc
 
 cat config/smfcfg.conf
 cat uerouting/uerouting.conf

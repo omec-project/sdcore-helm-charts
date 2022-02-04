@@ -6,21 +6,11 @@
 
 set -xe
 
-DIR=""
-if [ -d "/free5gc/ausf" ]; then
-  DIR="/free5gc"
-  echo "free5gc directory exist"
-fi
-if [ -d "/sdcore/ausf" ]; then
-  DIR="/sdcore"
-  echo "sdcore directory exist"
-fi
-
 {{- if .Values.config.coreDump.enabled }}
-cp $DIR/ausf/ausf /tmp/coredump/
+cp /free5gc/ausf/ausf /tmp/coredump/
 {{- end }}
 
-cd $DIR
+cd /free5gc
 cat config/ausfcfg.conf
 
 GOTRACEBACK=crash ./ausf/ausf -ausfcfg config/ausfcfg.conf

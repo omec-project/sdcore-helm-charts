@@ -6,21 +6,12 @@
 
 set -xe
 
-DIR=""
-if [ -d "/free5gc/amf" ]; then
-  DIR="/free5gc"
-  echo "free5gc directory exist" 
-fi
-if [ -d "/sdcore/amf" ]; then
-  DIR="/sdcore"
-  echo "sdcore directory exist" 
-fi 
-
+IMGPATH={{ .Values.config.imagePath }}
 {{- if .Values.config.coreDump.enabled }}
-cp $DIR/amf/amf /tmp/coredump/
+cp $IMGPATH/amf/amf /tmp/coredump/
 {{- end }}
 
-cd $DIR
+cd $IMGPATH
 cat config/amfcfg.conf
 
 GOTRACEBACK=crash ./amf/amf -amfcfg config/amfcfg.conf

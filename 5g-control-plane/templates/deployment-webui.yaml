@@ -61,35 +61,22 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: ["/free5gc/script/webui-run.sh", "/sdcore/script/webui-run.sh"]
+        command: ["/free5gc/script/webui-run.sh"]
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.webui | indent 10 }}
       {{- end }}
         volumeMounts:
-        - name: run-script-tmp
+        - name: run-script
           mountPath: /free5gc/script/webui-run.sh
           subPath: webui-run.sh
-        - name: nf-config-tmp
-          mountPath: /free5gc/config
-        - name: run-script
-          mountPath: /sdcore/script/webui-run.sh
-          subPath: webui-run.sh
         - name: nf-config
-          mountPath: /sdcore/config
+          mountPath: /free5gc/config
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
       volumes:
-      - name: run-script-tmp
-        configMap:
-          name: webui
-          defaultMode: 493
-      - name: nf-config-tmp
-        configMap:
-          name: webui
-          defaultMode: 493
       - name: run-script
         configMap:
           name: webui

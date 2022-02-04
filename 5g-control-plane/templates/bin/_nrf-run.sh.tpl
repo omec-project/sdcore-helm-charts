@@ -6,21 +6,11 @@
 
 set -xe
 
-DIR=""
-if [ -d "/free5gc/nrf" ]; then
-  DIR="/free5gc"
-  echo "free5gc directory exist"
-fi
-if [ -d "/sdcore/nrf" ]; then
-  DIR="/sdcore"
-  echo "sdcore directory exist"
-fi
-
 {{- if .Values.config.coreDump.enabled }}
-cp $DIR/nrf/nrf /tmp/coredump/
+cp /free5gc/nrf/nrf /tmp/coredump/
 {{- end }}
 
-cd $DIR
+cd /free5gc
 
 cat config/nrfcfg.conf
 

@@ -6,21 +6,11 @@
 
 set -xe
 
-DIR=""
-if [ -d "/free5gc/udr" ]; then
-  DIR="/free5gc"
-  echo "free5gc directory exist"
-fi
-if [ -d "/sdcore/udr" ]; then
-  DIR="/sdcore"
-  echo "sdcore directory exist"
-fi
-
 {{- if .Values.config.coreDump.enabled }}
-cp $DIR/udr/udr /tmp/coredump/
+cp /free5gc/udr/udr /tmp/coredump/
 {{- end }}
 
-cd $DIR
+cd /free5gc
 
 cat config/udrcfg.conf
 

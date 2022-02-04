@@ -49,7 +49,7 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: ["/free5gc/script/nrf-run.sh", "/sdcore/script/nrf-run.sh"]
+        command: ["/free5gc/script/nrf-run.sh"]
         env:
         - name: GRPC_GO_LOG_VERBOSITY_LEVEL
           value: {{ .Values.config.grpc.golog_verbosity | quote }}
@@ -72,29 +72,16 @@ spec:
 {{ toYaml .Values.resources.nrf | indent 10 }}
       {{- end }}
         volumeMounts:
-        - name: run-script-tmp
+        - name: run-script
           mountPath: /free5gc/script/nrf-run.sh
           subPath: nrf-run.sh
-        - name: nf-config-tmp
-          mountPath: /free5gc/config
-        - name: run-script
-          mountPath: /sdcore/script/nrf-run.sh
-          subPath: nrf-run.sh
         - name: nf-config
-          mountPath: /sdcore/config
+          mountPath: /free5gc/config
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
       volumes:
-      - name: run-script-tmp
-        configMap:
-          name: nrf
-          defaultMode: 493
-      - name: nf-config-tmp
-        configMap:
-          name: nrf
-          defaultMode: 493
       - name: run-script
         configMap:
           name: nrf
