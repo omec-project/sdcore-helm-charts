@@ -2,7 +2,7 @@
 
 # Copyright 2021-present Open Networking Foundation
 #
-# SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
+# SPDX-License-Identifier: Apache-2.0
 
 while ! curl -f --connect-timeout 5 http://spgwc:8080/startup
 do
