@@ -10,11 +10,11 @@ images:
     depCheck: quay.io/stackanetes/kubernetes-entrypoint:v0.3.1
     hssdb: registry.aetherproject.org/proxy/omecproject/c3po-hssdb:master-771c0c3
     hss: registry.aetherproject.org/proxy/omecproject/c3po-hss:master-771c0c3
-    mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-a503ae3
-    spgwc: registry.aetherproject.org/omecproject/spgw:master-0ee9973
-    pcrf: registry.aetherproject.org/proxy/omecproject/c3po-pcrf:pcrf-a6bdc3d
-    pcrfdb: registry.aetherproject.org/proxy/omecproject/c3po-pcrfdb:pcrf-a6bdc3d
-    config4g: registry.aetherproject.org/omecproject/5gc-webui:onf-release3.0.5-a973f7c
+    mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-01dc535
+    spgwc: registry.aetherproject.org/omecproject/spgw:master-96012d9
+    pcrf: registry.aetherproject.org/proxy/omecproject/c3po-pcrf:pcrf-ccdc128
+    pcrfdb: registry.aetherproject.org/proxy/omecproject/c3po-pcrfdb:pcrf-ccdc128
+    config4g: registry.aetherproject.org/omecproject/5gc-webui:master-4a8e10a
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.
   pullSecrets:
@@ -499,6 +499,7 @@ config:
           urrConfig: 0
           loggingLevel: "LOG_DEBUG"
           heartbeatFailure: true
+          upfdnstimeout: 100 #timeout in ms
         ip_pool_config:
           ueIpPool:
             ip: "10.250.0.0"
