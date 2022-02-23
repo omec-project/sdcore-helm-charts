@@ -5,7 +5,7 @@
 images:
   tags:
     init: docker.io/omecproject/pod-init:1.0.0
-    simapp: "registry.aetherproject.org/omecproject/simapp:main-552bbec"
+    simapp: "registry.aetherproject.org/omecproject/simapp:main-2a3d85f"
   pullPolicy: IfNotPresent
   # Optionally specify an array of imagePullSecrets.
   # Secrets must be manually created in the namespace.

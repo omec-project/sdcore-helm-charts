@@ -2,7 +2,6 @@
 # Copyright 2018-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-License-Identifier: Apache-2.0
 
 images:
   tags:
@@ -117,7 +116,7 @@ config:
       debugLevel: info
       ReportCaller: false
   config4g:
-    deploy: false
+    deploy: true
     podAnnotations:
       field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
     prometheus:
@@ -141,13 +140,11 @@ config:
           version: 1.0.0
           description: WebUI initial local configuration
         configuration:
+          spec-compliant-sdf: false
           endpoints:
             - type: spgw
               configPushUrl: "http://spgwc:8080/v1/config"
               configCheckUrl: "http://spgwc:8080/v1/config-check"
-            #- type: mmeapp
-            #  configPushUrl: "http://mme-app-config:8080/v1/config/slice"
-            #  configCheckUrl: "http://mme-app-config:8080/v1/config-check"
             - type: mme-s1ap
               configPushUrl: "http://mme:8081/v1/config/slice"
               configCheckUrl: "http://mme:8081/v1/config-check"
