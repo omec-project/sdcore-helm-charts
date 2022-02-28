@@ -16,7 +16,7 @@ data:
   gnbsim-run.sh: |
 {{ tuple "bin/_gnbsim-run.sh.tpl" . | include "5g-ransim-plane.template" | indent 4 }}
 {{- range $key, $value := .Values.config.gnbsim.yamlCfgFiles }}
-  {{ $key }}: |
-{{ $value | indent 4 }}
+  {{ $key }}: |-
+{{ toYaml $value | indent 4 }}
 {{- end }}
 {{- end }}
