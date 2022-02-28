@@ -7,12 +7,12 @@ images:
   tags:
     init: registry.aetherproject.org/tools/busybox:stable
     depCheck: quay.io/stackanetes/kubernetes-entrypoint:v0.3.1
-    hssdb: registry.aetherproject.org/proxy/omecproject/c3po-hssdb:master-771c0c3
-    hss: registry.aetherproject.org/proxy/omecproject/c3po-hss:master-771c0c3
+    hssdb: registry.aetherproject.org/proxy/omecproject/c3po-hssdb:master-df54425
+    hss: registry.aetherproject.org/proxy/omecproject/c3po-hss:master-df54425
     mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-01dc535
     spgwc: registry.aetherproject.org/omecproject/spgw:master-96012d9
-    pcrf: registry.aetherproject.org/proxy/omecproject/c3po-pcrf:pcrf-ccdc128
-    pcrfdb: registry.aetherproject.org/proxy/omecproject/c3po-pcrfdb:pcrf-ccdc128
+    pcrf: registry.aetherproject.org/proxy/omecproject/c3po-pcrf:pcrf-d58dd1c
+    pcrfdb: registry.aetherproject.org/proxy/omecproject/c3po-pcrfdb:pcrf-d58dd1c
     config4g: registry.aetherproject.org/omecproject/5gc-webui:master-4a8e10a
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.
@@ -129,11 +129,6 @@ config:
       nodePort:
         enabled: false
         port: 35000
-    ingress:
-      enabled: false
-      hostname: free5gc.local
-      path: /
-      pathType: Prefix
     cfgFiles:
       webuicfg.conf:
         info:
@@ -249,14 +244,14 @@ config:
           reloadkey: false
           logsize: 20
           lognumber: 5
-          logname: logs/pcrf.log
+          logname: "" #logs/pcrf.log
           logqsize: 8192
           statlogsize: 20
           statlognumber: 5
-          statlogname: logs/pcrf_stat.log
+          statlogname: "" #logs/pcrf_stat.log
           auditlogsize: 20
           auditlognumber: 5
-          auditlogname: logs/pcrf_audit.log
+          auditlogname: "" #logs/pcrf_audit.log
           statfreq: 2000
           numworkers: 4
           concurrent: 10
@@ -368,14 +363,14 @@ config:
           reloadkey: false
           logsize: 20
           lognumber: 5
-          logname: logs/hss.log
+          logname: "" #logs/hss.log
           logqsize: 8192
           statlogsize: 20
           statlognumber: 5
-          statlogname: logs/hss_stat.log
+          statlogname: "" #logs/hss_stat.log
           auditlogsize: 20
           auditlognumber: 5
-          auditlogname: logs/hss_audit.log
+          auditlogname: "" #logs/hss_audit.log
           statfreq: 2000
           numworkers: 4
           concurrent: 10

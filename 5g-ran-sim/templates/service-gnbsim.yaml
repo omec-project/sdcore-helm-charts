@@ -20,4 +20,9 @@ spec:
   - name: ngapp
     port: {{ .Values.config.gnbsim.ngapp.port }}
     protocol: SCTP
+{{- if .Values.config.gnbsim.profile.enable }}
+  - name: profile-http
+    port: {{ .Values.config.gnbsim.profile.port }}
+    protocol: TCP
+{{- end }}
 {{- end }}
