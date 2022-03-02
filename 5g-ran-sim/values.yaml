@@ -49,7 +49,7 @@ config:
         enabled: false
         port: 30071
     yamlCfgFiles:
-      gnb.conf: |
+      gnb.conf:
         info:
           version: 1.0.0
           description: gNodeB sim initial configuration
@@ -67,16 +67,16 @@ config:
                   mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
                 gNbId: 
                   bitLength: 24
-                  gNBValue: 000102 # gNB identifier (3 bytes hex string, range: 000000~FFFFFF)
+                  gNBValue: "000102" # gNB identifier (3 bytes hex string, range: 000000~FFFFFF)
               supportedTaList:
-              - tac: 000001 # Tracking Area Code (3 bytes hex string, range: 000000~FFFFFF)
+              - tac: "000001" # Tracking Area Code (3 bytes hex string, range: 000000~FFFFFF)
                 broadcastPlmnList:
                   - plmnId:
                       mcc: 208 
                       mnc: 93
                     taiSliceSupportList:
                         - sst: 1 # Slice/Service Type (uinteger, range: 0~255)
-                          sd: 010203 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
+                          sd: "010203" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
               defaultAmf:
                 hostName: amf # Host name of AMF
                 ipAddr: # AMF IP address
@@ -87,7 +87,7 @@ config:
               profileName: profile1 # uniqely identifies a profile within application
               enable: false # Set true to execute the profile, false otherwise.
               gnbName: gnb1 # gNB to be used for this profile
-              startImsi: 2089300007487 #First IMSI. Subsequent values will be used if ueCount is mo    re than 1
+              startImsi: 208930100007487 #First IMSI. Subsequent values will be used if ueCount is mo    re than 1
               ueCount: 5 # Number of UEs for for which the profile will be executed
               plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
                 mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
@@ -96,7 +96,7 @@ config:
               profileName: profile2
               enable: true
               gnbName: gnb1
-              startImsi: 2089300007492
+              startImsi: 208930100007492
               ueCount: 5
               plmnId:
                 mcc: 208
@@ -106,7 +106,7 @@ config:
               profileName: profile3
               enable: false
               gnbName: gnb1
-              startImsi: 2089300007497
+              startImsi: 208930100007497
               ueCount: 5
               plmnId:
                 mcc: 208
@@ -124,7 +124,7 @@ config:
               profileName: profile4
               enable: false
               gnbName: gnb1
-              startImsi: 2089300007497
+              startImsi: 208930100007497
               ueCount: 5
               plmnId:
                 mcc: 208

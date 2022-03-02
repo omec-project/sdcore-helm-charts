@@ -7,10 +7,10 @@ images:
     init: docker.io/omecproject/pod-init:1.0.0
     amf: registry.aetherproject.org/omecproject/5gc-amf:master-31437f9
     nrf: registry.aetherproject.org/omecproject/5gc-nrf:onf-release3.0.5-13304e8
-    smf: registry.aetherproject.org/omecproject/5gc-smf:master-6f2aba1
+    smf: registry.aetherproject.org/omecproject/5gc-smf:master-430fc55
     ausf: registry.aetherproject.org/omecproject/5gc-ausf:onf-release3.0.5-be7d4ac
     nssf: registry.aetherproject.org/omecproject/5gc-nssf:onf-release3.0.5-aa3a60b
-    pcf: registry.aetherproject.org/omecproject/5gc-pcf:master-dbbef99
+    pcf: registry.aetherproject.org/omecproject/5gc-pcf:master-b720a4c
     udr: registry.aetherproject.org/omecproject/5gc-udr:onf-release3.0.5-deef506
     udm: registry.aetherproject.org/omecproject/5gc-udm:onf-release3.0.5-c28433a
     webui: registry.aetherproject.org/omecproject/5gc-webui:master-4a8e10a
