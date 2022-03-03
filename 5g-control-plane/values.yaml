@@ -229,11 +229,11 @@ config:
           nrfUri: http://nrf:29510
           plmnList:
             - plmnId:
-                mcc: 208
-                mnc: 93
+                mcc: "208"
+                mnc: "93"
             - plmnId:
-                mcc: 222
-                mnc: 88
+                mcc: "222"
+                mnc: "88"
           serviceNameList:
             - nudm-sdm
             - nudm-uecm
@@ -271,11 +271,11 @@ config:
           nrfUri: http://nrf:29510
           plmnSupportList:
             - plmnId:
-                mcc: 208
-                mnc: 93
+                mcc: "208"
+                mnc: "93"
             - plmnId:
-                mcc: 333
-                mnc: 88
+                mcc: "333"
+                mnc: "88"
           sbi:
             scheme: http
             bindingIPv4: "0.0.0.0"
@@ -304,11 +304,11 @@ config:
           defaultBdtRefId: BdtPolicyId-
           plmnList:
             - plmnId:
-                mcc: 208
-                mnc: 93
+                mcc: "208"
+                mnc: "93"
             - plmnId:
-                mcc: 333
-                mnc: 88
+                mcc: "333"
+                mnc: "88"
           serviceList:
             - serviceName: npcf-am-policy-control
             - serviceName: npcf-smpolicycontrol
@@ -343,12 +343,12 @@ config:
             - nnssf-nsselection
             - nnssf-nssaiavailability
           supportedPlmnList:
-            - mcc: 208
-              mnc: 93
+            - mcc: "208"
+              mnc: "93"
           supportedNssaiInPlmnList:
             - plmnId:
-                mcc: 208
-                mnc: 93
+                mcc: "208"
+                mnc: "93"
               supportedSnssaiList:
                 - sst: 1
                   sd: "010203"
@@ -398,18 +398,18 @@ config:
             - namf-oam
           servedGuamiList:
             - plmnId:
-                mcc: 208
-                mnc: 93
+                mcc: "208"
+                mnc: "93"
               amfId: cafe00
           supportTaiList:
             - plmnId:
-                mcc: 208
-                mnc: 93
+                mcc: "208"
+                mnc: "93"
               tac: 1
           plmnSupportList:
             - plmnId:
-                mcc: 208
-                mnc: 93
+                mcc: "208"
+                mnc: "93"
               snssaiList:
                 - sst: 1
                   sd: "010203"
@@ -417,6 +417,7 @@ config:
             - internet
           security:
             integrityOrder:
+              - NIA1
               - NIA2
             cipheringOrder:
               - NEA0
@@ -480,8 +481,8 @@ config:
             bindingIPv4: "0.0.0.0"
             registerIPv4: nrf
           DefaultPlmnId:
-            mcc: 208
-            mnc: 93
+            mcc: "208"
+            mnc: "93"
           serviceNameList:
             - nnrf-nfm
             - nnrf-disc
@@ -527,10 +528,10 @@ config:
             - nsmf-event-exposure
           snssaiInfos:
             - dnnInfos:
-              - dnn: internet
+              - dnn: "internet"
                 dns: # the IP address of DNS
-                   ipv4: 8.8.8.8
-                   ipv6: 2001:4860:4860::8888
+                   ipv4: "8.8.8.8"
+                   ipv6: "2001:4860:4860::8888"
                 ueSubnet: 172.250.0.0/16 # should be CIDR type
               sNssai:
                 sd: "010203"
@@ -547,7 +548,7 @@ config:
                       sst: 1 # Slice/Service Type (uinteger, range: 0~255)
                       sd: "010203" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
                     dnnUpfInfoList: # DNN information list for this S-NSSAI
-                      - dnn: internet
+                      - dnn: "internet"
                     plmnId:
                       mcc: "208"
                       mnc: "93"
@@ -555,7 +556,7 @@ config:
                       sst: 1 # Slice/Service Type (uinteger, range: 0~255)
                       sd: "112233" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
                     dnnUpfInfoList: # DNN information list for this S-NSSAI
-                      - dnn: internet
+                      - dnn: "internet"
                     plmnId:
                       mcc: "208"
                       mnc: "93"
@@ -591,6 +592,6 @@ config:
           serviceNameList:
             - nausf-auth
           plmnSupportList:
-            - mcc: 208
-              mnc: 93
+            - mcc: "208"
+              mnc: "93"
           groupId: ausfGroup001
