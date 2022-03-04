@@ -37,7 +37,7 @@ spec:
     {{- end }}
       initContainers:
       - name: wait-ausf-module2
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup ausf; do echo waiting for ausf; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
@@ -45,7 +45,7 @@ spec:
     {{- end }}
       containers:
       - name: ausf
-        image: {{ .Values.images.tags.ausf }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.ausf }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

@@ -35,11 +35,11 @@ spec:
     {{- end }}
       initContainers:
       - name: wait-udm-module
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup udm; do echo waiting for udm; sleep 4; done;']
       - name: wait-udr-module
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup udr; do echo waiting for udr; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
@@ -47,7 +47,7 @@ spec:
     {{- end }}
       containers:
       - name: udm
-        image: {{ .Values.images.tags.udm }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.udm }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

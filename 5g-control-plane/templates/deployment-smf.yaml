@@ -37,7 +37,7 @@ spec:
     {{- end }}
       initContainers:
       - name: wait-smf-module
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup smf; do echo waiting for smf; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
@@ -45,7 +45,7 @@ spec:
     {{- end }}
       containers:
       - name: smf
-        image: {{ .Values.images.tags.smf }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.smf }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

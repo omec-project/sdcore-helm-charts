@@ -43,7 +43,7 @@ spec:
     {{- end }}
       containers:
       - name: spgwc
-        image: {{ .Values.images.tags.spgwc }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.spgwc }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:
@@ -112,7 +112,7 @@ spec:
           mountPath: /tmp/coredump
       {{- end }}
       - name: gx-app
-        image: {{ .Values.images.tags.spgwc }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.spgwc }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

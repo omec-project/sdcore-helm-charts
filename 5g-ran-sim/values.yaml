@@ -3,13 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 images:
+  repository: "" #default docker hub
   tags:
-    init: docker.io/omecproject/pod-init:1.0.0
-    gnbsim: registry.aetherproject.org/omecproject/5gc-gnbsim:main-a984342
+    init: omecproject/pod-init:1.0.0
+    gnbsim: omecproject/5gc-gnbsim:main-a984342
   pullPolicy: IfNotPresent
-  # Secrets must be manually created in the namespace.
-  pullSecrets:
-    - name: aether.registry
 
 nodeSelectors:
   enabled: false

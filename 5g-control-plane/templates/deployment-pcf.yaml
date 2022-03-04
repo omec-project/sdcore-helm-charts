@@ -35,7 +35,7 @@ spec:
     {{- end }}
       initContainers:
       - name: wait-pcf-module
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup pcf; do echo waiting for pcf; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
@@ -43,7 +43,7 @@ spec:
     {{- end }}
       containers:
       - name: pcf
-        image: {{ .Values.images.tags.pcf }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.pcf }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

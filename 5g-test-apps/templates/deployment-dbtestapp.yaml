@@ -37,7 +37,7 @@ spec:
     {{- end }}
       containers:
       - name: dbtestapp
-        image: {{ .Values.images.tags.dbtestapp }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.dbtestapp }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

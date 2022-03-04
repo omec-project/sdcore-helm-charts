@@ -41,7 +41,7 @@ spec:
     {{- end }}
       containers:
       - name: nrf
-        image: {{ .Values.images.tags.nrf }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.nrf }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

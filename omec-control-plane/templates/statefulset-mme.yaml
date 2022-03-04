@@ -39,7 +39,7 @@ spec:
     {{- end }}
       initContainers:
       - name: mme-load-sctp-module
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         securityContext:
           privileged: true
@@ -86,7 +86,7 @@ spec:
           []
     {{- end }}
       - name: mme-init
-        image: {{ .Values.images.tags.mme | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.mme }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ["/opt/mme/scripts/mme-init.sh"]
         env:
@@ -106,7 +106,7 @@ spec:
     {{- end }}
       containers:
       - name: mme-app
-        image: {{ .Values.images.tags.mme | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.mme }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:
@@ -145,7 +145,7 @@ spec:
           mountPath: /tmp/coredump
       {{- end }}
       - name: s1ap-app
-        image: {{ .Values.images.tags.mme | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.mme }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:
@@ -180,7 +180,7 @@ spec:
           mountPath: /tmp/coredump
       {{- end }}
       - name: s6a-app
-        image: {{ .Values.images.tags.mme | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.mme }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:
@@ -213,7 +213,7 @@ spec:
           mountPath: /tmp/coredump
       {{- end }}
       - name: s11-app
-        image: {{ .Values.images.tags.mme | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.mme }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

@@ -35,7 +35,7 @@ spec:
     {{- end }}
       initContainers:
       - name: wait-udr-module
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup udr; do echo waiting for udr; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
@@ -43,7 +43,7 @@ spec:
     {{- end }}
       containers:
       - name: udr
-        image: {{ .Values.images.tags.udr }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.udr }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

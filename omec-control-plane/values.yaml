@@ -4,20 +4,18 @@
 # SPDX-License-Identifier: Apache-2.0
 
 images:
+  repository: "" # default docker hub
   tags:
-    init: registry.aetherproject.org/tools/busybox:stable
+    init: omecproject/busybox:stable
     depCheck: quay.io/stackanetes/kubernetes-entrypoint:v0.3.1
-    hssdb: registry.aetherproject.org/proxy/omecproject/c3po-hssdb:master-df54425
-    hss: registry.aetherproject.org/proxy/omecproject/c3po-hss:master-df54425
-    mme: registry.aetherproject.org/proxy/omecproject/nucleus:master-01dc535
-    spgwc: registry.aetherproject.org/omecproject/spgw:master-96012d9
-    pcrf: registry.aetherproject.org/proxy/omecproject/c3po-pcrf:pcrf-d58dd1c
-    pcrfdb: registry.aetherproject.org/proxy/omecproject/c3po-pcrfdb:pcrf-d58dd1c
-    config4g: registry.aetherproject.org/omecproject/5gc-webui:master-4a8e10a
+    hssdb: omecproject/c3po-hssdb:master-df54425
+    hss: omecproject/c3po-hss:master-df54425
+    mme: omecproject/nucleus:master-01dc535
+    spgwc: omecproject/spgw:master-96012d9
+    pcrf: omecproject/c3po-pcrf:pcrf-d58dd1c
+    pcrfdb: omecproject/c3po-pcrfdb:pcrf-d58dd1c
+    config4g: omecproject/5gc-webui:master-7f96cfd
   pullPolicy: IfNotPresent
-  # Secrets must be manually created in the namespace.
-  pullSecrets:
-    - name: aether.registry
 
 nodeSelectors:
   enabled: false
@@ -547,6 +545,12 @@ config:
             access-tags:
               tag1: ACC
         qos-profiles:
+          qos-profile1:
+            qci: 9
+            arp: 1
+            apn-ambr:
+              - 12345678
+              - 12345678
           mobile:
             qci: 9
             arp: 1

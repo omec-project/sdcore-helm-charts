@@ -48,7 +48,7 @@ spec:
 
       initContainers:
       - name: wait-amf-module
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup amf; do echo waiting for nrf; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
@@ -56,7 +56,7 @@ spec:
     {{- end }}
       containers:
       - name: gnbsim
-        image: {{ .Values.images.tags.gnbsim }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.gnbsim }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         securityContext:
           privileged: true

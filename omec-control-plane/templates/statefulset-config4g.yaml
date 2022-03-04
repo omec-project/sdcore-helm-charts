@@ -35,7 +35,7 @@ spec:
     {{- end }}
       containers:
       - name: config-4g
-        image: {{ .Values.images.tags.config4g }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.config4g }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

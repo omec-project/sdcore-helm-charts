@@ -39,7 +39,7 @@ spec:
       serviceAccountName: pcrf
       initContainers:
       - name: pcrf-bootstrap
-        image: {{ .Values.images.tags.pcrfdb }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.pcrfdb }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ["/opt/c3po/pcrf/pcrf-bootstrap.sh"]
         volumeMounts:
@@ -50,7 +50,7 @@ spec:
     {{- end }}
       containers:
       - name: pcrf
-        image: {{ .Values.images.tags.pcrf }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.pcrf }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

@@ -43,7 +43,7 @@ spec:
     {{- end }}
       initContainers:
       - name: hss-bootstrap
-        image: {{ .Values.images.tags.hssdb }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.hssdb }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ["/opt/c3po/hss/scripts/hss-bootstrap.sh"]
         volumeMounts:
@@ -54,7 +54,7 @@ spec:
     {{- end }}
       containers:
       - name: hss
-        image: {{ .Values.images.tags.hss }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.hss }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

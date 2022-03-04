@@ -35,7 +35,7 @@ spec:
     {{- end }}
       initContainers:
       - name: wait-nssf-module
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup nssf; do echo waiting for nssf; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
@@ -43,7 +43,7 @@ spec:
     {{- end }}
       containers:
       - name: nssf
-        image: {{ .Values.images.tags.nssf }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.nssf }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

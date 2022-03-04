@@ -37,7 +37,7 @@ spec:
     {{- end }}
       initContainers:
       - name: wait-simapp-module2
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup simapp; do echo waiting for simapp; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
@@ -45,7 +45,7 @@ spec:
     {{- end }}
       containers:
       - name: simapp
-        image: {{ .Values.images.tags.simapp }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.simapp }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:
