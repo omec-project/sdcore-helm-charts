@@ -8,7 +8,7 @@ images:
     init: omecproject/pod-init:1.0.0
     amf: omecproject/5gc-amf:master-4e0656a
     nrf: omecproject/5gc-nrf:master-3768767
-    smf: omecproject/5gc-smf:master-d14a4c9
+    smf: omecproject/5gc-smf:master-cf8736b
     ausf: omecproject/5gc-ausf:master-97794b4
     nssf: omecproject/5gc-nssf:master-0e9b742
     pcf: omecproject/5gc-pcf:master-b720a4c
@@ -21,7 +21,7 @@ resources:
   enabled: false
   amf:
     requests:
-      cpu: 3
+      cpu: 2
       memory: 1Gi
     limits:
       cpu: 2
