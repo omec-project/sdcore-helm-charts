@@ -8,10 +8,10 @@ images:
     init: omecproject/pod-init:1.0.0
     amf: omecproject/5gc-amf:master-4e0656a
     nrf: omecproject/5gc-nrf:master-3768767
-    smf: omecproject/5gc-smf:master-cf8736b
+    smf: omecproject/5gc-smf:master-3b5bfbf
     ausf: omecproject/5gc-ausf:master-97794b4
     nssf: omecproject/5gc-nssf:master-0e9b742
-    pcf: omecproject/5gc-pcf:master-b720a4c
+    pcf: omecproject/5gc-pcf:master-2ddfe5b
     udr: omecproject/5gc-udr:master-f020ef3
     udm: omecproject/5gc-udm:master-bd72757
     webui: omecproject/5gc-webui:master-7f96cfd

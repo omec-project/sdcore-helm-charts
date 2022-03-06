@@ -8,7 +8,7 @@ description: SD-Core 5G control plane services
 name: 5g-control-plane
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 0.6.14
+version: 0.6.15
 
 dependencies:
   - name: mongodb
