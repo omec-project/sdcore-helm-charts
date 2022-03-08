@@ -14,7 +14,7 @@ images:
     pcf: omecproject/5gc-pcf:master-02f7325
     udr: omecproject/5gc-udr:master-3756e35
     udm: omecproject/5gc-udm:master-15369ab
-    webui: omecproject/5gc-webui:master-7f96cfd
+    webui: omecproject/5gc-webui:master-1fb4467
   pullPolicy: IfNotPresent
 
 resources:
