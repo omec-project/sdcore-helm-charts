@@ -6,15 +6,15 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    amf: omecproject/5gc-amf:master-221e1a6
+    amf: omecproject/5gc-amf:master-757e1d5
     nrf: omecproject/5gc-nrf:master-5844fcf
     smf: omecproject/5gc-smf:master-7088650
     ausf: omecproject/5gc-ausf:master-7dcc39c
     nssf: omecproject/5gc-nssf:master-e751140
-    pcf: omecproject/5gc-pcf:master-02f7325
+    pcf: omecproject/5gc-pcf:master-6bf5a23
     udr: omecproject/5gc-udr:master-3756e35
     udm: omecproject/5gc-udm:master-15369ab
-    webui: omecproject/5gc-webui:master-1fb4467
+    webui: omecproject/5gc-webui:master-20db479
   pullPolicy: IfNotPresent
 
 resources:
@@ -207,7 +207,8 @@ config:
         info:
           version: 1.0.0
           description: WebUI initial local configuration
-        configuration: {}
+        configuration:
+          spec-compliant-sdf: false
   udm:
     deploy: true
     #podAnnotations:
