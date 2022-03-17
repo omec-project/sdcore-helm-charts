@@ -10,8 +10,8 @@ images:
     depCheck: quay.io/stackanetes/kubernetes-entrypoint:v0.3.1
     hssdb: omecproject/c3po-hssdb:master-df54425
     hss: omecproject/c3po-hss:master-df54425
-    mme: omecproject/nucleus:master-01dc535
-    spgwc: omecproject/spgw:master-96012d9
+    mme: omecproject/nucleus:master-a8002eb
+    spgwc: omecproject/spgw:master-e419062
     pcrf: omecproject/c3po-pcrf:pcrf-d58dd1c
     pcrfdb: omecproject/c3po-pcrfdb:pcrf-d58dd1c
     config4g: omecproject/5gc-webui:master-727636a
