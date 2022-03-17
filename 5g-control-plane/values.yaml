@@ -11,7 +11,7 @@ images:
     smf: omecproject/5gc-smf:master-7ef661b
     ausf: omecproject/5gc-ausf:master-7dcc39c
     nssf: omecproject/5gc-nssf:master-e751140
-    pcf: omecproject/5gc-pcf:master-6bf5a23
+    pcf: omecproject/5gc-pcf:master-874bbe1
     udr: omecproject/5gc-udr:master-3756e35
     udm: omecproject/5gc-udm:master-15369ab
     webui: omecproject/5gc-webui:master-727636a
