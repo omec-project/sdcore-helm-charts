@@ -56,6 +56,8 @@ config:
         info:
           version: 1.0.0
           description: gNodeB sim initial configuration
+        logger:
+          logLevel: info # how detailed the log will be, values: trace, debug, info, warn, error, fatal, panic
         configuration:
           #singleInterface: #this will be added thorugh configmap script
           gnbs: # pool of gNodeBs
@@ -93,7 +95,7 @@ config:
               gnbName: gnb1 # gNB to be used for this profile
               startImsi: 208930100007487 #First IMSI. Subsequent values will be used if ueCount is mo    re than 1
               ueCount: 5 # Number of UEs for for which the profile will be executed
-              defaultAs: "192.168.250.1"
+              defaultAs: "192.168.250.1" #default icmp pkt destination
               plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
                 mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
                 mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
@@ -107,6 +109,7 @@ config:
                 mcc: 208
                 mnc: 93
               dataPktCount: 5 # Number of UL user data packets to be transmitted. Common for all UEs
+              defaultAs: "192.168.250.1" #default icmp pkt destination
             - profileType: anrelease
               profileName: profile3
               enable: false
@@ -116,6 +119,7 @@ config:
               plmnId:
                 mcc: 208
                 mnc: 93
+              defaultAs: "192.168.250.1" #default icmp pkt destination
             - profileType: uetriggservicereq
               profileName: profile4
               enable: false
@@ -125,8 +129,9 @@ config:
               plmnId:
                 mcc: 208
                 mnc: 93
+              defaultAs: "192.168.250.1" #default icmp pkt destination
             - profileType: deregister
-              profileName: profile4
+              profileName: profile5
               enable: false
               gnbName: gnb1
               startImsi: 208930100007497
@@ -134,5 +139,25 @@ config:
               plmnId:
                 mcc: 208
                 mnc: 93
-        logger:
-          logLevel: info # how detailed the log will be, values: trace, debug, info, warn, error, fatal, panic 
+              defaultAs: "192.168.250.1" #default icmp pkt destination
+            - profileType: nwtriggeruedereg # profile type
+              profileName: profile6 # uniqely identifies a profile within application
+              enable: false # Set true to execute the profile, false otherwise.
+              gnbName: gnb1 # gNB to be used for this profile
+              startImsi: 208930100007497 # First IMSI. Subsequent values will be used if ueCount is more than 1
+              ueCount: 5 # Number of UEs for for which the profile will be executed
+              defaultAs: "192.168.250.1" #default icmp pkt destination
+              perUserTimeout: 100 #if no expected event received in this time then treat it as failure
+              plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>. Should match startImsi
+                mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+                mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+            - profileType: uereqpdusessrelease # profile type
+              profileName: profile7 # uniqely identifies a profile within application
+              enable: false # Set true to execute the profile, false otherwise.
+              gnbName: gnb1 # gNB to be used for this profile
+              startImsi: 208930100007497 # First IMSI. Subsequent values will be used if ueCount is more than 1
+              ueCount: 5 # Number of UEs for for which the profile will be executed
+              plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>. Should match startImsi
+                mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+                mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+              defaultAs: "192.168.250.1" #default icmp pkt destination
