@@ -6,7 +6,7 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    gnbsim: omecproject/5gc-gnbsim:main-832a5a6
+    gnbsim: omecproject/5gc-gnbsim:main-6e34bd2
   pullPolicy: IfNotPresent
 
 nodeSelectors:
@@ -26,6 +26,7 @@ resources:
       memory: 1Gi
 
 config:
+  useExistingConfigMap: false
   clusterDomain: cluster.local
   coreDump:
     enabled: false
@@ -37,7 +38,7 @@ config:
     ipam: static
     cniPlugin: simpleovs #need override value
     gnb:
-      ip: 192.168.251.5/24
+      ip: 192.168.251.5/24 #user plane IP at gnb if 2 separate interface provided
     profile:
       enable: true
       port: 5000
@@ -46,12 +47,17 @@ config:
       nodePort:
         enabled: false
         port: 30071
+    singleInterface: false
+    networkTopo:
+      - upfAddr: "192.168.252.3/32"
+        upfGw: "192.168.251.1"
     yamlCfgFiles:
       gnb.conf:
         info:
           version: 1.0.0
           description: gNodeB sim initial configuration
         configuration:
+          #singleInterface: #this will be added thorugh configmap script
           gnbs: # pool of gNodeBs
             gnb1:
               n2IpAddr: # gNB N2 interface IP address used to connect to AMF 
@@ -87,6 +93,7 @@ config:
               gnbName: gnb1 # gNB to be used for this profile
               startImsi: 208930100007487 #First IMSI. Subsequent values will be used if ueCount is mo    re than 1
               ueCount: 5 # Number of UEs for for which the profile will be executed
+              defaultAs: "192.168.250.1"
               plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
                 mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
                 mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)

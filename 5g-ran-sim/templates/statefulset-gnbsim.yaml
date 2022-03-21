@@ -23,6 +23,7 @@ spec:
     metadata:
       labels:
 {{ tuple "gnbsim" . | include "5g-ransim-plane.metadata_labels" | indent 8 }}
+{{- if not .Values.config.gnbsim.singleInterface }}
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
            { 
@@ -35,6 +36,7 @@ spec:
 {{- end }}
            }
          ]'
+{{- end }}
     spec:
     {{- if .Values.nodeSelectors.enabled }}
       nodeSelector:

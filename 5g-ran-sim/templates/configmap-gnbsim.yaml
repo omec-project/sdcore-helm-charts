@@ -5,6 +5,18 @@
 */}}
 
 {{- if .Values.config.gnbsim.deploy }}
+{{- if not .Values.config.useExistingConfigMap }}
+{{- $config := index .Values.config "gnbsim" }}
+{{- $gnbconf := index .Values.config.gnbsim.yamlCfgFiles "gnb.conf" }}
+{{- $configuration := index $gnbconf "configuration" }}
+
+{{- if not (hasKey $configuration "singleInterface") -}}
+{{- $_ := .Values.config.gnbsim.singleInterface | set $configuration "singleInterface" -}}
+{{- end }}
+{{- $_ := .Values.config.gnbsim.networkTopo | set $configuration "networkTopo" -}}
+{{- end }}
+
+
 ---
 apiVersion: v1
 kind: ConfigMap

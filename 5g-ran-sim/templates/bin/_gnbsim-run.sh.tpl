@@ -13,7 +13,13 @@ cp /gnbsim/bin/gnbsim /tmp/coredump/
 cd /gnbsim
 cat ./config/gnb.conf
 cat /etc/hosts
-ip route add 192.168.252.0/24 via 192.168.251.1
+
+{{- if not .Values.config.gnbsim.singleInterface }}
+{{- range .Values.config.gnbsim.networkTopo }}
+ip route add {{ .upfAddr }} via {{ .upfGw }}
+{{- end }}
+
 # Disabling checksum offloading to hardware
 ethtool -K enb tx off
+{{- end }}
 sleep infinity
