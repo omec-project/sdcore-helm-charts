@@ -16,10 +16,8 @@ cat /etc/hosts
 
 {{- if not .Values.config.gnbsim.singleInterface }}
 {{- range .Values.config.gnbsim.networkTopo }}
-ip route add {{ .upfAddr }} via {{ .upfGw }}
+ip route replace {{ .upfAddr }} via {{ .upfGw }}
+{{- end }}
 {{- end }}
 
-# Disabling checksum offloading to hardware
-ethtool -K enb tx off
-{{- end }}
 sleep infinity

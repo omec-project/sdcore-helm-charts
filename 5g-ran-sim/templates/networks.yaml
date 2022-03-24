@@ -8,10 +8,10 @@
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: enb-net
+  name: gnb-net
 {{- if $.Values.config.gnbsim.sriov.enabled }}
   annotations:
-    k8s.v1.cni.cncf.io/resourceName: intel.com/sriov_vfio_access_net
+    k8s.v1.cni.cncf.io/resourceName:  {{ .Values.config.gnbsim.sriov.resourceName }}
 {{- end }}
 spec:
   config: '{
@@ -19,6 +19,12 @@ spec:
     "cniVersion": "0.3.1",
 {{- end }}
     "type": {{ .Values.config.gnbsim.cniPlugin | quote }},
+  {{- if eq .Values.config.gnbsim.cniPlugin "macvlan" }}
+    "master": {{ .Values.config.gnbsim.iface | quote }},
+  {{- end }}
+  {{- if eq .Values.config.gnbsim.cniPlugin "host-device" }}
+    "device": {{ .Values.config.gnbsim.iface | quote }},
+  {{- end }}
     "ipam": {
         "type": {{ .Values.config.gnbsim.ipam | quote }}
     }

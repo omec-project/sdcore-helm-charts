@@ -33,10 +33,16 @@ config:
     path: /tmp/coredump
   gnbsim:
     deploy: true
+    singleInterface: false
+    networkTopo:
+      - upfAddr: "192.168.252.3/32"
+        upfGw: "192.168.251.1"
     sriov:
       enabled: disabled
+      resourceName: "intel.com/intel_sriov_vfio"
     ipam: static
-    cniPlugin: simpleovs #need override value
+    cniPlugin: macvlan # supported CNIs: sriov, macvlan, host-device
+    iface: data # master in macvlan or device in host-device
     gnb:
       ip: 192.168.251.5/24 #user plane IP at gnb if 2 separate interface provided
     profile:
@@ -47,10 +53,6 @@ config:
       nodePort:
         enabled: false
         port: 30071
-    singleInterface: false
-    networkTopo:
-      - upfAddr: "192.168.252.3/32"
-        upfGw: "192.168.251.1"
     yamlCfgFiles:
       gnb.conf:
         info:

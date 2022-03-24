@@ -27,8 +27,8 @@ spec:
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
            { 
-               "name": "enb-net",
-               "interface": "enb",
+               "name": "gnb-net",
+               "interface": "gnb",
 {{- if semverCompare ">=1.16-0" .Capabilities.KubeVersion.GitVersion }}
                "ips": [{{ .Values.config.gnbsim.gnb.ip | quote }}]
 {{- else }}
