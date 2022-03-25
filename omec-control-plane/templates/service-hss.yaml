@@ -13,64 +13,41 @@ metadata:
   labels:
 {{ tuple "hss" . | include "omec-control-plane.metadata_labels" | indent 4 }}
 spec:
+  type: {{ .Values.config.hss.serviceType }}
+{{- if .Values.config.hss.externalIP }}
+  externalIPs:
+    - {{ .Values.config.hss.externalIP }}
+{{- end }}
+{{- if eq .Values.config.hss.serviceType "LoadBalancer" }}
+{{- if .Values.config.hss.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.config.hss.loadBalancerIP }}
+{{- end }}
+{{- end }}
   selector:
 {{ tuple "hss" . | include "omec-control-plane.metadata_labels" | indent 4 }}
   ports:
   - name: s6a
     port: 3868
     protocol: TCP
+{{- if eq .Values.config.hss.serviceType "NodePort" }}
+{{- if .Values.config.hss.s6a.nodePort }}
+    nodePort: {{ .Values.config.hss.s6a.nodePort }}
+{{- end }}
+{{- end }}
   - name: config-port
     port: {{ .Values.config.hss.configPort.port }}
     protocol: TCP
+{{- if eq .Values.config.hss.serviceType "NodePort" }}
+{{- if .Values.config.hss.configPort.nodePort }}
+    nodePort: {{ .Values.config.hss.configPort.nodePort }}
+{{- end }}
+{{- end }}
   - name: prometheus-exporter
     port: {{ .Values.config.hss.prometheus.port }}
     protocol: TCP
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hss-headless
-  labels:
-{{ tuple "hss" . | include "omec-control-plane.metadata_labels" | indent 4 }}
-spec:
-  selector:
-{{ tuple "hss" . | include "omec-control-plane.metadata_labels" | indent 4 }}
-  clusterIP: None
-  ports:
-  - name: s6a
-    port: 3868
-    protocol: TCP
-  - name: config-port
-    port: {{ .Values.config.hss.configPort.port }}
-    protocol: TCP
-{{- if or .Values.config.hss.s6a.nodePort.enabled .Values.config.hss.configPort.nodePort.enabled}}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hss-external
-  labels:
-{{ tuple "hss" . | include "omec-control-plane.metadata_labels" | indent 4 }}
-spec:
-  selector:
-{{ tuple "hss" . | include "omec-control-plane.metadata_labels" | indent 4 }}
-  type: NodePort
-  ports:
-  {{- if .Values.config.hss.prometheus.nodePort.enabled }}
-    - name: prometheus-exporter
-      port: {{ .Values.config.hss.prometheus.port }}
-      protocol: TCP
-      nodePort: {{ .Values.config.hss.prometheus.nodePort.port }}
-  {{- end }}
-    - name: s6a
-      port: 3868
-      protocol: TCP
-      nodePort: {{ .Values.config.hss.s6a.nodePort.port }}
-  {{- if .Values.config.hss.configPort.nodePort.enabled }}
-    - name: config-port
-      port: {{ .Values.config.hss.configPort.port }}
-      protocol: TCP
-      nodePort: {{ .Values.config.hss.configPort.nodePort.port }}
-  {{- end }}
+{{- if eq .Values.config.hss.serviceType "NodePort" }}
+{{- if .Values.config.hss.prometheus.nodePort }}
+    nodePort: {{ .Values.config.hss.prometheus.nodePort }}
+{{- end }}
 {{- end }}
 {{- end }}

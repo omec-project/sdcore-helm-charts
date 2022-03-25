@@ -117,16 +117,16 @@ config:
     deploy: true
     podAnnotations:
       field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    serviceType: ClusterIP
+    #externalIP:
+    #loadBalancerIP:
+    # nodePort is valid only when serviceType is NodePort
     prometheus:
       port: 9089
-      nodePort:
-        enabled: false
-        port: 30084
+      nodePort: 30084
     urlport:
       port: 5000
-      nodePort:
-        enabled: false
-        port: 35000
+      nodePort: 35000
     cfgFiles:
       webuicfg.conf:
         info:
@@ -153,20 +153,19 @@ config:
       fluentbit.io/parser: pcrf
       field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
     pcrfdb: cassandra
+    serviceType: ClusterIP
+    #externalIP:
+    #loadBalancerIP:
+    # nodePort is valid only when serviceType is NodePort
     configPort:
       port: 8080
-      nodePort:
-        enabled: false
-        port: 30081
+      nodePort: 30081
     gx:
-      nodePort:
-        enabled: false
-        port: 33868
+      #port: 3868 # fixed
+      nodePort: 33868
     prometheus:
       port: 9089
-      nodePort:
-        enabled: false
-        port: 30086
+      nodePort: 30086
     # Provide the peer whitelist extension
     # The peer name must be a fqdn. We allow also a special "*" character as the
     # first label of the fqdn, to allow all fqdn with the same domain name.
@@ -284,20 +283,19 @@ config:
       fluentbit.io/parser: hss
       field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
     hssdb: cassandra
+    serviceType: ClusterIP
+    #externalIP:
+    #loadBalancerIP:
+    # nodePort is valid only when serviceType is NodePort
     s6a:
-      nodePort:
-        enabled: false
-        port: 33868
+      #port: 3868 # fixed
+      nodePort: 33868
     configPort:
       port: 8080
-      nodePort:
-        enabled: false
-        port: 30081
+      nodePort: 30081
     prometheus:
       port: 9089
-      nodePort:
-        enabled: false
-        port: 30086
+      nodePort: 30086
     # Provide the peer whitelist extension
     # The peer name must be a fqdn. We allow also a special "*" character as the
     # first label of the fqdn, to allow all fqdn with the same domain name.
@@ -402,19 +400,22 @@ config:
       fluentbit.io/parser: mme
       field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":3081,"schema":"HTTP"}]'
     spgwAddr: spgwc
+    serviceType: NodePort
+    #externalIP:
+    #loadBalancerIP:
+    # nodePort is valid only when serviceType is NodePort
     s11:
-      nodePort:
-        enabled: false
-        port: 32124
+      #port: use cfgFiles.config.json.s11.egtp_default_port
+      nodePort: 32124
     s6a:
-      nodePort:
-        enabled: false
-        port: 33869
+      #port: 3868 #fixed
+      nodePort: 33869
     prometheus:
       port: 3081
-      nodePort:
-        enabled: false
-        port: 30085
+      nodePort: 30085
+    s1ap:
+      #port: use cfgFiles.config.json.s6a.sctp_port
+      nodePort: 36412
     # See https://github.com/omec-project/openmme/blob/master/README.txt for more config options
     cfgFiles:
       config.json:
@@ -438,7 +439,6 @@ config:
             sec_alg_list: "[EEA0, EEA1, EEA2]"
         s1ap:
           sctp_port: 36412
-          sctp_port_external: 36412
         s11:
           egtp_default_port: 2123
           # sgw_addr and pgw_addr will be set dynamically if unset
@@ -457,26 +457,22 @@ config:
     podAnnotations:
       fluentbit.io/parser: spgwc
       field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    serviceType: ClusterIP
+    #externalIP:
+    #loadBalancerIP:
+    # nodePort is valid only when serviceType is NodePort
     s11:
       port: 2123
-      nodePort:
-        enabled: false
-        port: 32123
+      nodePort: 32123
     n4:
       port: 8805
-      nodePort:
-        enabled: false
-        port: 30021
+      nodePort: 30021
     prometheus:
       port: 9089
-      nodePort:
-        enabled: false
-        port: 30084
+      nodePort: 30084
     rest:
       port: 8080
-      nodePort:
-        enabled: false
-        port: 30080
+      nodePort: 30080
     cfgFiles:
       cp.json:
         global:

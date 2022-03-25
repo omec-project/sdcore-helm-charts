@@ -13,69 +13,49 @@ metadata:
   labels:
 {{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 4 }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.config.spgwc.serviceType }}
+{{- if .Values.config.spgwc.externalIP }}
+  externalIPs:
+    - {{ .Values.config.spgwc.externalIP }}
+{{- end }}
+{{- if eq .Values.config.spgwc.serviceType "LoadBalancer" }}
+{{- if .Values.config.spgwc.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.config.spgwc.loadBalancerIP }}
+{{- end }}
+{{- end }}
   selector:
 {{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 4 }}
   ports:
   - name: s11
     port: {{ .Values.config.spgwc.s11.port }}
     protocol: UDP
+{{- if eq .Values.config.spgwc.serviceType "NodePort" }}
+{{- if .Values.config.spgwc.s11.nodePort }}
+    nodePort: {{ .Values.config.spgwc.s11.nodePort }}
+{{- end }}
+{{- end }}
   - name: pfcp
     port: {{ .Values.config.spgwc.n4.port }}
     protocol: UDP
+{{- if eq .Values.config.spgwc.serviceType "NodePort" }}
+{{- if .Values.config.spgwc.n4.nodePort }}
+    nodePort: {{ .Values.config.spgwc.n4.nodePort }}
+{{- end }}
+{{- end }}
   - name: prometheus-exporter
     port: {{ .Values.config.spgwc.prometheus.port }}
     protocol: TCP
+{{- if eq .Values.config.spgwc.serviceType "NodePort" }}
+{{- if .Values.config.spgwc.prometheus.nodePort }}
+    nodePort: {{ .Values.config.spgwc.prometheus.nodePort }}
+{{- end }}
+{{- end }}
   - name: rest
     port: {{ .Values.config.spgwc.rest.port }}
     protocol: TCP
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: spgwc-headless
-  labels:
-{{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 4 }}
-spec:
-  clusterIP: None
-  selector:
-{{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 4 }}
-{{- if or .Values.config.spgwc.s11.nodePort.enabled .Values.config.spgwc.n4.nodePort.enabled .Values.config.spgwc.prometheus.nodePort.enabled .Values.config.spgwc.rest.nodePort.enabled }}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: spgwc-external
-  labels:
-{{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 4 }}
-spec:
-  type: NodePort
-  selector:
-{{ tuple "spgwc" . | include "omec-control-plane.metadata_labels" | indent 4 }}
-  ports:
-{{- if .Values.config.spgwc.s11.nodePort.enabled }}
-  - name: s11
-    port: {{ .Values.config.spgwc.s11.port }}
-    protocol: UDP
-    nodePort: {{ .Values.config.spgwc.s11.nodePort.port }}
-{{- end }}
-{{- if .Values.config.spgwc.n4.nodePort.enabled }}
-  - name: pfcp
-    port: {{ .Values.config.spgwc.n4.port }}
-    protocol: UDP
-    nodePort: {{ .Values.config.spgwc.n4.nodePort.port }}
-{{- end }}
-{{- if .Values.config.spgwc.prometheus.nodePort.enabled }}
-  - name: prometheus-exporter
-    port: {{ .Values.config.spgwc.prometheus.port }}
-    protocol: TCP
-    nodePort: {{ .Values.config.spgwc.prometheus.nodePort.port }}
-{{- end }}
-{{- if .Values.config.spgwc.rest.nodePort.enabled }}
-  - name: rest
-    port: {{ .Values.config.spgwc.rest.port }}
-    protocol: TCP
-    nodePort: {{ .Values.config.spgwc.rest.nodePort.port }}
+{{- if eq .Values.config.spgwc.serviceType "NodePort" }}
+{{- if .Values.config.spgwc.rest.nodePort }}
+    nodePort: {{ .Values.config.spgwc.rest.nodePort }}
 {{- end }}
 {{- end }}
 {{- end }}
