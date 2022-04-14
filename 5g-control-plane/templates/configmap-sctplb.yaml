@@ -1,0 +1,38 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.config.sctplb.deploy }}
+
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- $sctplbcfg := index .Values.config.sctplb.cfgFiles "sctplb.yaml" }}
+
+{{- if not (hasKey $sctplbcfg.configuration "ngappPort") -}}
+{{- $_ := .Values.config.sctplb.ngapp.port | set $sctplbcfg.configuration "ngappPort" -}}
+{{- end }}
+
+{{- if not (hasKey $sctplbcfg.configuration "sctpGrpcPort") -}}
+{{- $_ := .Values.config.sctplb.sctp_grpc.port | set $sctplbcfg.configuration "sctpGrpcPort" -}}
+{{- end }}
+
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sctplb
+  labels:
+{{ tuple "sctplb" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+data:
+  sctplb-run.sh: |
+{{ tuple "bin/_sctplb-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- range $key, $value := .Values.config.sctplb.cfgFiles }}
+  {{ $key }}: |-
+{{ toYaml $value | indent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

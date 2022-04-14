@@ -14,9 +14,22 @@
 {{- $_ := .Values.config.amf.sbi.port | set $sbi "port" -}}
 {{- end }}
 
+{{- if not (hasKey $amfcfg.configuration "ngappPort") -}}
+{{- $_ := .Values.config.amf.ngapp.port | set $amfcfg.configuration "ngappPort" -}}
+{{- end }}
+
+{{- if not (hasKey $amfcfg.configuration "sctpGrpcPort") -}}
+{{- $_ := .Values.config.amf.sctp_grpc.port | set $amfcfg.configuration "sctpGrpcPort" -}}
+{{- end }}
+
 {{- if not (hasKey $amfcfg "logger") -}}
 {{- $_ := .Values.config.logger | set $amfcfg "logger" -}}
 {{- end }}
+
+{{- if not (hasKey $amfcfg.configuration "enableSctpLb") -}}
+{{- $_ := .Values.config.sctplb.deploy | set $amfcfg.configuration "enableSctpLb" -}}
+{{- end }}
+
 
 {{- end }}
 

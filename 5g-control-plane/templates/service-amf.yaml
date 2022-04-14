@@ -45,4 +45,27 @@ spec:
     nodePort: {{ .Values.config.amf.ngapp.nodePort }}
 {{- end }}
 {{- end }}
+  - name: sctp-grpc
+    port: {{ .Values.config.amf.sctp_grpc.port }}
+    protocol: TCP
+{{- if eq .Values.config.amf.serviceType "NodePort" }}
+{{- if .Values.config.amf.sctp_grpc.nodePort }}
+    nodePort: {{ .Values.config.amf.sctp_grpc.nodePort }}
+{{- end }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: amf-headless
+  labels:
+{{ tuple "amf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  selector:
+{{ tuple "amf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+  clusterIP: None
+  ports:
+  - name: grpc
+    port: 9000
+    protocol: TCP
 {{- end }}

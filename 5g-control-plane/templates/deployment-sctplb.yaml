@@ -1,0 +1,103 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.config.sctplb.deploy }}
+{{ tuple "sctplb" . | include "5g-control-plane.service_account" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sctplb
+  labels:
+{{ tuple "sctplb" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: 1
+  #serviceName: sctplb-headless
+  selector:
+    matchLabels:
+{{ tuple "sctplb" . | include "5g-control-plane.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "sctplb" . | include "5g-control-plane.metadata_labels" | indent 8 }}
+    {{- with .Values.config.sctplb.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    spec:
+      serviceAccountName: sctplb
+    {{- if hasKey .Values.images "pullSecrets" }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecrets | indent 8 }}
+    {{- end }}
+      initContainers:
+      - name: wait-nrf-module
+        image: {{ .Values.images.tags.init | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        command: ['sh', '-c', 'until nslookup nrf; do echo waiting for nrf; sleep 4; done;']
+    {{- if .Values.config.coreDump.enabled }}
+{{ tuple "sctplb" . | include "5g-control-plane.coredump_init" | indent 6 }}
+    {{- end }}
+      containers:
+      - name: sctplb
+        image: {{ .Values.images.tags.sctplb }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          runAsUser: 0
+      {{- end }}
+        stdin: true
+        tty: true
+        command: ["/sdcore/script/sctplb-run.sh"]
+        env:
+        - name: GRPC_GO_LOG_VERBOSITY_LEVEL
+          value: {{ .Values.config.grpc.golog_verbosity | quote }}
+        - name: GRPC_GO_LOG_SEVERITY_LEVEL
+          value: {{ .Values.config.grpc.severity | quote }}
+        - name: GRPC_TRACE
+          value: {{ .Values.config.grpc.trace | quote }}
+        - name: GRPC_VERBOSITY
+          value: {{ .Values.config.grpc.verbosity | quote }}
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      {{- if .Values.config.managedByConfigPod.enabled }}
+        - name: MANAGED_BY_CONFIG_POD 
+          value: "true"
+      {{- end }}
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.sctplb | indent 10 }}
+      {{- end }}
+        volumeMounts:
+        - name: run-script
+          mountPath: /sdcore/script/sctplb-run.sh
+          subPath: sctplb-run.sh
+        - name: sctplb-config
+          mountPath: /sdcore/config
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      volumes:
+      - name: run-script
+        configMap:
+          name: sctplb
+          defaultMode: 493
+      - name: sctplb-config
+        configMap:
+          name: sctplb
+          defaultMode: 493
+    {{- if .Values.config.coreDump.enabled }}
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+{{- end }}

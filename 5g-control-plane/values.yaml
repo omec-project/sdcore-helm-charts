@@ -15,10 +15,18 @@ images:
     udr: omecproject/5gc-udr:master-3756e35
     udm: omecproject/5gc-udm:master-15369ab
     webui: omecproject/5gc-webui:master-727636a
+    sctplb: sctplb:0.0.1-dev-local1
   pullPolicy: IfNotPresent
 
 resources:
   enabled: false
+  sctplb:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
   amf:
     requests:
       cpu: 2
@@ -357,6 +365,33 @@ config:
               nsiInformationList:
                 - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
                   nsiId: 22
+  sctplb:
+    deploy: false
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    serviceType: ClusterIP
+    sctp_grpc:
+      port: 9000
+      #nodePort: 30088
+    ngapp:
+      #externalIp:
+      port: 38412
+      #nodePort: 30071
+    cfgFiles:
+      # https://github.com/free5gc/free5gc/blob/main/config/amfcfg.yaml
+      sctplb.yaml:
+        info:
+          version: 1.0.0
+          description: SCTPLB initial local configuration
+        logger:
+          sctpLogs: info
+          dispatcherLogs: info
+          clientdiscLogs: info
+        configuration:
+          serviceNames:
+          - "amf-headless"
+          ngapIpList:
+            - "0.0.0.0"
   amf:
     deploy: true
     podAnnotations:
@@ -366,6 +401,9 @@ config:
       port: 9089
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30084
+    sctp_grpc:
+      port: 9000
+      #nodePort: 30088
     sbi:
       port: 29518
       #nodePort: 30088
