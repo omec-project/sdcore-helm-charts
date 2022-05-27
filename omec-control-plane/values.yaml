@@ -14,7 +14,7 @@ images:
     spgwc: omecproject/spgw:master-e419062
     pcrf: omecproject/c3po-pcrf:pcrf-d58dd1c
     pcrfdb: omecproject/c3po-pcrfdb:pcrf-d58dd1c
-    config4g: omecproject/5gc-webui:master-727636a
+    config4g: omecproject/5gc-webui:master-87adbcc
   pullPolicy: IfNotPresent
 
 nodeSelectors:
