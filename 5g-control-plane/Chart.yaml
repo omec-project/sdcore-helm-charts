@@ -8,10 +8,15 @@ description: SD-Core 5G control plane services
 name: 5g-control-plane
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 0.7.2
+version: 0.7.3
 
 dependencies:
   - name: mongodb
     version: 10.7.1
     repository: https://charts.bitnami.com/bitnami
     condition: mongodb.deploy
+  - name: kafka
+    version: 16.2.10
+    repository: https://charts.bitnami.com/bitnami
+    condition: kafka.deploy
+

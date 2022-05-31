@@ -16,6 +16,7 @@ images:
     udm: omecproject/5gc-udm:master-5992f3f
     webui: omecproject/5gc-webui:master-87adbcc
     sctplb: sctplb:0.0.1-dev-local1
+    metrics: metricfunc:0.0.1-dev-local0
   pullPolicy: IfNotPresent
 
 resources:
@@ -90,6 +91,17 @@ resources:
     limits:
       cpu: 1
       memory: 1Gi
+
+  metrics:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+kafka:
+  deploy: false
 
 mongodb:
   deploy: true
@@ -631,3 +643,32 @@ config:
             - mcc: "208"
               mnc: "93"
           groupId: ausfGroup001
+  metrics:
+    deploy: false
+    serviceType: ClusterIP
+    prometheus:
+      port: 9089
+    cfgFiles:
+      metricscfg.conf:
+        info:
+          version: 1.0.0
+          description: Metrics initial local configuration
+        logger:
+          logLevel: "debug"
+        configuration:
+          nfStream:
+            urls:
+              - "sd-core-kafka-headless:9092"
+            topic:
+              name: "sdcore-nf-data-source"
+              group:
+                analytics: "analytics"
+                mongodb: "mongodb"
+                restapi: "restapi"
+                prometheus: "prometheus"
+          analyticsStream:
+            enable: true
+            urls:
+               - "sd-core-kafka-headless:9092"
+            topic: "sdcore-analytics-feed"
+
