@@ -8,7 +8,7 @@ name: sd-core
 description: SD-Core control plane services
 icon: https://guide.opencord.org/logos/cord.svg
 type: application
-version: 0.11.3
+version: 0.11.4
 home: https://opennetworking.org/sd-core/
 maintainers:
   - name: SD-Core Support
@@ -26,9 +26,8 @@ dependencies:
     condition: omec-sub-provision.enable
 
   - name: 5g-control-plane
-    version: 0.7.2
-    #repository: https://charts.aetherproject.org
-    repository: "file://../5g-control-plane"
+    version: 0.7.3
+    repository: https://charts.aetherproject.org
     condition: 5g-control-plane.enable5G
 
   - name: bess-upf
