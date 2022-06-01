@@ -35,7 +35,7 @@ omec-sub-provision:
 5g-control-plane:
   enable5G: true
   kafka:
-    deploy: true
+    deploy: false
     persistence:
       enabled: false
     zookeeper:
