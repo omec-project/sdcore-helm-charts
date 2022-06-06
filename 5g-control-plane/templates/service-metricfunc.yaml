@@ -1,0 +1,28 @@
+{{/*
+# Copyright 2022-present Open Networking Foundation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.config.metricfunc.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metricfunc
+  labels:
+{{ tuple "metricfunc" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  type: {{ .Values.config.metricfunc.serviceType }}
+  selector:
+{{ tuple "metricfunc" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+  ports:
+  - name: prometheus-exporter
+    port: {{ .Values.config.metricfunc.prometheus.port }}
+    protocol: TCP
+{{- if eq .Values.config.metricfunc.serviceType "NodePort" }}
+{{- if .Values.config.metricfunc.prometheus.nodePort }}
+    nodePort: {{ .Values.config.metricfunc.prometheus.nodePort }}
+{{- end }}
+{{- end }}
+{{- end }}

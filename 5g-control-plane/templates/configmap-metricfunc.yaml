@@ -1,0 +1,30 @@
+{{/*
+# Copyright 2022-present Open Networking Foundation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.config.metricfunc.deploy }}
+
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- $metricscfg := index .Values.config.metricfunc.cfgFiles "metricscfg.conf" }}
+
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metricfunc
+  labels:
+{{ tuple "metricfunc" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+data:
+  metricfunc-run.sh: |
+{{ tuple "bin/_metricfunc-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- range $key, $value := .Values.config.metricfunc.cfgFiles }}
+  {{ $key }}: |-
+{{ toYaml $value | indent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -30,6 +30,10 @@
 {{- $_ := .Values.config.sctplb.deploy | set $amfcfg.configuration "enableSctpLb" -}}
 {{- end }}
 
+{{- if not (hasKey $amfcfg.configuration "nfKafka") -}}
+{{- $_ := .Values.kafka.nfKafka | set $amfcfg.configuration "nfKafka" -}}
+{{- $_ := .Values.kafka.deploy | set $amfcfg.configuration.nfKafka "enable" -}}
+{{- end }}
 
 {{- end }}
 

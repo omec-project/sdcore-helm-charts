@@ -16,6 +16,10 @@
 {{- if not (hasKey $sbi "port") -}}
 {{- $_ := .Values.config.smf.sbi.port | set $sbi "port" -}}
 {{- end }}
+{{- if not (hasKey $smfcfg.configuration "nfKafka") -}}
+{{- $_ := .Values.kafka.nfKafka | set $smfcfg.configuration "nfKafka" -}}
+{{- $_ := .Values.kafka.deploy | set $smfcfg.configuration.nfKafka "enable" -}}
+{{- end }}
 {{- end }}
 
 ---

@@ -3,38 +3,38 @@
 
 # SPDX-License-Identifier: Apache-2.0
 */}}
-{{- if .Values.config.metrics.deploy }}
-{{ tuple "metrics" . | include "5g-control-plane.service_account" }}
+{{- if .Values.config.metricfunc.deploy }}
+{{ tuple "metricfunc" . | include "5g-control-plane.service_account" }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: metrics
+  name: metricfunc
   labels:
-{{ tuple "metrics" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+{{ tuple "metricfunc" . | include "5g-control-plane.metadata_labels" | indent 4 }}
 spec:
   replicas: 1
-  #serviceName: metrics-headless
+  #serviceName: metricfunc-headless
   selector:
     matchLabels:
-{{ tuple "metrics" . | include "5g-control-plane.metadata_labels" | indent 6 }}
+{{ tuple "metricfunc" . | include "5g-control-plane.metadata_labels" | indent 6 }}
   template:
     metadata:
       labels:
-{{ tuple "metrics" . | include "5g-control-plane.metadata_labels" | indent 8 }}
-    {{- with .Values.config.metrics.podAnnotations }}
+{{ tuple "metricfunc" . | include "5g-control-plane.metadata_labels" | indent 8 }}
+    {{- with .Values.config.metricfunc.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
     spec:
-      serviceAccountName: metrics
+      serviceAccountName: metricfunc
     {{- if hasKey .Values.images "pullSecrets" }}
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
       containers:
-      - name: metrics
-        image: {{ .Values.images.tags.metrics }}
+      - name: metricfunc
+        image: {{ .Values.images.tags.metricfunc }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:
@@ -42,7 +42,7 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: [ "/metricfunc/script/metrics-run.sh" ]
+        command: [ "/metricfunc/script/metricfunc-run.sh" ]
         env:
         - name: POD_IP
           valueFrom:
@@ -50,13 +50,13 @@ spec:
               fieldPath: status.podIP
       {{- if .Values.resources.enabled }}
         resources:
-{{ toYaml .Values.resources.metrics | indent 10 }}
+{{ toYaml .Values.resources.metricfunc | indent 10 }}
       {{- end }}
         volumeMounts:
         - name: run-script
-          mountPath: /metricfunc/script/metrics-run.sh
-          subPath: metrics-run.sh
-        - name: metrics-config
+          mountPath: /metricfunc/script/metricfunc-run.sh
+          subPath: metricfunc-run.sh
+        - name: metricfunc-config
           mountPath: /metricfunc/config
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
@@ -65,11 +65,11 @@ spec:
       volumes:
       - name: run-script
         configMap:
-          name: metrics
+          name: metricfunc
           defaultMode: 493
-      - name: metrics-config
+      - name: metricfunc-config
         configMap:
-          name: metrics
+          name: metricfunc
           defaultMode: 493
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs

@@ -15,8 +15,8 @@ images:
     udr: omecproject/5gc-udr:master-c9c04fe
     udm: omecproject/5gc-udm:master-5992f3f
     webui: omecproject/5gc-webui:master-87adbcc
-    sctplb: sctplb:0.0.1-dev-local1
-    metrics: metricfunc:0.0.1-dev-local0
+    sctplb: omecproject/sctplb:master-538dad6
+    metricfunc: metricfunc:0.0.1-dev-local0
   pullPolicy: IfNotPresent
 
 resources:
@@ -92,7 +92,7 @@ resources:
       cpu: 1
       memory: 1Gi
 
-  metrics:
+  metricfunc:
     requests:
       cpu: 1
       memory: 1Gi
@@ -102,6 +102,10 @@ resources:
 
 kafka:
   deploy: false
+  nfKafka:
+    urls:
+      - "sd-core-kafka-headless:9092"
+    topic: "sdcore-nf-data-source"
 
 mongodb:
   deploy: true
@@ -643,7 +647,7 @@ config:
             - mcc: "208"
               mnc: "93"
           groupId: ausfGroup001
-  metrics:
+  metricfunc:
     deploy: false
     serviceType: ClusterIP
     prometheus:
