@@ -6,7 +6,7 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    simapp: omecproject/simapp:main-2a3d85f
+    simapp: omecproject/simapp:main-9545c5e
   pullPolicy: IfNotPresent
 
 resources:
