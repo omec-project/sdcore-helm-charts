@@ -11,6 +11,10 @@
 {{- $config := index $nrfcfg "configuration" }}
 {{- $sbi := index $config "sbi" }}
 
+{{- if not (hasKey $config "mongodb") -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $config "mongodb" -}}
+{{- end }}
+
 {{- if not (hasKey $config "MongoDBName") -}}
 {{- $_ := .Values.config.mongodb.name | set $config "MongoDBName" -}}
 {{- end }}

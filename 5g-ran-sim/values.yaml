@@ -6,7 +6,7 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    gnbsim: omecproject/5gc-gnbsim:main-238bdee
+    gnbsim: omecproject/5gc-gnbsim:main-d2e5b8c
   pullPolicy: IfNotPresent
 
 nodeSelectors:

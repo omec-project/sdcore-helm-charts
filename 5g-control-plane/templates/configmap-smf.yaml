@@ -10,6 +10,10 @@
 {{- $smfcfg := index .Values.config.smf.cfgFiles "smfcfg.conf" }}
 {{- $sbi := index $smfcfg.configuration "sbi" }}
 
+{{- if not (hasKey $smfcfg "mongodb") -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $smfcfg "mongodb" -}}
+{{- end }}
+
 {{- if not (hasKey $smfcfg "logger") -}}
 {{- $_ := .Values.config.logger | set $smfcfg "logger" -}}
 {{- end }}
