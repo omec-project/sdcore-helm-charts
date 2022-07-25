@@ -17,12 +17,14 @@ spec:
   selector:
 {{ tuple "smf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
+{{- if eq .Values.config.upfadapter.deploy false }}
   - name: pfcp
     port: {{ .Values.config.smf.n4.port }}
     protocol: UDP
 {{- if eq .Values.config.smf.serviceType "NodePort" }}
 {{- if .Values.config.smf.n4.nodePort }}
     nodePort: {{ .Values.config.smf.n4.nodePort }}
+{{- end }}
 {{- end }}
 {{- end }}
   - name: prometheus-exporter

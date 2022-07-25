@@ -1,3 +1,4 @@
+# SPDX-FileCopyrightText: 2022-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -17,6 +18,7 @@ images:
     webui: omecproject/5gc-webui:master-fec9bfc
     sctplb: omecproject/sctplb:master-538dad6
     metricfunc: metricfunc:0.0.1-dev-local0
+    upfadapter: omecproject/5gc-smf:master-b73f587
   pullPolicy: IfNotPresent
 
 resources:
@@ -48,6 +50,13 @@ resources:
       memory: 1Gi
     limits:
       cpu: 2
+      memory: 1Gi
+  upfadapter:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 1
       memory: 1Gi
   ausf:
     requests:
@@ -394,7 +403,6 @@ config:
       port: 38412
       #nodePort: 30071
     cfgFiles:
-      # https://github.com/free5gc/free5gc/blob/main/config/amfcfg.yaml
       sctplb.yaml:
         info:
           version: 1.0.0
@@ -434,6 +442,8 @@ config:
           version: 1.0.0
           description: AMF initial local configuration
         configuration:
+          amfDBName: sdcore_amf
+          enableDBStore: false
           ngapIpList:
             - "0.0.0.0"
           amfName: AMF
@@ -528,6 +538,9 @@ config:
           version: 1.0.0
           description: NRF initial local configuration
         configuration:
+          mongoDBStreamEnable: true
+          nfProfileExpiryEnable: true
+          nfKeepAliveTime: 60
           sbi:
             scheme: http
             bindingIPv4: "0.0.0.0"
@@ -564,6 +577,8 @@ config:
           version: 1.0.0
           description: SMF initial local configuration
         configuration:
+          smfDBName: sdcore_smf
+          enableDBStore: false
           pfcp:
              addr: "POD_IP"
           smfName: SMF
@@ -675,4 +690,21 @@ config:
             urls:
                - "sd-core-kafka-headless:9092"
             topic: "sdcore-analytics-feed"
+  upfadapter:
+    deploy: false
+    serviceType: ClusterIP
+    n4:
+      port: 8805
+      # Provide nodePort when serviceType is NodePort
+      # nodePort: 30021
+    rest:
+      port: 8090
+      #nodePort: 30080
+    cfgFiles:
+      config.yaml:
+        info:
+          version: 1.0.0
+          description: UPF Adapter initial local configuration
+        logger:
+          level: info
 

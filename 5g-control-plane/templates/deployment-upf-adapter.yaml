@@ -1,0 +1,83 @@
+{{/*
+# SPDX-FileCopyrightText: 2022-present Intel Corporation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.config.upfadapter.deploy }}
+{{ tuple "upfadapter" . | include "5g-control-plane.service_account" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upf-adapter
+  labels:
+{{ tuple "upfadapter" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: 1
+  #serviceName: upfadapter-headless
+  selector:
+    matchLabels:
+{{ tuple "upfadapter" . | include "5g-control-plane.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "upfadapter" . | include "5g-control-plane.metadata_labels" | indent 8 }}
+    {{- with .Values.config.upfadapter.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    spec:
+      serviceAccountName: upfadapter
+    {{- if hasKey .Values.images "pullSecrets" }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecrets | indent 8 }}
+    {{- end }}
+      containers:
+      - name: upfadapter
+        image: {{ .Values.images.tags.upfadapter }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.config.coreDump.enabled }}
+        securityContext:
+          runAsUser: 0
+      {{- end }}
+        stdin: true
+        tty: true
+        command: ["/free5gc/script/upf-adapter-run.sh"]
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.upfadapter | indent 10 }}
+      {{- end }}
+        volumeMounts:
+        - name: run-script
+          mountPath: /free5gc/script/upf-adapter-run.sh
+          subPath: upf-adapter-run.sh
+        - name: upfadapter-config
+          mountPath: /free5gc/config
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      volumes:
+      - name: run-script
+        configMap:
+          name: upf-adapter
+          defaultMode: 493
+      - name: upfadapter-config
+        configMap:
+          name: upf-adapter
+          defaultMode: 493
+    {{- if .Values.config.coreDump.enabled }}
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+{{- end }}

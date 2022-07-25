@@ -1,5 +1,7 @@
 ---
+# SPDX-FileCopyrightText: 2022-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
+
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -8,7 +10,7 @@ description: SD-Core 5G control plane services
 name: 5g-control-plane
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 0.7.6
+version: 0.7.7
 
 dependencies:
   - name: mongodb

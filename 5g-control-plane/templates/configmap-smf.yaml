@@ -1,4 +1,5 @@
 {{/*
+# SPDX-FileCopyrightText: 2022-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
@@ -19,6 +20,9 @@
 {{- end }}
 {{- if not (hasKey $sbi "port") -}}
 {{- $_ := .Values.config.smf.sbi.port | set $sbi "port" -}}
+{{- end }}
+{{- if not (hasKey $smfcfg.configuration "enableUPFAdapter") -}}
+{{- $_ := .Values.config.upfadapter.deploy | set $smfcfg.configuration "enableUPFAdapter" -}}
 {{- end }}
 {{- if not (hasKey $smfcfg.configuration "nfKafka") -}}
 {{- $_ := .Values.kafka.nfKafka | set $smfcfg.configuration "nfKafka" -}}

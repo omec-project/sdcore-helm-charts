@@ -1,0 +1,35 @@
+{{/*
+
+# SPDX-FileCopyrightText: 2022-present Intel Corporation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.config.upfadapter.deploy }}
+
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- $upfadaptercfg := index .Values.config.upfadapter.cfgFiles "config.yaml" }}
+
+{{- if not (hasKey $upfadaptercfg "mongodb") -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $upfadaptercfg "mongodb" -}}
+{{- end }}
+
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: upf-adapter
+  labels:
+{{ tuple "upfadapter" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+data:
+  upf-adapter-run.sh: |
+{{ tuple "bin/_upf-adapter-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
+{{- if not .Values.config.useExistingConfigMap -}}
+{{- range $key, $value := .Values.config.upfadapter.cfgFiles }}
+  {{ $key }}: |-
+{{ toYaml $value | indent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}
