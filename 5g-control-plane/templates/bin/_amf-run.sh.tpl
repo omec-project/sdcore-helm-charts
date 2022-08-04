@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright 2020-present Open Networking Foundation
 #
@@ -14,4 +14,4 @@ cp $IMGPATH/amf/amf /tmp/coredump/
 cd $IMGPATH
 cat config/amfcfg.conf
 
-GOTRACEBACK=crash ./amf/amf -amfcfg config/amfcfg.conf
+#GOTRACEBACK=crash ./amf/amf -amfcfg config/amfcfg.conf
