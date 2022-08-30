@@ -35,12 +35,8 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
-      initContainers:
-      - name: wait-ausf-module2
-        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
-        imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup ausf; do echo waiting for ausf; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
+      initContainers:
 {{ tuple "ausf" . | include "5g-control-plane.coredump_init" | indent 6 }}
     {{- end }}
       containers:

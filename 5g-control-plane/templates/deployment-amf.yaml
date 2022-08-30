@@ -32,6 +32,10 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
+      {{- if .Values.config.coreDump.enabled }}
+      initContainers:
+      {{ tuple "amf" . | include "5g-control-plane.coredump_init" | indent 6 }}
+      {{- end }}
       containers:
       - name: amf
         image: {{ .Values.images.repository }}{{ .Values.images.tags.amf }}

@@ -33,13 +33,9 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
-      initContainers:
-      - name: wait-udr-module
-        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
-        imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup udr; do echo waiting for udr; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
-{{ tuple "udr" . | include "5g-control-plane.coredump_init" | indent 6 }}
+      initContainers:
+    {{ tuple "udr" . | include "5g-control-plane.coredump_init" | indent 6 }}
     {{- end }}
       containers:
       - name: udr

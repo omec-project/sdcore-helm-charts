@@ -32,13 +32,9 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
-      initContainers:
-      - name: wait-webui-module
-        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
-        imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup webui; do echo waiting for webui; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
-{{ tuple "webui" . | include "5g-control-plane.coredump_init" | indent 6 }}
+      initContainers:
+    {{ tuple "webui" . | include "5g-control-plane.coredump_init" | indent 6 }}
     {{- end }}
       containers:
       - name: webui

@@ -33,13 +33,9 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
-      initContainers:
-      - name: wait-nssf-module
-        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
-        imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup nssf; do echo waiting for nssf; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
-{{ tuple "nssf" . | include "5g-control-plane.coredump_init" | indent 6 }}
+      initContainers:
+    {{ tuple "nssf" . | include "5g-control-plane.coredump_init" | indent 6 }}
     {{- end }}
       containers:
       - name: nssf
