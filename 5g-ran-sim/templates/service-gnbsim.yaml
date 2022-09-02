@@ -13,13 +13,16 @@ metadata:
   labels:
 {{ tuple "gnbsim" . | include "5g-ransim-plane.metadata_labels" | indent 4 }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.config.gnbsim.serviceType }}
   selector:
 {{ tuple "gnbsim" . | include "5g-ransim-plane.metadata_labels" | indent 4 }}
   ports:
   - name: ngapp
     port: {{ .Values.config.gnbsim.ngapp.port }}
     protocol: SCTP
+  - name: http-api
+    port: {{ .Values.config.gnbsim.httpServer.port }}
+    protocol: TCP
 {{- if .Values.config.gnbsim.profile.enable }}
   - name: profile-http
     port: {{ .Values.config.gnbsim.profile.port }}

@@ -22,8 +22,8 @@
 {{- $_ := .Values.config.amf.sctp_grpc.port | set $amfcfg.configuration "sctpGrpcPort" -}}
 {{- end }}
 
-{{- if not (hasKey $amfcfg "mongodb") -}}
-{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $amfcfg "mongodb" -}}
+{{- if not (hasKey $amfcfg.configuration "mongodb") -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $amfcfg.configuration "mongodb" -}}
 {{- end }}
 
 {{- if not (hasKey $amfcfg "logger") -}}

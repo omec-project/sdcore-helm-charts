@@ -33,6 +33,7 @@ config:
     path: /tmp/coredump
   gnbsim:
     deploy: true
+    serviceType: ClusterIP
     singleInterface: false
     networkTopo:
       - upfAddr: "192.168.252.3/32"
@@ -45,6 +46,10 @@ config:
     iface: data # master in macvlan or device in host-device
     gnb:
       ip: 192.168.251.5/24 #user plane IP at gnb if 2 separate interface provided
+    httpServer:
+      enable: true
+      ipAddr: "POD_IP"
+      port: 6000
     profile:
       enable: true
       port: 5000
