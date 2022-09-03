@@ -47,7 +47,7 @@ config:
     gnb:
       ip: 192.168.251.5/24 #user plane IP at gnb if 2 separate interface provided
     httpServer:
-      enable: true
+      enable: false
       ipAddr: "POD_IP"
       port: 6000
     profile:
