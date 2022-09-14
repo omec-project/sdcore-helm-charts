@@ -1,0 +1,23 @@
+{{/*
+# Copyright 2022-present Open Networking Foundation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.config.dbtestapp.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbtestapp
+  labels:
+{{ tuple "dbtestapp" . | include "5g-test-apps.metadata_labels" | indent 4 }}
+spec:
+  type: {{ .Values.config.dbtestapp.serviceType }}
+  selector:
+{{ tuple "dbtestapp" . | include "5g-test-apps.metadata_labels" | indent 4 }}
+  ports:
+  - name: http-api
+    port: {{ .Values.config.dbtestapp.httpServer.port }}
+    protocol: TCP
+{{- end }}
