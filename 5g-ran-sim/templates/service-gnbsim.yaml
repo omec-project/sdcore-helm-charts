@@ -23,9 +23,9 @@ spec:
   - name: http-api
     port: {{ .Values.config.gnbsim.httpServer.port }}
     protocol: TCP
-{{- if .Values.config.gnbsim.profile.enable }}
+{{- if .Values.config.gnbsim.goProfile.enable }}
   - name: profile-http
-    port: {{ .Values.config.gnbsim.profile.port }}
+    port: {{ .Values.config.gnbsim.goProfile.port }}
     protocol: TCP
 {{- end }}
 {{- end }}

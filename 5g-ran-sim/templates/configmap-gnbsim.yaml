@@ -10,6 +10,10 @@
 {{- $gnbconf := index .Values.config.gnbsim.yamlCfgFiles "gnb.conf" }}
 {{- $configuration := index $gnbconf "configuration" }}
 
+{{- if not (hasKey $configuration "goProfile") -}}
+{{- $_ := dict "enable" .Values.config.gnbsim.goProfile.enable "port" .Values.config.gnbsim.goProfile.port | set $configuration "goProfile" -}}
+{{- end }}
+
 {{- if not (hasKey $configuration "httpServer") -}}
 {{- $_ := dict "enable" .Values.config.gnbsim.httpServer.enable "ipAddr" .Values.config.gnbsim.httpServer.ipAddr "port" .Values.config.gnbsim.httpServer.port | set $configuration "httpServer" -}}
 {{- end }}

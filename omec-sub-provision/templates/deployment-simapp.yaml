@@ -35,8 +35,12 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
-    {{- if .Values.config.coreDump.enabled }}
       initContainers:
+      - name: wait-simapp-module2
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        command: ['sh', '-c', 'until nslookup simapp; do echo waiting for simapp; sleep 4; done;']
+    {{- if .Values.config.coreDump.enabled }}
     {{ tuple "simapp" . | include "omec-sub-provision.coredump_init" | indent 6 }}
     {{- end }}
       containers:

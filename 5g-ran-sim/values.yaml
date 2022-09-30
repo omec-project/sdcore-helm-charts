@@ -6,7 +6,7 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    gnbsim: omecproject/5gc-gnbsim:main-d2e5b8c
+    gnbsim: omecproject/5gc-gnbsim:main-cd26209
   pullPolicy: IfNotPresent
 
 nodeSelectors:
@@ -50,7 +50,7 @@ config:
       enable: false
       ipAddr: "POD_IP"
       port: 6000
-    profile:
+    goProfile:
       enable: true
       port: 5000
     ngapp:
