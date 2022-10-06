@@ -18,12 +18,8 @@
 {{- $_ := dict "enable" .Values.config.gnbsim.httpServer.enable "ipAddr" .Values.config.gnbsim.httpServer.ipAddr "port" .Values.config.gnbsim.httpServer.port | set $configuration "httpServer" -}}
 {{- end }}
 
-{{- if not (hasKey $configuration "singleInterface") -}}
-{{- $_ := .Values.config.gnbsim.singleInterface | set $configuration "singleInterface" -}}
-{{- end }}
 {{- $_ := .Values.config.gnbsim.networkTopo | set $configuration "networkTopo" -}}
 {{- end }}
-
 
 ---
 apiVersion: v1

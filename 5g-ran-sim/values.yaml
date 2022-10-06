@@ -6,7 +6,7 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    gnbsim: omecproject/5gc-gnbsim:main-cd26209
+    gnbsim: omecproject/5gc-gnbsim:main-0e4b557
   pullPolicy: IfNotPresent
 
 nodeSelectors:
@@ -34,7 +34,6 @@ config:
   gnbsim:
     deploy: true
     serviceType: ClusterIP
-    singleInterface: false
     networkTopo:
       - upfAddr: "192.168.252.3/32"
         upfGw: "192.168.251.1"
@@ -66,7 +65,8 @@ config:
         logger:
           logLevel: info # how detailed the log will be, values: trace, debug, info, warn, error, fatal, panic
         configuration:
-          #singleInterface: #this will be added thorugh configmap script
+          singleInterface: #this will be added thorugh configmap script
+          execInParallel: false #run all profiles in parallel
           gnbs: # pool of gNodeBs
             gnb1:
               n2IpAddr: # gNB N2 interface IP address used to connect to AMF 
@@ -100,6 +100,8 @@ config:
               profileName: profile1 # uniqely identifies a profile within application
               enable: false # Set true to execute the profile, false otherwise.
               gnbName: gnb1 # gNB to be used for this profile
+              execInParallel: false #run all subscribers in this profile parallel
+              stepTrigger: false #wait for trigger to move to next step
               startImsi: 208930100007487 #First IMSI. Subsequent values will be used if ueCount is mo    re than 1
               ueCount: 5 # Number of UEs for for which the profile will be executed
               defaultAs: "192.168.250.1" #default icmp pkt destination
@@ -112,6 +114,8 @@ config:
               profileName: profile2
               enable: true
               gnbName: gnb1
+              execInParallel: false #run all subscribers in this profile parallel
+              stepTrigger: false #wait for trigger to move to next step
               startImsi: 208930100007492
               ueCount: 5
               opc: "981d464c7c52eb6e5036234984ad0bcf"
@@ -125,6 +129,8 @@ config:
               profileName: profile3
               enable: false
               gnbName: gnb1
+              execInParallel: false #run all subscribers in this profile parallel
+              stepTrigger: false #wait for trigger to move to next step
               startImsi: 208930100007497
               ueCount: 5
               opc: "981d464c7c52eb6e5036234984ad0bcf"
@@ -137,6 +143,8 @@ config:
               profileName: profile4
               enable: false
               gnbName: gnb1
+              execInParallel: false #run all subscribers in this profile parallel
+              stepTrigger: false #wait for trigger to move to next step
               startImsi: 208930100007497
               ueCount: 5
               opc: "981d464c7c52eb6e5036234984ad0bcf"
@@ -149,6 +157,8 @@ config:
               profileName: profile5
               enable: false
               gnbName: gnb1
+              execInParallel: false #run all subscribers in this profile parallel
+              stepTrigger: false #wait for trigger to move to next step
               startImsi: 208930100007497
               ueCount: 5
               opc: "981d464c7c52eb6e5036234984ad0bcf"
@@ -161,6 +171,8 @@ config:
               profileName: profile6 # uniqely identifies a profile within application
               enable: false # Set true to execute the profile, false otherwise.
               gnbName: gnb1 # gNB to be used for this profile
+              execInParallel: false #run all subscribers in this profile parallel
+              stepTrigger: false #wait for trigger to move to next step
               startImsi: 208930100007497 # First IMSI. Subsequent values will be used if ueCount is more than 1
               ueCount: 5 # Number of UEs for for which the profile will be executed
               defaultAs: "192.168.250.1" #default icmp pkt destination
@@ -174,6 +186,8 @@ config:
               profileName: profile7 # uniqely identifies a profile within application
               enable: false # Set true to execute the profile, false otherwise.
               gnbName: gnb1 # gNB to be used for this profile
+              execInParallel: false #run all subscribers in this profile parallel
+              stepTrigger: false #wait for trigger to move to next step
               startImsi: 208930100007497 # First IMSI. Subsequent values will be used if ueCount is more than 1
               ueCount: 5 # Number of UEs for for which the profile will be executed
               opc: "981d464c7c52eb6e5036234984ad0bcf"
