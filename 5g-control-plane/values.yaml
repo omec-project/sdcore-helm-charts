@@ -9,7 +9,7 @@ images:
     init: omecproject/pod-init:1.0.0
     amf: omecproject/5gc-amf:master-af1c9f1
     nrf: omecproject/5gc-nrf:master-4313faa
-    smf: omecproject/5gc-smf:master-d7c32f2
+    smf: omecproject/5gc-smf:master-d94b123
     ausf: omecproject/5gc-ausf:master-c84dff4
     nssf: omecproject/5gc-nssf:master-4e5aef3
     pcf: omecproject/5gc-pcf:master-bcbdeb0
