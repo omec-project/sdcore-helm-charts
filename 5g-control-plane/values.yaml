@@ -15,7 +15,7 @@ images:
     pcf: omecproject/5gc-pcf:master-bcbdeb0
     udr: omecproject/5gc-udr:master-35eb7b7
     udm: omecproject/5gc-udm:master-a0f0671
-    webui: omecproject/5gc-webui:master-fec9bfc
+    webui: omecproject/5gc-webui:master-1121545
     sctplb: omecproject/sctplb:master-bf081d5
     metricfunc: metricfunc:0.0.1-dev-local0
     upfadapter: omecproject/5gc-smf:master-d7c32f2
