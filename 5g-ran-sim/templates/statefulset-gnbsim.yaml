@@ -26,11 +26,11 @@ spec:
 {{- if not .Values.config.gnbsim.singleInterface }}
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
-           { 
+           {
                "name": "gnb-net",
                "interface": "gnb",
 {{- if semverCompare ">=1.16-0" .Capabilities.KubeVersion.GitVersion }}
-               "ips": [{{ .Values.config.gnbsim.gnb.ip | quote }}]
+               "ips": [ {{ include "gnbiplist" .}} ]
 {{- else }}
                "ips": {{ .Values.config.gnbsim.gnb.ip | quote }}
 {{- end }}

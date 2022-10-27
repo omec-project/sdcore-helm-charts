@@ -14,6 +14,10 @@ cd /gnbsim
 cat ./config/gnb.conf
 cat /etc/hosts
 
+{{- define "gnbiplist" -}}
+{{- join "," .Values.config.gnbsim.gnb.ips }}
+{{- end -}}
+
 {{- if not .Values.config.gnbsim.singleInterface }}
 {{- range .Values.config.gnbsim.networkTopo }}
 ip route replace {{ .upfAddr }} via {{ .upfGw }}
