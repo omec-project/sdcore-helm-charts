@@ -418,6 +418,8 @@ config:
             - "0.0.0.0"
   amf:
     deploy: true
+    serviceAnnotations:
+      amfFqdn: "aether-amf.tenant-site.company.com"
     podAnnotations:
       field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
     serviceType: ClusterIP

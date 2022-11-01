@@ -12,6 +12,8 @@ metadata:
   name: amf
   labels:
 {{ tuple "amf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+  annotations:
+    external-dns.beta.kubernetes.io/hostname: {{ .Values.config.amf.serviceAnnotations.amfFqdn }}
 spec:
   type: {{ .Values.config.amf.serviceType }}
 {{- if .Values.config.amf.ngapp.externalIp }}
