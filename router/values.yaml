@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: {C) 2022 Intel Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
+images:
+  repository: "" #default docker hub
+  tags:
+    router: docker.io/ubuntu:latest
+  pullPolicy: IfNotPresent
+
+resources:
+  enabled: false
+  router:
+    requests:
+      cpu: 0.5
+      memory: 256Mi
+    limits:
+      cpu: 0.5
+      memory: 256Mi
+
+config:
+  router:
+    deploy: true
+    cni: "sriov"
+    # resourceName is valid only when sriov cni is used
+    resourceName: "intel.com/intel_sriov_netdevice"
+    # dataIface is required when macvlan cni is used
+    # dataIface: "eno1"
+    routes:
+    - to: "172.250.0.0/16"
+      via: "192.168.250.3"
+    interfaces:
+    - name: core
+      ip: "192.168.250.1/24"
+    - name: access
+      ip: "192.168.252.1/24"
+    - name: ran
+      ip: "192.168.251.1/24"
