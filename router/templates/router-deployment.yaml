@@ -42,6 +42,8 @@ spec:
             trap : TERM INT; sleep infinity & wait
         image: {{ .Values.images.tags.router }}
         securityContext:
+          privileged: true
+          runAsUser: 0
           capabilities:
             add:
               - NET_ADMIN

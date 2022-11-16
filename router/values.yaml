@@ -5,7 +5,7 @@
 images:
   repository: "" #default docker hub
   tags:
-    router: docker.io/ubuntu:latest
+    router: wbitt/network-multitool:minimal
   pullPolicy: IfNotPresent
 
 resources:

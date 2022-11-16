@@ -418,8 +418,8 @@ config:
             - "0.0.0.0"
   amf:
     deploy: true
-    serviceAnnotations:
-      amfFqdn: "aether-amf.tenant-site.company.com"
+    # serviceAnnotations:
+    #   external-dns.alpha.kubernetes.io/hostname: "aether-amf.tenant-site.company.com"
     podAnnotations:
       field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
     serviceType: ClusterIP
@@ -558,6 +558,7 @@ config:
     podAnnotations:
       field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
     serviceType: ClusterIP
+    upfPort: 8805
     n4:
       port: 8805
       # Provide nodePort when serviceType is NodePort

@@ -63,6 +63,8 @@ spec:
           value: {{ .Values.config.grpc.trace | quote }}
         - name: GRPC_VERBOSITY
           value: {{ .Values.config.grpc.verbosity | quote }}
+        - name: PFCP_PORT_UPF
+          value: {{ .Values.config.smf.upfPort | quote }}
         - name: POD_IP
           valueFrom:
             fieldRef:

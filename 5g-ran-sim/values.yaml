@@ -33,6 +33,7 @@ config:
     path: /tmp/coredump
   gnbsim:
     deploy: true
+    nonStandalone: true
     serviceType: ClusterIP
     networkTopo:
       - upfAddr: "192.168.252.3/32"

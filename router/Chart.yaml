@@ -8,4 +8,4 @@ description: Route Data plane packets from Gnb to UPF to Internet and vice versa
 name: router
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 0.1.0
+version: 0.1.1
