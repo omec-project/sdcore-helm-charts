@@ -444,10 +444,15 @@ config:
       amfcfg.conf:
         info:
           version: 1.0.0
-          description: AMF initial local configuration
+          description: AMF initial configuration
         configuration:
           amfDBName: sdcore_amf
           enableDBStore: false
+          debugProfilePort: 5001
+          kafkaInfo:
+            brokerUri: "sd-core-kafka-headless"
+            brokerPort: 9092
+            topicName: "sdcore-data-source-amf"
           ngapIpList:
             - "0.0.0.0"
           amfName: AMF
@@ -584,6 +589,11 @@ config:
         configuration:
           smfDBName: sdcore_smf
           enableDBStore: false
+          debugProfilePort: 5001
+          kafkaInfo:
+            brokerUri: "sd-core-kafka-headless"
+            brokerPort: 9092
+            topicName: "sdcore-data-source-smf"
           pfcp:
              addr: "POD_IP"
           smfName: SMF
@@ -674,27 +684,34 @@ config:
       port: 9089
     cfgFiles:
       metricscfg.conf:
-        info:
-          version: 1.0.0
-          description: Metrics initial local configuration
-        logger:
-          logLevel: "debug"
         configuration:
-          nfStream:
-            urls:
-              - "sd-core-kafka-headless:9092"
-            topic:
-              name: "sdcore-nf-data-source"
-              group:
-                analytics: "analytics"
-                mongodb: "mongodb"
-                restapi: "restapi"
-                prometheus: "prometheus"
-          analyticsStream:
-            enable: true
-            urls:
-               - "sd-core-kafka-headless:9092"
-            topic: "sdcore-analytics-feed"
+          nfStreams:
+            - topic:
+                topicGroup: analytics
+                topicName: sdcore-data-source-amf
+              urls:
+                - uri: "sd-core-kafka-headless"
+                  port: 9092
+            - topic:
+                topicGroup: analytics
+                topicName: sdcore-data-source-smf
+              urls:
+                - uri: "sd-core-kafka-headless"
+                  port: 9092
+          prometheusServer:
+            addr: POD_IP
+            port: 9089
+          apiServer:
+            addr: POD_IP
+            port: 9301
+          debugProfileServer:
+            addr: POD_IP
+            port: 5001
+        info:
+          description: Metrics initial local configuration
+          version: 1.0.0
+        logger:
+          level: info
   upfadapter:
     deploy: false
     serviceType: ClusterIP
