@@ -24,4 +24,9 @@ ip route replace {{ .upfAddr }} via {{ .upfGw }}
 {{- end }}
 {{- end }}
 
+{{- if .Values.config.gnbsim.httpServer.enable}}
+cd /gnbsim
+./bin/gnbsim --cfg ./config/gnb.conf
+{{- else }}
 sleep infinity
+{{- end }}

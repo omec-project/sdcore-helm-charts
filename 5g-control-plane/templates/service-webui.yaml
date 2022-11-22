@@ -12,6 +12,10 @@ metadata:
   name: webui
   labels:
 {{ tuple "webui" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+{{- with .Values.config.webui.serviceAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
 spec:
   type: {{ .Values.config.webui.serviceType }}
   selector:

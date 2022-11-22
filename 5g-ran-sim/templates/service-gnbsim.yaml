@@ -12,6 +12,10 @@ metadata:
   name: gnbsim
   labels:
 {{ tuple "gnbsim" . | include "5g-ransim-plane.metadata_labels" | indent 4 }}
+{{- with .Values.config.gnbsim.serviceAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
 spec:
   type: {{ .Values.config.gnbsim.serviceType }}
   selector:
@@ -23,6 +27,9 @@ spec:
   - name: http-api
     port: {{ .Values.config.gnbsim.httpServer.port }}
     protocol: TCP
+{{- if .Values.config.gnbsim.httpServer.nodePort.enabled }}
+    nodePort: {{ .Values.config.gnbsim.httpServer.nodePort.port }}
+{{- end }}
 {{- if .Values.config.gnbsim.goProfile.enable }}
   - name: profile-http
     port: {{ .Values.config.gnbsim.goProfile.port }}

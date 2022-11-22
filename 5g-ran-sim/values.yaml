@@ -33,25 +33,30 @@ config:
     path: /tmp/coredump
   gnbsim:
     deploy: true
-    nonStandalone: true
+    waitForAmf: true
     serviceType: ClusterIP
+    # serviceAnnotations:
+    #   external-dns.alpha.kubernetes.io/hostname: "gnbsim.tenant-site.company.com"
     networkTopo:
       - upfAddr: "192.168.252.3/32"
         upfGw: "192.168.251.1"
     sriov:
-      enabled: disabled
+      enabled: false
       resourceName: "intel.com/intel_sriov_vfio"
     ipam: static
     cniPlugin: macvlan # supported CNIs: sriov, macvlan, host-device
     iface: data # master in macvlan or device in host-device
     gnb:
-      ips: 
+      ips:
       - '"192.168.251.5/24"' #user plane IP at gnb if 2 separate interface provided
       - '"192.168.251.6/32"' #user plane IP at gnb if 2 separate interface provided
     httpServer:
       enable: false
       ipAddr: "POD_IP"
       port: 6000
+      nodePort:
+        enabled: false
+        port: 30091
     goProfile:
       enable: true
       port: 5000

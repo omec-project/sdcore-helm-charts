@@ -48,11 +48,11 @@ spec:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
       initContainers:
-    {{- if .Values.config.gnbsim.nonStandalone }}
+    {{- if .Values.config.gnbsim.waitForAmf }}
       - name: wait-amf-module
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup amf; do echo waiting for amf; sleep 4; done;']
+        command: ['sh', '-c', 'until nslookup amf; do echo waiting for amf; sleep 4; done; sleep 20']
     {{- end }}
     {{- if .Values.config.coreDump.enabled }}
     {{ tuple "gnbsim" . | include "5g-ransim-plane.coredump_init" | indent 6 }}

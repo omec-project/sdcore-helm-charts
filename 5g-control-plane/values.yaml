@@ -220,6 +220,8 @@ config:
     deploy: true
     #podAnnotations:
     serviceType: ClusterIP
+    # serviceAnnotations:
+    #   external-dns.alpha.kubernetes.io/hostname: "aether-config.tenant-site.company.com"
     urlport:
       port: 5000
       # Provide nodePort when serviceType is NodePort
