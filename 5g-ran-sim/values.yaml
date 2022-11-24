@@ -73,6 +73,7 @@ config:
         logger:
           logLevel: info # how detailed the log will be, values: trace, debug, info, warn, error, fatal, panic
         configuration:
+          runConfigProfilesAtStart: true
           singleInterface: #this will be added thorugh configmap script
           execInParallel: false #run all profiles in parallel
           gnbs: # pool of gNodeBs
