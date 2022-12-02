@@ -7,18 +7,18 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    amf: omecproject/5gc-amf:master-c1a1a75
+    amf: omecproject/5gc-amf:master-40ec83b
     nrf: omecproject/5gc-nrf:master-4313faa
-    smf: omecproject/5gc-smf:master-a39c30c
+    smf: omecproject/5gc-smf:master-175785d
     ausf: omecproject/5gc-ausf:master-c84dff4
     nssf: omecproject/5gc-nssf:master-4e5aef3
     pcf: omecproject/5gc-pcf:master-bcbdeb0
     udr: omecproject/5gc-udr:master-35eb7b7
-    udm: omecproject/5gc-udm:master-a0f0671
+    udm: omecproject/5gc-udm:master-6956659
     webui: omecproject/5gc-webui:master-1121545
     sctplb: omecproject/sctplb:master-bf081d5
-    metricfunc: metricfunc:0.0.1-dev-local0
-    upfadapter: omecproject/5gc-smf:master-a39c30c
+    metricfunc: bhelankur/5gc-metricfunc:0.1.16-dev
+    upfadapter: omecproject/5gc-smf:master-175785d
   pullPolicy: IfNotPresent
 
 resources:
