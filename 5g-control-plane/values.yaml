@@ -132,12 +132,12 @@ mongodb:
   serviceAccount:
     create: false
   #clusterDomain: cluster.local
-  #architecture: replicaset
-  #replicaCount: 3
+  architecture: replicaset
+  replicaCount: 1
 
 config:
   managedByConfigPod:      # config comes from helm by default, if enabled true, then discard
-    enabled: false         # helm chart config and use the config from config Pod
+    enabled: true          # helm chart config and use the config from config Pod
     syncUrl: ""            # Get the config from adapater in case control plane is down
   useExistingConfigMap: false
   imagePath: /free5gc
@@ -146,7 +146,7 @@ config:
     path: /tmp/coredump
   mongodb:
     name: free5gc
-    url: mongodb://mongodb
+    url: mongodb://mongodb-arbiter-headless
   grpc:
     golog_verbosity: "99"
     severity: "info"
@@ -454,6 +454,7 @@ config:
         configuration:
           amfDBName: sdcore_amf
           enableDBStore: false
+          enableNrfCaching: false
           debugProfilePort: 5001
           kafkaInfo:
             brokerUri: "kafka-headless"
@@ -595,6 +596,7 @@ config:
         configuration:
           smfDBName: sdcore_smf
           enableDBStore: false
+          enableNrfCaching: false
           debugProfilePort: 5001
           kafkaInfo:
             brokerUri: "kafka-headless"
