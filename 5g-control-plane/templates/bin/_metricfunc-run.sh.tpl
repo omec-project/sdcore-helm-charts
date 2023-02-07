@@ -16,4 +16,4 @@ cat config/metricscfg.conf
 
 echo $PWD
 
-GOTRACEBACK=crash /metricfunc/bin/metricfunc -metrics config/metricscfg.conf 
+GOTRACEBACK=crash /metricfunc/bin/metricfunc -metrics config/metricscfg.conf

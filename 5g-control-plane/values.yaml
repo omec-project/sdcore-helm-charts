@@ -8,7 +8,7 @@ images:
   tags:
     init: omecproject/pod-init:1.0.0
     amf: omecproject/5gc-amf:master-a4759db
-    nrf: omecproject/5gc-nrf:master-a8e60e0
+    nrf: omecproject/5gc-nrf:master-b747b98
     smf: omecproject/5gc-smf:master-4ad802a
     ausf: omecproject/5gc-ausf:master-c84dff4
     nssf: omecproject/5gc-nssf:master-4e5aef3
@@ -17,7 +17,7 @@ images:
     udm: omecproject/5gc-udm:master-6956659
     webui: omecproject/5gc-webui:master-1121545
     sctplb: omecproject/sctplb:master-bf081d5
-    metricfunc: omecproject/metricfunc:main-af3baa8
+    metricfunc: omecproject/metricfunc:main-ea5e53f
     upfadapter: omecproject/5gc-smf:master-4ad802a
   pullPolicy: IfNotPresent
 
@@ -693,6 +693,7 @@ config:
     cfgFiles:
       metricscfg.conf:
         configuration:
+          controllerFlag: true
           nfStreams:
             - topic:
                 topicGroup: analytics
@@ -715,11 +716,21 @@ config:
           debugProfileServer:
             addr: POD_IP
             port: 5001
+          onosApiServer:
+            addr: "onosapp"
+            port: 9301
+          rocEndPoint:
+            addr: "aether-roc-umbrella-aether-roc-gui-v2-1-external.aether-roc.svc"
+            port: 80
+          metricFuncEndPoint:
+            addr: "metricfunc.omec.svc"
+            port: 5001
         info:
           description: Metrics initial local configuration
           version: 1.0.0
         logger:
           level: info
+
   upfadapter:
     deploy: false
     serviceType: ClusterIP
