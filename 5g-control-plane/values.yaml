@@ -17,7 +17,7 @@ images:
     udm: omecproject/5gc-udm:master-6956659
     webui: omecproject/5gc-webui:master-1121545
     sctplb: omecproject/sctplb:master-bf081d5
-    metricfunc: omecproject/metricfunc:main-ea5e53f
+    metricfunc: omecproject/metricfunc:main-2a2b257
     upfadapter: omecproject/5gc-smf:master-4ad802a
   pullPolicy: IfNotPresent
 
