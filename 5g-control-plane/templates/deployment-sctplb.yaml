@@ -35,7 +35,7 @@ spec:
     {{- end }}
       initContainers:
       - name: wait-nrf-module
-        image: {{ .Values.images.tags.init | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup nrf; do echo waiting for nrf; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
@@ -43,7 +43,7 @@ spec:
     {{- end }}
       containers:
       - name: sctplb
-        image: {{ .Values.images.tags.sctplb }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.sctplb }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:
@@ -66,7 +66,7 @@ spec:
             fieldRef:
               fieldPath: status.podIP
       {{- if .Values.config.managedByConfigPod.enabled }}
-        - name: MANAGED_BY_CONFIG_POD 
+        - name: MANAGED_BY_CONFIG_POD
           value: "true"
       {{- end }}
       {{- if .Values.resources.enabled }}
