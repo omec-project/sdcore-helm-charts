@@ -35,7 +35,7 @@ spec:
     {{- end }}
       containers:
       - name: upfadapter
-        image: {{ .Values.images.tags.upfadapter }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.upfadapter }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:

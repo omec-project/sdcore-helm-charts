@@ -34,7 +34,7 @@ spec:
     {{- end }}
       containers:
       - name: metricfunc
-        image: {{ .Values.images.tags.metricfunc }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.metricfunc }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:
