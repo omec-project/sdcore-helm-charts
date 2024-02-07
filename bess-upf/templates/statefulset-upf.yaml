@@ -1,0 +1,240 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- $upfConfig := index .Values.config.upf.cfgFiles "upf.json" }}
+{{- $accessConfig := index $upfConfig "access" }}
+{{- $coreConfig := index $upfConfig "core" }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: upf
+  labels:
+{{ tuple "upf" . | include "omec-user-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: 1
+  serviceName: upf-headless
+  selector:
+    matchLabels:
+{{ tuple "upf" . | include "omec-user-plane.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "upf" . | include "omec-user-plane.metadata_labels" | indent 8 }}
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[
+          {
+            "name": "access-net",
+            "interface": {{ index $accessConfig "ifname" | quote }},
+          {{- if hasKey .Values.config.upf.access "mac" }}
+            "mac": {{ .Values.config.upf.access.mac | quote }},
+          {{- end }}
+            "ips": [{{ .Values.config.upf.access.ip | quote }}]
+          },
+          {
+            "name": "core-net",
+            "interface": {{ index $coreConfig "ifname" | quote }},
+          {{- if hasKey .Values.config.upf.core "mac" }}
+            "mac": {{ .Values.config.upf.core.mac | quote }},
+          {{- end }}
+            "ips": [{{ .Values.config.upf.core.ip | quote }}]
+          }
+        ]'
+    spec:
+      shareProcessNamespace: true
+    {{- if .Values.nodeSelectors.enabled }}
+      nodeSelector:
+        {{ .Values.nodeSelectors.upf.label }}: {{ .Values.nodeSelectors.upf.value }}
+    {{- end }}
+    {{- if hasKey .Values.images "pullSecrets" }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecrets | indent 8 }}
+    {{- end }}
+      initContainers:
+      - name: bess-init
+        image: {{ .Values.images.tags.bess | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        command: ["sh", "-xec"]
+        args:
+        - ip route replace {{ .Values.config.upf.enb.subnet }} via {{ .Values.config.upf.access.gateway }};
+          ip route replace default via {{ .Values.config.upf.core.gateway }} metric 110;
+          {{- range .Values.config.upf.routes }}
+          ip route replace {{ .to }} via {{ .via }};
+          {{- end }}
+          iptables -I OUTPUT -p icmp --icmp-type port-unreachable -j DROP;
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        resources:
+          limits:
+            cpu: 128m
+            memory: 64Mi
+          requests:
+            cpu: 128m
+            memory: 64Mi
+    {{- if .Values.config.coreDump.enabled }}
+{{ tuple "upf" . | include "omec-user-plane.coredump_init" | indent 6 }}
+    {{- end }}
+      containers:
+      - name: bessd
+        image: {{ .Values.images.tags.bess | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        securityContext:
+        {{- if .Values.config.upf.privileged }}
+          privileged: true
+        {{- end }}
+          capabilities:
+            add:
+            - IPC_LOCK
+            - CAP_SYS_NICE
+        stdin: true
+        tty: true
+        command: ["/bin/bash", "-xc"]
+        args:
+        {{- if .Values.config.upf.hugepage.enabled }}
+          - bessd -f -grpc-url=0.0.0.0:10514
+        {{- else }}
+          - bessd -m 0 -f -grpc-url=0.0.0.0:10514
+        {{- end }}
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/etc/bess/conf/bessd-poststart.sh"]
+        livenessProbe:
+          tcpSocket:
+            port: 10514
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          requests:
+          {{- if .Values.resources.enabled }}
+{{ toYaml .Values.resources.bess.requests | indent 12 }}
+          {{- end }}
+          {{- if .Values.config.upf.hugepage.enabled }}
+            hugepages-1Gi: 2Gi
+          {{- end }}
+          {{- if .Values.config.upf.sriov.enabled }}
+          {{- if eq .Values.config.upf.access.resourceName .Values.config.upf.core.resourceName }}
+            {{ .Values.config.upf.access.resourceName }}: 2
+          {{- else }}
+            {{ .Values.config.upf.access.resourceName }}: 1
+            {{ .Values.config.upf.core.resourceName }}: 1
+          {{- end }}
+          {{- end }}
+          limits:
+          {{- if .Values.resources.enabled }}
+{{ toYaml .Values.resources.bess.limits | indent 12 }}
+          {{- end }}
+          {{- if .Values.config.upf.hugepage.enabled }}
+            hugepages-1Gi: 2Gi
+          {{- end }}
+          {{- if .Values.config.upf.sriov.enabled }}
+          {{- if eq .Values.config.upf.access.resourceName .Values.config.upf.core.resourceName }}
+            {{ .Values.config.upf.access.resourceName }}: 2
+          {{- else }}
+            {{ .Values.config.upf.access.resourceName }}: 1
+            {{ .Values.config.upf.core.resourceName }}: 1
+          {{- end }}
+          {{- end }}
+        env:
+          - name: CONF_FILE
+            value: /etc/bess/conf/upf.json
+        volumeMounts:
+          - name: shared-app
+            mountPath: /pod-share
+        {{- if .Values.config.upf.hugepage.enabled }}
+          - name: hugepages
+            mountPath: /dev/hugepages
+        {{- end }}
+          - name: configs
+            mountPath: /etc/bess/conf
+        {{- if .Values.config.coreDump.enabled }}
+          - name: coredump
+            mountPath: /tmp/coredump
+        {{- end }}
+      - name: routectl
+        image: {{ .Values.images.tags.bess | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+        command: ["/opt/bess/bessctl/conf/route_control.py"]
+        args:
+          - -i
+          - {{ index $accessConfig "ifname" }}
+          - {{ index $coreConfig "ifname" }}
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.routectl | indent 10 }}
+      {{- end }}
+      - name: web
+        image: {{ .Values.images.tags.bess | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        command: ["/bin/bash", "-xc", "bessctl http 0.0.0.0 8000"]
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.web | indent 10 }}
+      {{- end }}
+      - name: pfcp-agent
+        image: {{ .Values.images.tags.pfcpiface | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        command: ["pfcpiface"]
+        args:
+          - -config
+          - /tmp/conf/upf.json
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.cpiface | indent 10 }}
+      {{- end }}
+        volumeMounts:
+          - name: shared-app
+            mountPath: /pod-share
+          - name: configs
+            mountPath: /tmp/conf
+    {{- if .Values.config.gratuitousArp.enabled }}
+      - name: arping
+        image: {{ .Values.images.tags.tools | quote }}
+        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        command: ["sh", "-xc"]
+        args:
+          - |
+            while true; do
+              # arping does not work - BESS graph is still disconnected
+              #arping -c 2 -I {{ index $accessConfig "ifname" }} {{ .Values.config.upf.access.gateway }}
+              #arping -c 2 -I {{ index $coreConfig "ifname" }} {{ .Values.config.upf.core.gateway }}
+              ping -c 2 {{ .Values.config.upf.access.gateway }}
+              ping -c 2 {{ .Values.config.upf.core.gateway }}
+              sleep {{ .Values.config.gratuitousArp.interval }}
+            done
+        resources:
+          limits:
+            cpu: 128m
+            memory: 64Mi
+          requests:
+            cpu: 128m
+            memory: 64Mi
+    {{- end }}
+      volumes:
+      - name: configs
+        configMap:
+          name: upf
+          defaultMode: 493
+      - name: shared-app
+        emptyDir: {}
+    {{- if .Values.config.upf.hugepage.enabled }}
+      - name: hugepages
+        emptyDir:
+          medium: HugePages
+    {{- end }}
+    {{- if .Values.config.coreDump.enabled }}
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: {{ .Values.config.coreDump.path }}
+    {{- end }}
