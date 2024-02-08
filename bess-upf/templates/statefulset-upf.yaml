@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- $upfConfig := index .Values.config.upf.cfgFiles "upf.json" }}
+{{- $upfConfig := index .Values.config.upf.cfgFiles "upf.jsonc" }}
 {{- $accessConfig := index $upfConfig "access" }}
 {{- $coreConfig := index $upfConfig "core" }}
 ---
@@ -142,7 +142,7 @@ spec:
           {{- end }}
         env:
           - name: CONF_FILE
-            value: /etc/bess/conf/upf.json
+            value: /etc/bess/conf/upf.jsonc
         volumeMounts:
           - name: shared-app
             mountPath: /pod-share
@@ -185,7 +185,7 @@ spec:
         command: ["pfcpiface"]
         args:
           - -config
-          - /tmp/conf/upf.json
+          - /tmp/conf/upf.jsonc
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.cpiface | indent 10 }}

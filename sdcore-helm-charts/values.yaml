@@ -24,7 +24,7 @@ omec-user-plane:
   #config:
   #  upf:
   #    cfgFiles:
-  #      upf.json:
+  #      upf.jsonc:
   #        cpiface:
 
 omec-sub-provision:

@@ -93,7 +93,7 @@ config:
       #vlan:
       #iface:
     cfgFiles:
-      upf.json:
+      upf.jsonc:
         mode: dpdk
         workers: 1
         max_sessions: 50000
