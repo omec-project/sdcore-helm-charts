@@ -420,10 +420,11 @@ config:
           dispatcherLogs: info
           clientdiscLogs: info
         configuration:
-          serviceNames:
-          - "amf-headless"
+          type: "grpc"
+          services:
+            - uri: "amf-headless"
           ngapIpList:
-            - "0.0.0.0"
+            - 0.0.0.0
   amf:
     deploy: true
     # serviceAnnotations:
