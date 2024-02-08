@@ -38,6 +38,7 @@ dependencies:
   - name: bess-upf
     version: 0.1.0
     repository: https://charts.aetherproject.org
+    #repository: "file://../bess-upf"
     alias: omec-user-plane
     condition: omec-user-plane.enable
 

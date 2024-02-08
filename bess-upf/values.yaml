@@ -1,0 +1,142 @@
+# Copyright 2020-present Open Networking Foundation
+#
+# SPDX-License-Identifier: Apache-2.0
+
+images:
+  tags:
+    bess: "omecproject/upf-epc-bess:master-5786085"
+    pfcpiface: "omecproject/upf-epc-pfcpiface:master-5786085"
+    tools: registry.aetherproject.org/tools/busybox:stable
+  pullPolicy: IfNotPresent
+  # Secrets must be manually created in the namespace.
+  pullSecrets:
+    - name: aether.registry
+
+nodeSelectors:
+  enabled: false
+  upf:
+    label: node-role.aetherproject.org
+    value: omec-upf
+
+resources:
+  enabled: true
+  bess:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 1Gi
+  routectl:
+    requests:
+      cpu: 256m
+      memory: 128Mi
+    limits:
+      cpu: 256m
+      memory: 128Mi
+  web:
+    requests:
+      cpu: 256m
+      memory: 128Mi
+    limits:
+      cpu: 256m
+      memory: 128Mi
+  cpiface:
+    requests:
+      cpu: 256m
+      memory: 128Mi
+    limits:
+      cpu: 256m
+      memory: 128Mi
+
+config:
+  coreDump:
+    enabled: false
+    path: /tmp/coredump
+  gratuitousArp:
+    enabled: true
+    interval: 10 # seconds
+  upf:
+    # Enable privileged when run from VM with sriov support
+    privileged: false
+    prometheus:
+      port: 8080
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30088
+    hugepage:
+      enabled: true
+    sriov:
+      enabled: true
+    # Dynamic IP allocation is not supported yet
+    ipam: static
+    # Custom routes inside UPF
+    #routes:
+    #  - to: 10.76.28.173/32
+    #    via: 169.254.1.1
+    cniPlugin: vfioveth
+    enb:
+      subnet: 192.168.251.0/24
+    access:
+      # Provide sriov resource name when sriov is enabled
+      resourceName: "intel.com/intel_sriov_vfio"
+      gateway: 192.168.252.1
+      ip: 192.168.252.3/24
+      #mac:
+      #vlan:
+      #iface:
+    core:
+      # Provide sriov resource name when sriov is enabled
+      resourceName: "intel.com/intel_sriov_vfio"
+      gateway: 192.168.250.1
+      ip: 192.168.250.3/24
+      #mac:
+      #vlan:
+      #iface:
+    cfgFiles:
+      upf.json:
+        mode: dpdk
+        workers: 1
+        max_sessions: 50000
+        table_sizes:
+          pdrLookup: 50000
+          appQERLookup: 200000
+          sessionQERLookup: 100000
+          farLookup: 150000
+        access:
+          ifname: access
+        core:
+          ifname: core
+        measure_upf: true
+        measure_flow: false
+        enable_notify_bess: true
+        notify_sockaddr: "/pod-share/notifycp"
+        cpiface:
+          dnn: "internet"
+          hostname: "upf"
+          http_port: "8080"
+        # Default global rate limits. Can be changed at runtime via BESS gRPC.
+        slice_rate_limit_config:
+          # Uplink
+          n6_bps: 1000000000 # 1Gbps
+          n6_burst_bytes: 12500000 # 10ms * 1Gbps
+          # Downlink
+          n3_bps: 1000000000 # 1Gbps
+          n3_burst_bytes: 12500000 # 10ms * 1Gbps
+        qci_qos_config:
+          - qci: 0 # Fallback QCI
+            cbs: 50000
+            ebs: 50000
+            pbs: 50000
+            burst_duration_ms: 10
+            priority: 7
+
+service:
+  type: ClusterIP
+  #externalIp:
+  #annotations:
+
+servicemonitor:
+  enabled: false
+
+podsecuritypolicy:
+  enabled: false

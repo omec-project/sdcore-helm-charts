@@ -1,0 +1,48 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.podsecuritypolicy.enabled }}
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+    name: 1-upf
+spec:
+    {{ if or .Values.config.coreDump.enabled  .Values.config.upf.privileged }}
+    privileged: true
+    allowPrivilegeEscalation: true
+    {{ else }}
+    privileged: false
+    allowPrivilegeEscalation: false
+    {{ end }}
+    allowedCapabilities:
+    - IPC_LOCK
+    - NET_ADMIN
+    volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'secret'
+    {{- if .Values.config.coreDump.enabled }}
+    - 'hostPath'
+    allowedHostPaths:
+    - pathPrefix: "/"
+    - pathPrefix: "/tmp/coredump"
+    {{- end }}
+    seLinux:
+        rule: RunAsAny
+    supplementalGroups:
+      rule: 'MustRunAs'
+      ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+    runAsUser:
+        rule: RunAsAny
+    fsGroup:
+      rule: 'MustRunAs'
+      ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+{{- end }}

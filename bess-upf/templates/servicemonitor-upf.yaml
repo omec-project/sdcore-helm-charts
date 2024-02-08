@@ -1,0 +1,19 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+{{- if .Values.servicemonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: upf
+spec:
+  endpoints:
+  - path: /metrics
+    port: prometheus-exporter
+  selector:
+    matchLabels:
+{{ tuple "upf" . | include "omec-user-plane.metadata_labels" | indent 6 }}
+{{- end }}

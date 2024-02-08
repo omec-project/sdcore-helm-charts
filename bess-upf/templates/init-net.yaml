@@ -1,0 +1,38 @@
+{{/*
+# Copyright 2022-present Open Networking Foundation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: init-net
+spec:
+  selector:
+    matchLabels:
+      name: init-net
+  template:
+    metadata:
+      labels:
+        name: init-net
+    spec:
+      containers:
+      - name: init-sriov-plugin
+        image: docker.io/omecproject/omec-cni:1.1.4
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/bash", "-c"]
+        args:
+          - >
+            yes | cp /tmp/cni/bin/{vfioveth,static} /host/opt/cni/bin/;
+            chmod +x /host/opt/cni/bin/vfioveth;
+            chmod +x /host/opt/cni/bin/static;
+            trap : TERM INT; sleep infinity & wait;
+        volumeMounts:
+          - name: cni-bin
+            mountPath: /host/opt/cni/bin
+      volumes:
+      - name: cni-bin
+        hostPath:
+          path: /opt/cni/bin
