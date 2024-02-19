@@ -55,8 +55,8 @@ spec:
     {{- end }}
       initContainers:
       - name: bess-init
-        image: {{ .Values.images.tags.bess | quote }}
-        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.bess }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ["sh", "-xec"]
         args:
         - ip route replace {{ .Values.config.upf.enb.subnet }} via {{ .Values.config.upf.access.gateway }};
@@ -81,8 +81,8 @@ spec:
     {{- end }}
       containers:
       - name: bessd
-        image: {{ .Values.images.tags.bess | quote }}
-        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.bess }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
         securityContext:
         {{- if .Values.config.upf.privileged }}
           privileged: true
@@ -157,8 +157,8 @@ spec:
             mountPath: /tmp/coredump
         {{- end }}
       - name: routectl
-        image: {{ .Values.images.tags.bess | quote }}
-        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.bess }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
         env:
           - name: PYTHONUNBUFFERED
             value: "1"
@@ -172,16 +172,16 @@ spec:
 {{ toYaml .Values.resources.routectl | indent 10 }}
       {{- end }}
       - name: web
-        image: {{ .Values.images.tags.bess | quote }}
-        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.bess }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ["/bin/bash", "-xc", "bessctl http 0.0.0.0 8000"]
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.web | indent 10 }}
       {{- end }}
       - name: pfcp-agent
-        image: {{ .Values.images.tags.pfcpiface | quote }}
-        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.pfcpiface }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ["pfcpiface"]
         args:
           - -config
@@ -197,8 +197,8 @@ spec:
             mountPath: /tmp/conf
     {{- if .Values.config.gratuitousArp.enabled }}
       - name: arping
-        image: {{ .Values.images.tags.tools | quote }}
-        imagePullPolicy: {{ .Values.images.pullPolicy | quote }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.tools }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ["sh", "-xc"]
         args:
           - |

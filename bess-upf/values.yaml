@@ -3,10 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 images:
+  repository: "" #default docker hub
   tags:
-    bess: "omecproject/upf-epc-bess:master-5786085"
-    pfcpiface: "omecproject/upf-epc-pfcpiface:master-5786085"
-    tools: registry.aetherproject.org/tools/busybox:stable
+    bess: omecproject/upf-epc-bess:master-5786085
+    pfcpiface: omecproject/upf-epc-pfcpiface:master-5786085
+    tools: busybox:stable
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.
   pullSecrets:
