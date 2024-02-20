@@ -147,6 +147,8 @@ config:
   mongodb:
     name: free5gc
     url: mongodb://mongodb-arbiter-headless
+    authKeysDbName: authentication
+    authUrl: mongodb://mongodb-arbiter-headless
   grpc:
     golog_verbosity: "99"
     severity: "info"
