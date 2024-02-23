@@ -12,7 +12,7 @@
 {{- $sbi := index $config "sbi" }}
 
 {{- if not (hasKey $config "mongodb") -}}
-{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $config "mongodb" -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url "authKeysDbName" .Values.config.mongodb.authKeysDbName "authUrl" .Values.config.mongodb.authUrl | set $config "mongodb" -}}
 {{- end }}
 
 {{- if not (hasKey $udrcfg "logger") -}}
