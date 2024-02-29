@@ -8,6 +8,8 @@ on:
     branches:
       - main
   push:
+    branches:
+      - main
 
 jobs:
   license-check:
