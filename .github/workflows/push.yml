@@ -1,0 +1,118 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2024 Intel Corporation
+
+name: Tag/Publish Release
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  CHARTS_REPO_URL: https://charts.aetherproject.org
+  CHARTS_DIR: charts
+  REF_CHARTS_DIR: charts-ref
+
+jobs:
+  # CAUTION: Other actions depend on this name "tag-github"
+  tag-github:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.version-change.outputs.changed }}
+      version: ${{ steps.version-change.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changes
+        id: version-file
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep VERSION; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION file was not changed"
+          fi
+
+      - name: Validate change in version file
+        id: version-change
+        if: steps.version-file.outputs.changed == 'true'
+        run: |
+          version=$(cat VERSION)
+          echo "version=$version"
+          validate="^[0-9]+\.[0-9]+\.[0-9]+$"
+          if [[ $version =~ $validate ]]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version=$version" >> $GITHUB_OUTPUT
+          else
+            echo "Version change not for release"
+          fi
+
+      - name: Create release using REST API
+        if: steps.version-change.outputs.changed == 'true'
+        run: |
+          curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GH_OMEC_PAT }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/releases \
+            -d '{
+              "tag_name": "${{ steps.version-change.outputs.version }}",
+              "target_commitish": "master",
+              "name": "${{ steps.version-change.outputs.version }}",
+              "draft": false,
+              "prerelease": false,
+              "generate_release_notes": true
+              }'
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: tag-github
+    if: needs.tag-github.outputs.changed == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: latest
+          token: ${{ secrets.GH_OMEC_PAT }}
+
+      - name: Get current Index.yaml
+        run: |
+          mkdir -p ${{ env.REF_CHARTS_DIR }}
+          curl -o ${{ env.REF_CHARTS_DIR }}/index.yaml ${{ env.CHARTS_REPO_URL }}/index.yaml
+
+      - name: Find all Charts and Package them
+        run: |
+          mkdir -p ${{ env.CHARTS_DIR }}
+          for dir in $(find . -maxdepth 1 -mindepth 1 -type d); do
+            if [[ -f "$dir/Chart.yaml" ]]; then
+              echo "Packaging charts for: $dir"
+              helm dependency update "$dir"
+              helm package "$dir" --destination ${{ env.CHARTS_DIR }}
+            fi
+          done
+          helm repo index ${{ env.CHARTS_DIR }} --url ${{ env.CHARTS_REPO_URL }} --merge ${{ env.REF_CHARTS_DIR }}/index.yaml
+
+      - name: Remove not "updated" local Charts (version has not changed)
+        working-directory: ${{ env.CHARTS_DIR }}
+        run: |
+          for file in *.tgz; do
+            if grep -q "${{ env.CHARTS_REPO_URL }}/$file" "../${{ env.REF_CHARTS_DIR }}/index.yaml"; then
+              echo "Not publishing $file because it is already in ${{ env.CHARTS_REPO_URL }}/index.yaml"
+              rm $file
+            fi
+          done
+
+      - name: rsync deployments
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avh
+          path: ${{ env.CHARTS_DIR }}
+          remote_path: /srv/sites/charts.aetherproject.org/
+          remote_host: static.opennetworking.org
+          remote_user: ${{ secrets.JENKINS_USERNAME }}
+          remote_key: ${{ secrets.JENKINS_SSHKEY }}
+          remote_key_pass: ${{ secrets.JENKINS_PASSPHRASE }}
