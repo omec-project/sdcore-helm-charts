@@ -116,3 +116,35 @@ jobs:
           remote_user: ${{ secrets.JENKINS_USERNAME }}
           remote_key: ${{ secrets.JENKINS_SSHKEY }}
           remote_key_pass: ${{ secrets.JENKINS_PASSPHRASE }}
+
+  update-version:
+    runs-on: ubuntu-latest
+    needs: tag-github
+    if: needs.tag-github.outputs.changed == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Increment version
+        run: |
+          version=${{ needs.tag-github.outputs.version }}
+          IFS='.' read -r major minor patch <<< "$version"
+          minor_update=$((minor+1))
+          NEW_VERSION="$major.$minor_update.$patch-dev"
+          echo $NEW_VERSION > VERSION
+          echo "Updated version: $NEW_VERSION"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GH_OMEC_PAT }}
+          commit-message: Update version
+          committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: version-update
+          delete-branch: true
+          title: Update version
+          body: |
+            Update VERSION file
+          add-paths: |
+            VERSION
