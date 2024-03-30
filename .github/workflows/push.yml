@@ -107,10 +107,10 @@ jobs:
           done
 
       - name: rsync deployments
-        uses: burnett01/rsync-deployments@6.0.0
+        uses: burnett01/rsync-deployments@7.0.0
         with:
           switches: -avh
-          path: ${{ env.CHARTS_DIR }}
+          path: ${{ env.CHARTS_DIR }}/
           remote_path: /srv/sites/charts.aetherproject.org/
           remote_host: static.opennetworking.org
           remote_user: ${{ secrets.JENKINS_USERNAME }}
@@ -131,10 +131,10 @@ jobs:
           helm repo index ${{ env.CHARTS_DIR }} --url ${{ env.CHARTS_REPO_URL }} --merge ${{ env.REF_CHARTS_DIR }}/index.yaml
 
       - name: rsync deployments
-        uses: burnett01/rsync-deployments@6.0.0
+        uses: burnett01/rsync-deployments@7.0.0
         with:
           switches: -avh
-          path: ${{ env.CHARTS_DIR }}
+          path: ${{ env.CHARTS_DIR }}/
           remote_path: /srv/sites/charts.aetherproject.org/
           remote_host: static.opennetworking.org
           remote_user: ${{ secrets.JENKINS_USERNAME }}
