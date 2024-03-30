@@ -6,7 +6,7 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    simapp: omecproject/simapp:main-a4f741a
+    simapp: omecproject/simapp:rel-1.4.0
   pullPolicy: IfNotPresent
 
 resources:
@@ -102,7 +102,7 @@ config:
             slice-id:
               sd: 65565
               sst: 255
-            site-device-group: 
+            site-device-group:
             - "iot-camera"
             applications-information:
             - app-name: "iot-app"
