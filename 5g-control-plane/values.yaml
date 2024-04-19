@@ -700,6 +700,8 @@ config:
     serviceType: ClusterIP
     prometheus:
       port: 9089
+    apiEndpoint:
+      port: 9301
     cfgFiles:
       metricscfg.conf:
         configuration:
