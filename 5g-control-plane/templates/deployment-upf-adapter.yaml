@@ -29,6 +29,10 @@ spec:
     {{- end }}
     spec:
       serviceAccountName: upfadapter
+    {{- if .Values.nodeSelectors.enabled }}
+      nodeSelector:
+        {{ .Values.nodeSelectors.label }}: {{ .Values.nodeSelectors.value }}
+    {{- end }}
     {{- if hasKey .Values.images "pullSecrets" }}
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}

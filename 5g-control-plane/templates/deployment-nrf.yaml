@@ -31,6 +31,10 @@ spec:
     {{- end }}
     spec:
       serviceAccountName: nrf
+    {{- if .Values.nodeSelectors.enabled }}
+      nodeSelector:
+        {{ .Values.nodeSelectors.label }}: {{ .Values.nodeSelectors.value }}
+    {{- end }}
     {{- if hasKey .Values.images "pullSecrets" }}
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
@@ -64,7 +68,7 @@ spec:
             fieldRef:
               fieldPath: status.podIP
       {{- if .Values.config.managedByConfigPod.enabled }}
-        - name: MANAGED_BY_CONFIG_POD 
+        - name: MANAGED_BY_CONFIG_POD
           value: "true"
       {{- end }}
       {{- if .Values.resources.enabled }}

@@ -21,6 +21,11 @@ images:
     upfadapter: omecproject/5gc-smf:rel-1.4.0
   pullPolicy: IfNotPresent
 
+nodeSelectors:
+  enabled: false
+  label: node-role.aetherproject.org
+  value: 5gc
+
 resources:
   enabled: false
   sctplb:
