@@ -95,11 +95,13 @@ spec:
         tty: true
         command: ["/bin/bash", "-xc"]
         args:
-        {{- if .Values.config.upf.hugepage.enabled }}
-          - bessd -f -grpc-url=0.0.0.0:10514
-        {{- else }}
-          - bessd -m 0 -f -grpc-url=0.0.0.0:10514
-        {{- end }}
+          - |
+            VFS=$(ip link | grep -E 'alias [0-9a-f:.]+' | awk '{print $2}' | tr '\n' ',');
+          {{- if .Values.config.upf.hugepage.enabled }}
+            bessd -f --allow="$VFS" --grpc_url=0.0.0.0:10514;
+          {{- else }}
+            bessd -m 0 -f --allow="$VFS" --grpc_url=0.0.0.0:10514;
+          {{- end }}
         lifecycle:
           postStart:
             exec:
