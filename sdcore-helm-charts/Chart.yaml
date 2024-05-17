@@ -33,7 +33,7 @@ dependencies:
     condition: 5g-control-plane.enable5G
 
   - name: bess-upf
-    version: 1.0.0
+    version: 1.0.1
     repository: "file://../bess-upf"
     alias: omec-user-plane
     condition: omec-user-plane.enable
