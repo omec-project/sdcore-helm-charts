@@ -7,18 +7,18 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    amf: omecproject/5gc-amf:rel-1.4.0
-    nrf: omecproject/5gc-nrf:rel-1.4.0
-    smf: omecproject/5gc-smf:rel-1.4.0
-    ausf: omecproject/5gc-ausf:rel-1.4.0
-    nssf: omecproject/5gc-nssf:rel-1.4.0
-    pcf: omecproject/5gc-pcf:rel-1.4.0
-    udr: omecproject/5gc-udr:rel-1.4.0
-    udm: omecproject/5gc-udm:rel-1.4.0
-    webui: omecproject/5gc-webui:rel-1.4.0
-    sctplb: omecproject/sctplb:rel-1.4.0
-    metricfunc: omecproject/metricfunc:rel-1.4.0
-    upfadapter: omecproject/5gc-smf:rel-1.4.0
+    amf: omecproject/5gc-amf:rel-1.4.2
+    nrf: omecproject/5gc-nrf:rel-1.4.1
+    smf: omecproject/5gc-smf:rel-1.4.2
+    ausf: omecproject/5gc-ausf:rel-1.4.1
+    nssf: omecproject/5gc-nssf:rel-1.4.1
+    pcf: omecproject/5gc-pcf:rel-1.4.2
+    udr: omecproject/5gc-udr:rel-1.4.1
+    udm: omecproject/5gc-udm:rel-1.4.2
+    webui: omecproject/5gc-webui:rel-1.4.1
+    sctplb: omecproject/sctplb:rel-1.4.2
+    metricfunc: omecproject/metricfunc:rel-1.4.1
+    upfadapter: omecproject/5gc-smf:rel-1.4.2
   pullPolicy: IfNotPresent
 
 nodeSelectors:
