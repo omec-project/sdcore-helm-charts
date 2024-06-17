@@ -465,7 +465,6 @@ config:
           enableNrfCaching: false
           debugProfilePort: 5001
           kafkaInfo:
-            enableKafka: true
             brokerUri: "kafka-headless"
             brokerPort: 9092
             topicName: "sdcore-data-source-amf"
@@ -610,7 +609,6 @@ config:
           enableNrfCaching: false
           debugProfilePort: 5001
           kafkaInfo:
-            enableKafka: true
             brokerUri: "kafka-headless"
             brokerPort: 9092
             topicName: "sdcore-data-source-smf"
