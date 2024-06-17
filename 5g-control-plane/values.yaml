@@ -7,9 +7,9 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    amf: omecproject/5gc-amf:rel-1.4.2
+    amf: omecproject/5gc-amf:rel-1.4.3
     nrf: omecproject/5gc-nrf:rel-1.4.1
-    smf: omecproject/5gc-smf:rel-1.4.2
+    smf: omecproject/5gc-smf:rel-1.4.3
     ausf: omecproject/5gc-ausf:rel-1.4.1
     nssf: omecproject/5gc-nssf:rel-1.4.1
     pcf: omecproject/5gc-pcf:rel-1.4.2
@@ -250,7 +250,6 @@ config:
         # - host: free5gc.local
         #   path: /
     cfgFiles:
-      # https://github.com/free5gc/free5gc/blob/main/config/webuicfg.yaml
       webuicfg.conf:
         info:
           version: 1.0.0
@@ -266,7 +265,7 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30074
     cfgFiles:
-      # https://github.com/free5gc/free5gc/blob/main/config/udmcfg.yaml
+      # https://github.com/omec-project/udm/blob/master/factory/udmcfg.yaml
       udmcfg.conf:
         info:
           version: 1.0.0
@@ -309,7 +308,7 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30074
     cfgFiles:
-      # https://github.com/free5gc/free5gc/blob/main/config/udrcfg.yaml
+      # https://github.com/omec-project/udr/blob/master/factory/config.example.yaml
       udrcfg.conf:
         info:
           version: 1.0.0
@@ -337,7 +336,7 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30077
     cfgFiles:
-      # https://github.com/free5gc/free5gc/blob/main/config/pcfcfg.yaml
+      # https://github.com/omec-project/pcf/blob/master/factory/pcfcfg.yaml
       pcfcfg.conf:
         info:
           version: 1.0.0
@@ -375,7 +374,6 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30081
     cfgFiles:
-      # https://github.com/free5gc/free5gc/blob/main/config/nssfcfg.yaml
       nssfcfg.conf:
         info:
           version: 1.0.0
@@ -457,7 +455,6 @@ config:
       port: 38412
       #nodePort: 30071
     cfgFiles:
-      # https://github.com/free5gc/free5gc/blob/main/config/amfcfg.yaml
       amfcfg.conf:
         info:
           version: 1.0.0
@@ -560,7 +557,6 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30070
     cfgFiles:
-      # https://github.com/free5gc/free5gc/blob/main/config/nrfcfg.yaml
       nrfcfg.conf:
         info:
           version: 1.0.0
@@ -597,11 +593,12 @@ config:
       port: 29502
       #nodePort: 30080
     cfgFiles:
+      # https://github.com/omec-project/smf/blob/master/config/uerouting.yaml
       uerouting.conf:
         info:
           version: 1.0.0
           description: Routing information for UE
-      # https://github.com/free5gc/free5gc/blob/main/config/smfcfg.yaml
+      # https://github.com/omec-project/smf/blob/master/config/smfcfg.yaml
       smfcfg.conf:
         info:
           version: 1.0.0
@@ -682,7 +679,7 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30082
     cfgFiles:
-      # https://github.com/free5gc/free5gc/blob/main/config/ausfcfg.yaml
+      # https://github.com/omec-project/ausf/blob/master/factory/ausfcfg.yaml
       ausfcfg.conf:
         info:
           version: 1.0.0
