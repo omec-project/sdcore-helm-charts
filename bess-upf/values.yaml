@@ -69,15 +69,15 @@ config:
     sriov:
       enabled: true
     # Dynamic IP allocation is not supported yet
-    ipam: static
     # Custom routes inside UPF
     #routes:
     #  - to: 10.76.28.173/32
     #    via: 169.254.1.1
-    cniPlugin: vfioveth
     enb:
       subnet: 192.168.251.0/24
     access:
+      ipam: static
+      cniPlugin: vfioveth
       # Provide sriov resource name when sriov is enabled
       resourceName: "intel.com/intel_sriov_vfio"
       gateway: 192.168.252.1
@@ -86,6 +86,8 @@ config:
       #vlan:
       #iface:
     core:
+      ipam: static
+      cniPlugin: vfioveth
       # Provide sriov resource name when sriov is enabled
       resourceName: "intel.com/intel_sriov_vfio"
       gateway: 192.168.250.1
