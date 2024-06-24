@@ -1,0 +1,32 @@
+# Copyright 2022-present Open Networking Foundation
+# SPDX-License-Identifier: Apache-2.0
+{{- if .Values.config.upf.sriov.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sriovdp-config
+data:
+  config.json: |
+    {
+      "resourceList": [
+        {
+          "resourcePrefix": "intel.com",
+          "resourceName": "intel_sriov_vfio_access",
+          "selectors": {
+            "pfNames": ["{{ .Values.config.upf.access.iface }}#0"],
+            "vendors": ["8086"],
+            "drivers": ["vfio-pci"]
+          }
+        },
+        {
+          "resourcePrefix": "intel.com",
+          "resourceName": "intel_sriov_vfio_core",
+          "selectors": {
+            "pfNames": ["{{ .Values.config.upf.core.iface }}#1"],
+            "vendors": ["8086"],
+            "drivers": ["vfio-pci"]
+          }
+        }
+      ]
+    }
+{{- end }}
