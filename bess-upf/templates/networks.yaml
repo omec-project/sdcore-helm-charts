@@ -19,15 +19,15 @@ spec:
   {{- if hasKey .Values.config.upf.access "vlan" }}
     "vlan": {{ .Values.config.upf.access.vlan }},
   {{- end }}
-    "type": {{ .Values.config.upf.cniPlugin | quote }},
-  {{- if eq .Values.config.upf.cniPlugin "macvlan" }}
+    "type": {{ .Values.config.upf.access.cniPlugin | quote }},
+  {{- if eq .Values.config.upf.access.cniPlugin "macvlan" }}
     "master": {{ .Values.config.upf.access.iface | quote }},
   {{- end }}
-  {{- if eq .Values.config.upf.cniPlugin "host-device" }}
+  {{- if eq .Values.config.upf.access.cniPlugin "host-device" }}
     "device": {{ .Values.config.upf.access.iface | quote }},
   {{- end }}
     "ipam": {
-        "type": {{ .Values.config.upf.ipam | quote }}
+        "type": {{ .Values.config.upf.access.ipam | quote }}
     },
     "capabilities": { "mac": true}
   }'
@@ -46,15 +46,15 @@ spec:
   {{- if hasKey .Values.config.upf.core "vlan" }}
     "vlan": {{ .Values.config.upf.core.vlan }},
   {{- end }}
-    "type": {{ .Values.config.upf.cniPlugin | quote }},
-  {{- if eq .Values.config.upf.cniPlugin "macvlan" }}
+    "type": {{ .Values.config.upf.core.cniPlugin | quote }},
+  {{- if eq .Values.config.upf.core.cniPlugin "macvlan" }}
     "master": {{ .Values.config.upf.core.iface | quote }},
   {{- end }}
-  {{- if eq .Values.config.upf.cniPlugin "host-device" }}
+  {{- if eq .Values.config.upf.core.cniPlugin "host-device" }}
     "device": {{ .Values.config.upf.core.iface | quote }},
   {{- end }}
     "ipam": {
-        "type": {{ .Values.config.upf.ipam | quote }}
+        "type": {{ .Values.config.upf.core.ipam | quote }}
     },
     "capabilities": { "mac": true}
   }'
