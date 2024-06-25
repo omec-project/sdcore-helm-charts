@@ -33,7 +33,7 @@ spec:
           effect: NoSchedule
       initContainers:
         - name: init-sriov-plugin
-          image: docker.io/omecproject/omec-cni:1.1.6
+          image: docker.io/omecproject/omec-cni:1.1.7
           imagePullPolicy: IfNotPresent
           command: ["bash", "-c"]
           args:
@@ -45,7 +45,7 @@ spec:
       serviceAccountName: sriov-device-plugin
       containers:
         - name: kube-sriovdp
-          image: docker.io/nfvpe/sriov-device-plugin:v3.3
+          image: docker.io/nfvpe/sriov-device-plugin:v3.3.2
           imagePullPolicy: IfNotPresent
           args:
             - --log-dir=sriovdp
