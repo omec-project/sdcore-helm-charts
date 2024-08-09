@@ -9,16 +9,16 @@ images:
     init: omecproject/pod-init:1.0.0
     amf: omecproject/5gc-amf:rel-1.4.3
     nrf: omecproject/5gc-nrf:rel-1.4.1
-    smf: omecproject/5gc-smf:rel-1.4.3
+    smf: omecproject/5gc-smf:rel-1.5.0
     ausf: omecproject/5gc-ausf:rel-1.4.1
     nssf: omecproject/5gc-nssf:rel-1.4.1
     pcf: omecproject/5gc-pcf:rel-1.4.2
     udr: omecproject/5gc-udr:rel-1.4.1
     udm: omecproject/5gc-udm:rel-1.4.2
-    webui: omecproject/5gc-webui:rel-1.4.1
+    webui: omecproject/5gc-webui:rel-1.4.2
     sctplb: omecproject/sctplb:rel-1.4.2
     metricfunc: omecproject/metricfunc:rel-1.4.1
-    upfadapter: omecproject/5gc-smf:rel-1.4.2
+    upfadapter: omecproject/5gc-smf:rel-1.5.0
   pullPolicy: IfNotPresent
 
 nodeSelectors:
