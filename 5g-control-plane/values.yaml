@@ -707,7 +707,7 @@ config:
     cfgFiles:
       metricscfg.conf:
         configuration:
-          controllerFlag: true
+          controllerFlag: false
           nfStreams:
             - topic:
                 topicGroup: analytics
