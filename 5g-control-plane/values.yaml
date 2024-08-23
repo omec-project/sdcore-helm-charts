@@ -349,6 +349,8 @@ config:
             bindingIPv4: "0.0.0.0"
             registerIPv4: pcf
           defaultBdtRefId: BdtPolicyId-
+          enableNrfCaching: true
+          nrfCacheEvictionInterval: 900
           plmnList:
             - plmnId:
                 mcc: "208"
@@ -462,7 +464,8 @@ config:
         configuration:
           amfDBName: sdcore_amf
           enableDBStore: false
-          enableNrfCaching: false
+          enableNrfCaching: true
+          nrfCacheEvictionInterval: 900
           debugProfilePort: 5001
           kafkaInfo:
             brokerUri: "kafka-headless"
@@ -606,7 +609,8 @@ config:
         configuration:
           smfDBName: sdcore_smf
           enableDBStore: false
-          enableNrfCaching: false
+          enableNrfCaching: true
+          nrfCacheEvictionInterval: 900
           debugProfilePort: 5001
           kafkaInfo:
             brokerUri: "kafka-headless"
@@ -687,6 +691,8 @@ config:
         configuration:
           nrfUri: http://nrf:29510
           webuiUri: webui:9876
+          enableNrfCaching: true
+          nrfCacheEvictionInterval: 900
           sbi:
             scheme: http
             bindingIPv4: "0.0.0.0"
