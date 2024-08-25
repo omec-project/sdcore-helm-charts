@@ -752,7 +752,7 @@ config:
           level: info
 
   upfadapter:
-    deploy: false
+    deploy: true
     serviceType: ClusterIP
     n4:
       port: 8805
