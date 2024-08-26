@@ -14,7 +14,7 @@ images:
     nssf: omecproject/5gc-nssf:rel-1.4.1
     pcf: omecproject/5gc-pcf:rel-1.4.2
     udr: omecproject/5gc-udr:rel-1.4.1
-    udm: omecproject/5gc-udm:rel-1.4.2
+    udm: omecproject/5gc-udm:rel-1.4.3
     webui: omecproject/5gc-webui:rel-1.4.2
     sctplb: omecproject/sctplb:rel-1.4.2
     metricfunc: omecproject/metricfunc:rel-1.4.1
@@ -273,6 +273,8 @@ config:
         configuration:
           nrfUri: http://nrf:29510
           webuiUri: webui:9876
+          enableNrfCaching: true
+          nrfCacheEvictionInterval: 900
           plmnList:
             - plmnId:
                 mcc: "208"
@@ -280,7 +282,7 @@ config:
             - plmnId:
                 mcc: "222"
                 mnc: "88"
-          serviceNameList:
+          serviceList:
             - nudm-sdm
             - nudm-uecm
             - nudm-ueau
