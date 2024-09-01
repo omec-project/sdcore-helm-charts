@@ -40,13 +40,15 @@ spec:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
       initContainers:
-      - name: wait-smf-module
+      {{- if .Values.kafka.deploy }}
+      - name: wait-kafka-module
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup smf; do echo waiting for smf; sleep 4; done;']
-    {{- if .Values.config.coreDump.enabled }}
-    {{ tuple "smf" . | include "5g-control-plane.coredump_init" | indent 6 }}
-    {{- end }}
+        command: ['sh', '-c', 'until nslookup kafka; do echo waiting for kafka; sleep 4; done;']
+      {{- end }}
+      {{- if .Values.config.coreDump.enabled }}
+      {{ tuple "smf" . | include "5g-control-plane.coredump_init" | indent 6 }}
+      {{- end }}
       containers:
       - name: smf
         image: {{ .Values.images.repository }}{{ .Values.images.tags.smf }}
