@@ -14,7 +14,7 @@ version: 1.0.16
 home: https://opennetworking.org/sd-core/
 maintainers:
   - name: SD-Core Support
-    email: support@opennetworking.org
+    email: dev@lists.aetherproject.org
 
 dependencies:
   - name: omec-control-plane
