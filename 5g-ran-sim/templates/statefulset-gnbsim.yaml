@@ -74,6 +74,10 @@ spec:
               containerName: gnbsim
               resource: limits.memory
               divisor: 1Mi
+      {{- if eq .Values.config.GIN.mode "release" }}
+        - name: GIN_MODE
+          value: release
+      {{- end }}
         - name: POD_IP
           valueFrom:
             fieldRef:

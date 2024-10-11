@@ -7,18 +7,18 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    amf: omecproject/5gc-amf:rel-1.4.5
-    nrf: omecproject/5gc-nrf:rel-1.4.2
-    smf: omecproject/5gc-smf:rel-1.5.3
-    ausf: omecproject/5gc-ausf:rel-1.4.2
-    nssf: omecproject/5gc-nssf:rel-1.4.1
-    pcf: omecproject/5gc-pcf:rel-1.4.4
-    udr: omecproject/5gc-udr:rel-1.4.1
-    udm: omecproject/5gc-udm:rel-1.4.3
-    webui: omecproject/5gc-webui:rel-1.4.3
-    sctplb: omecproject/sctplb:rel-1.4.3
-    metricfunc: omecproject/metricfunc:rel-1.4.1
-    upfadapter: omecproject/5gc-smf:rel-1.5.3
+    amf: omecproject/5gc-amf:rel-1.5.0
+    nrf: omecproject/5gc-nrf:rel-1.5.0
+    smf: omecproject/5gc-smf:rel-1.6.0
+    ausf: omecproject/5gc-ausf:rel-1.5.0
+    nssf: omecproject/5gc-nssf:rel-1.5.0
+    pcf: omecproject/5gc-pcf:rel-1.5.0
+    udr: omecproject/5gc-udr:rel-1.5.0
+    udm: omecproject/5gc-udm:rel-1.5.0
+    webui: omecproject/5gc-webui:rel-1.5.0
+    sctplb: omecproject/sctplb:rel-1.5.0
+    metricfunc: omecproject/metricfunc:rel-1.5.0
+    upfadapter: omecproject/upfadapter:rel-2.0.0
   pullPolicy: IfNotPresent
 
 nodeSelectors:
@@ -155,80 +155,58 @@ config:
     authKeysDbName: authentication
     authUrl: mongodb://mongodb-arbiter-headless
   grpc:
-    golog_verbosity: "99"
+    golog_verbosity: "0"
     severity: "info"
-    trace: "all"
-    verbosity: "debug"
+    trace: "none"
+    verbosity: "none"
+  GIN:
+    mode: release          # Possible options are: release, debug
   logger:
     # network function
     AMF:
       debugLevel: info
-      ReportCaller: false
     SMF:
       debugLevel: info
-      ReportCaller: false
     UDR:
       debugLevel: info
-      ReportCaller: false
     UDM:
       debugLevel: info
-      ReportCaller: false
     NRF:
       debugLevel: info
-      ReportCaller: false
     PCF:
       debugLevel: info
-      ReportCaller: false
     AUSF:
       debugLevel: info
-      ReportCaller: false
     N3IWF:
       debugLevel: info
-      ReportCaller: false
   # library
     NAS:
       debugLevel: info
-      ReportCaller: false
     FSM:
       debugLevel: info
-      ReportCaller: false
     NGAP:
       debugLevel: info
-      ReportCaller: false
-    NamfComm:
+    NamfCommunication:
       debugLevel: info
-      ReportCaller: false
     NamfEventExposure:
       debugLevel: info
-      ReportCaller: false
     NsmfPDUSession:
       debugLevel: info
-      ReportCaller: false
     NudrDataRepository:
       debugLevel: info
-      ReportCaller: false
     OpenApi:
       debugLevel: info
-      ReportCaller: false
     Aper:
       debugLevel: info
-      ReportCaller: false
     CommonConsumerTest:
       debugLevel: info
-      ReportCaller: false
-    PFCP:
+    config5g:
       debugLevel: info
-      ReportCaller: false
     MongoDBLibrary:
       debugLevel: info
-      ReportCaller: false
-    PathUtil:
-      debugLevel: info
-      ReportCaller: false
   # webui
     WEBUI:
       debugLevel: info
-      ReportCaller: false
   webui:
     deploy: true
     #podAnnotations:
@@ -770,4 +748,3 @@ config:
           description: UPF Adapter initial local configuration
         logger:
           level: info
-

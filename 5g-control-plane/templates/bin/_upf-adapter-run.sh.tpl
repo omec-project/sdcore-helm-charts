@@ -7,11 +7,11 @@
 set -xe
 
 {{- if .Values.config.coreDump.enabled }}
-cp /free5gc/bin/upf-adapter /tmp/coredump/
+cp /aether/upfadapter /tmp/coredump/
 {{- end }}
 
-cd /free5gc
+cd /aether
 
 cat config/config.yaml
 
-GOTRACEBACK=crash ./bin/upf-adapter config/config.yaml
+GOTRACEBACK=crash ./upfadapter config/config.yaml
