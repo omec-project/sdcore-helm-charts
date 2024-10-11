@@ -47,7 +47,7 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: ["/free5gc/script/upf-adapter-run.sh"]
+        command: ["/aether/script/upf-adapter-run.sh"]
         env:
         - name: POD_IP
           valueFrom:
@@ -59,10 +59,10 @@ spec:
       {{- end }}
         volumeMounts:
         - name: run-script
-          mountPath: /free5gc/script/upf-adapter-run.sh
+          mountPath: /aether/script/upf-adapter-run.sh
           subPath: upf-adapter-run.sh
         - name: upfadapter-config
-          mountPath: /free5gc/config
+          mountPath: /aether/config
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump

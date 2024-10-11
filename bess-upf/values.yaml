@@ -5,8 +5,8 @@
 images:
   repository: "" #default docker hub
   tags:
-    bess: omecproject/upf-epc-bess:rel-1.4.1
-    pfcpiface: omecproject/upf-epc-pfcpiface:rel-1.4.1
+    bess: omecproject/upf-epc-bess:rel-1.5.0
+    pfcpiface: omecproject/upf-epc-pfcpiface:rel-1.5.0
     tools: busybox:stable
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.

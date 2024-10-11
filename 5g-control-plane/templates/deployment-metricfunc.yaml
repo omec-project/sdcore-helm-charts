@@ -48,6 +48,10 @@ spec:
         tty: true
         command: [ "/metricfunc/script/metricfunc-run.sh" ]
         env:
+      {{- if eq .Values.config.GIN.mode "release" }}
+        - name: GIN_MODE
+          value: release
+      {{- end }}
         - name: POD_IP
           valueFrom:
             fieldRef:
