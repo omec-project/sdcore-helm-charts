@@ -98,6 +98,7 @@ config:
     cfgFiles:
       upf.jsonc:
         mode: dpdk
+        log_level: "info"
         workers: 1
         max_sessions: 50000
         table_sizes:
