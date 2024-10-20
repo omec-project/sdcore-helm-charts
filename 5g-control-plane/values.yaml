@@ -122,10 +122,6 @@ kafka:
       enabled: false
   persistence:
     enabled: false
-  nfKafka:
-    urls:
-      - "kafka-headless:9092"
-    topic: "sdcore-nf-data-source"
 
 mongodb:
   deploy: true
@@ -748,3 +744,8 @@ config:
           description: UPF Adapter initial local configuration
         logger:
           level: info
+        configuration:
+          kafkaInfo:
+            brokerUri: "kafka-headless"
+            brokerPort: 9092
+            topicName: "sdcore-data-source-smf"

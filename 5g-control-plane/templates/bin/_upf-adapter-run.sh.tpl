@@ -14,4 +14,4 @@ cd /aether
 
 cat config/config.yaml
 
-GOTRACEBACK=crash ./upfadapter config/config.yaml
+GOTRACEBACK=crash ./upfadapter -config config/config.yaml
