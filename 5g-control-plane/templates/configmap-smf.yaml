@@ -24,10 +24,6 @@
 {{- if not (hasKey $smfcfg.configuration "enableUPFAdapter") -}}
 {{- $_ := .Values.config.upfadapter.deploy | set $smfcfg.configuration "enableUPFAdapter" -}}
 {{- end }}
-{{- if not (hasKey $smfcfg.configuration "nfKafka") -}}
-{{- $_ := .Values.kafka.nfKafka | set $smfcfg.configuration "nfKafka" -}}
-{{- $_ := .Values.kafka.deploy | set $smfcfg.configuration.nfKafka "enable" -}}
-{{- end }}
 {{- if not (hasKey $smfcfg.configuration.kafkaInfo "enableKafka") -}}
 {{- $_ := .Values.kafka.deploy | set $smfcfg.configuration.kafkaInfo "enableKafka" -}}
 {{- end }}

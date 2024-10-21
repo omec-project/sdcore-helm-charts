@@ -13,6 +13,12 @@
 {{- if not (hasKey $upfadaptercfg "mongodb") -}}
 {{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $upfadaptercfg "mongodb" -}}
 {{- end }}
+{{- if not (hasKey $upfadaptercfg "logger") -}}
+{{- $_ := .Values.config.logger | set $upfadaptercfg "logger" -}}
+{{- end }}
+{{- if not (hasKey $upfadaptercfg.configuration.kafkaInfo "enableKafka") -}}
+{{- $_ := .Values.kafka.deploy | set $upfadaptercfg.configuration.kafkaInfo "enableKafka" -}}
+{{- end }}
 
 {{- end }}
 
