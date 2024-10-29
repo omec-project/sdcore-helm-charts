@@ -7,15 +7,15 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:1.0.0
-    amf: omecproject/5gc-amf:rel-1.5.0
-    nrf: omecproject/5gc-nrf:rel-1.5.0
-    smf: omecproject/5gc-smf:rel-1.6.0
-    ausf: omecproject/5gc-ausf:rel-1.5.0
-    nssf: omecproject/5gc-nssf:rel-1.5.0
-    pcf: omecproject/5gc-pcf:rel-1.5.0
+    amf: omecproject/5gc-amf:rel-1.5.1
+    nrf: omecproject/5gc-nrf:rel-1.5.3
+    smf: omecproject/5gc-smf:rel-1.6.2
+    ausf: omecproject/5gc-ausf:rel-1.5.1
+    nssf: omecproject/5gc-nssf:rel-1.5.1
+    pcf: omecproject/5gc-pcf:rel-1.5.2
     udr: omecproject/5gc-udr:rel-1.5.0
-    udm: omecproject/5gc-udm:rel-1.5.0
-    webui: omecproject/5gc-webui:rel-1.5.0
+    udm: omecproject/5gc-udm:rel-1.5.1
+    webui: omecproject/5gc-webui:rel-1.6.0
     sctplb: omecproject/sctplb:rel-1.5.0
     metricfunc: omecproject/metricfunc:rel-1.5.0
     upfadapter: omecproject/upfadapter:rel-2.0.0
@@ -245,7 +245,7 @@ config:
           version: 1.0.0
           description: UDM initial local configuration
         configuration:
-          nrfUri: http://nrf:29510
+          nrfUri: https://nrf:29510
           webuiUri: webui:9876
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
@@ -263,13 +263,12 @@ config:
             - nudm-ee
             - nudm-pp
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: udm
             tls:
-              log: free5gc/udmsslkey.log
-              pem: free5gc/support/TLS/udm.pem
-              key: free5gc/support/TLS/udm.key
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
           keys:
                 udmProfileAHNPublicKey: 5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650
                 udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
@@ -290,7 +289,7 @@ config:
           version: 1.0.0
           description: UDR initial local configuration
         configuration:
-          nrfUri: http://nrf:29510
+          nrfUri: https://nrf:29510
           webuiUri: webui:9876
           plmnSupportList:
             - plmnId:
@@ -300,9 +299,12 @@ config:
                 mcc: "333"
                 mnc: "88"
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: udr
+            tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
   pcf:
     deploy: true
     #podAnnotations:
@@ -319,11 +321,14 @@ config:
           description: PCF initial local configuration
         configuration:
           pcfName: PCF
-          nrfUri: http://nrf:29510
+          nrfUri: https://nrf:29510
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: pcf
+            tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
           defaultBdtRefId: BdtPolicyId-
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
@@ -358,12 +363,15 @@ config:
           description: NSSF initial local configuration
         configuration:
           nssfName: NSSF
-          nrfUri: http://nrf:29510
+          nrfUri: https://nrf:29510
           webuiUri: webui:9876
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: nssf
+            tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
           serviceNameList:
             - nnssf-nsselection
             - nnssf-nssaiavailability
@@ -382,7 +390,7 @@ config:
                 sst: 1
                 sd: "010203"
               nsiInformationList:
-                - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
                   nsiId: 22
   sctplb:
     deploy: false
@@ -450,12 +458,15 @@ config:
           ngapIpList:
             - "0.0.0.0"
           amfName: AMF
-          nrfUri: http://nrf:29510
+          nrfUri: https://nrf:29510
           webuiUri: webui:9876
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: amf
+            tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
           serviceNameList:
             - namf-comm
             - namf-evts
@@ -546,9 +557,12 @@ config:
           nfKeepAliveTime: 60
           webuiUri: webui:9876
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: nrf
+            tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
           DefaultPlmnId:
             mcc: "208"
             mnc: "93"
@@ -595,15 +609,15 @@ config:
           pfcp:
              addr: "POD_IP"
           smfName: SMF
-          nrfUri: http://nrf:29510
+          nrfUri: https://nrf:29510
           webuiUri: webui:9876
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: smf
             tls:
-              key: gofree5gc/support/TLS/smf.key
-              pem: gofree5gc/support/TLS/smf.pem
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
           serviceNameList:
             - nsmf-pdusession
             - nsmf-event-exposure
@@ -665,14 +679,17 @@ config:
           version: 1.0.0
           description: AUSF initial local configuration
         configuration:
-          nrfUri: http://nrf:29510
+          nrfUri: https://nrf:29510
           webuiUri: webui:9876
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: ausf
+            tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
           serviceNameList:
             - nausf-auth
           plmnSupportList:

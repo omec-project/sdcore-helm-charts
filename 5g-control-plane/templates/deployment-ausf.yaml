@@ -89,6 +89,9 @@ spec:
           subPath: ausf-run.sh
         - name: nf-config
           mountPath: /free5gc/config
+        - name: certs
+          mountPath: /var/run/certs
+          readOnly: true
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
@@ -102,6 +105,9 @@ spec:
         configMap:
           name: ausf
           defaultMode: 493
+      - name: certs
+        secret:
+          secretName: ausf-certs
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs
         hostPath:

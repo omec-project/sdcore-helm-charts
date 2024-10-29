@@ -91,6 +91,9 @@ spec:
           subPath: udm-run.sh
         - name: nf-config
           mountPath: /free5gc/config
+        - name: certs
+          mountPath: /var/run/certs
+          readOnly: true
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
@@ -106,6 +109,9 @@ spec:
           defaultMode: 493
       - name: config-dir
         emptyDir: {}
+      - name: certs
+        secret:
+          secretName: udm-certs
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs
         hostPath:
