@@ -6,7 +6,7 @@
 images:
   repository: "" #default docker hub
   tags:
-    init: omecproject/pod-init:1.0.0
+    init: omecproject/pod-init:rel-1.1.1
     amf: omecproject/5gc-amf:rel-1.5.1
     nrf: omecproject/5gc-nrf:rel-1.5.3
     smf: omecproject/5gc-smf:rel-1.6.2
