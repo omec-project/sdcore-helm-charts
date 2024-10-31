@@ -91,6 +91,9 @@ spec:
           subPath: amf-run.sh
         - name: amf-config
           mountPath: {{ .Values.config.imagePath }}/config
+        - name: certs
+          mountPath: /var/run/certs
+          readOnly: true
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
@@ -104,6 +107,9 @@ spec:
         configMap:
           name: amf
           defaultMode: 493
+      - name: certs
+        secret:
+          secretName: amf-certs
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs
         hostPath:

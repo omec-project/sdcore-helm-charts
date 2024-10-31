@@ -98,6 +98,9 @@ spec:
           mountPath: {{ .Values.config.imagePath }}/uerouting
         - name: nf-config
           mountPath: {{ .Values.config.imagePath }}/config
+        - name: certs
+          mountPath: /var/run/certs
+          readOnly: true
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
@@ -111,6 +114,9 @@ spec:
         configMap:
           name: smf
           defaultMode: 493
+      - name: certs
+        secret:
+          secretName: smf-certs
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs
         hostPath:
