@@ -1,4 +1,5 @@
 {{/*
+# Copyright 2024-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
@@ -56,10 +57,7 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: [ {{ .Values.config.imagePath }}/script/amf-run.sh ]
-        command: [ "/bin/bash", "-c" ]
-        args:
-        - "cat {{ .Values.config.imagePath }}/config/amfcfg.conf && GOTRACEBACK=crash {{ .Values.config.imagePath }}/amf/amf -amfcfg {{ .Values.config.imagePath }}/config/amfcfg.conf"
+        command: [ /opt/amf-run.sh ]
         env:
         - name: GRPC_GO_LOG_VERBOSITY_LEVEL
           value: {{ .Values.config.grpc.golog_verbosity | quote }}
@@ -86,11 +84,8 @@ spec:
 {{ toYaml .Values.resources.amf | indent 10 }}
       {{- end }}
         volumeMounts:
-        - name: run-script
-          mountPath: {{ .Values.config.imagePath }}/script/amf-run.sh
-          subPath: amf-run.sh
-        - name: amf-config
-          mountPath: {{ .Values.config.imagePath }}/config
+        - name: nf-config
+          mountPath: /opt
         - name: certs
           mountPath: /var/run/certs
           readOnly: true
@@ -99,11 +94,7 @@ spec:
           mountPath: /tmp/coredump
       {{- end }}
       volumes:
-      - name: run-script
-        configMap:
-          name: amf
-          defaultMode: 493
-      - name: amf-config
+      - name: nf-config
         configMap:
           name: amf
           defaultMode: 493

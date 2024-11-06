@@ -7,18 +7,18 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:rel-1.1.1
-    amf: omecproject/5gc-amf:rel-1.5.1
-    nrf: omecproject/5gc-nrf:rel-1.5.3
-    smf: omecproject/5gc-smf:rel-1.6.2
-    ausf: omecproject/5gc-ausf:rel-1.5.1
-    nssf: omecproject/5gc-nssf:rel-1.5.1
-    pcf: omecproject/5gc-pcf:rel-1.5.2
-    udr: omecproject/5gc-udr:rel-1.5.0
-    udm: omecproject/5gc-udm:rel-1.5.1
-    webui: omecproject/5gc-webui:rel-1.6.0
-    sctplb: omecproject/sctplb:rel-1.5.0
-    metricfunc: omecproject/metricfunc:rel-1.5.0
-    upfadapter: omecproject/upfadapter:rel-2.0.0
+    amf: omecproject/5gc-amf:rel-1.6.0
+    nrf: omecproject/5gc-nrf:rel-1.6.0
+    smf: omecproject/5gc-smf:rel-1.7.0
+    ausf: omecproject/5gc-ausf:rel-1.6.0
+    nssf: omecproject/5gc-nssf:rel-1.6.0
+    pcf: omecproject/5gc-pcf:rel-1.6.0
+    udr: omecproject/5gc-udr:rel-1.6.1
+    udm: omecproject/5gc-udm:rel-1.6.0
+    webui: omecproject/5gc-webui:rel-1.7.0
+    sctplb: omecproject/sctplb:rel-1.6.0
+    metricfunc: omecproject/metricfunc:rel-1.6.0
+    upfadapter: omecproject/upfadapter:rel-2.0.1
   pullPolicy: IfNotPresent
 
 nodeSelectors:
@@ -141,7 +141,6 @@ config:
     enabled: true          # helm chart config and use the config from config Pod
     syncUrl: ""            # Get the config from adapater in case control plane is down
   useExistingConfigMap: false
-  imagePath: /free5gc
   coreDump:
     enabled: false
     path: /tmp/coredump
@@ -155,6 +154,11 @@ config:
     severity: "info"
     trace: "none"
     verbosity: "none"
+    secure_server: false  # if 'true', you must set the path to where the credentials (pem and key) are located
+    tls:
+      crt: /var/run/certs/tls.crt
+      key: /var/run/certs/tls.key
+
   GIN:
     mode: release          # Possible options are: release, debug
   logger:
@@ -194,15 +198,14 @@ config:
       debugLevel: info
     Aper:
       debugLevel: info
-    CommonConsumerTest:
-      debugLevel: info
-    config5g:
+    Config5g:
       debugLevel: info
     MongoDBLibrary:
       debugLevel: info
   # webui
     WEBUI:
       debugLevel: info
+
   webui:
     deploy: true
     #podAnnotations:
@@ -230,6 +233,11 @@ config:
           description: WebUI initial local configuration
         configuration:
           spec-compliant-sdf: false
+          secure-grpc-server: false  # if 'true', you must set the path to where the credentials (pem and key) are located
+          tls:
+            pem: /var/run/certs/tls.crt
+            key: /var/run/certs/tls.key
+
   udm:
     deploy: true
     #podAnnotations:

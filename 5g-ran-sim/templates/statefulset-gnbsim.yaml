@@ -1,9 +1,9 @@
 {{/*
+# Copyright 2024-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
 */}}
-
 {{- if .Values.config.gnbsim.deploy }}
 {{ tuple "gnbsim" . | include "5g-ransim-plane.service_account" }}
 ---
@@ -66,7 +66,7 @@ spec:
           runAsUser: 0
         stdin: true
         tty: true
-        command: ["/opt/cp/scripts/gnbsim-run.sh"]
+        command: ["/opt/gnbsim-run.sh"]
         env:
         - name: MEM_LIMIT
           valueFrom:
@@ -93,24 +93,17 @@ spec:
       {{- end }}
       {{- end }}
         volumeMounts:
-        - name: cp-script
-          mountPath: /opt/cp/scripts/gnbsim-run.sh
-          subPath: gnbsim-run.sh
-        - name: cp-config
-          mountPath: /gnbsim/config
+        - name: nf-config
+          mountPath: /opt
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
       volumes:
-      - name: cp-script
+      - name: nf-config
         configMap:
           name: gnbsim
           defaultMode: 493
-      - name: cp-config
-        configMap:
-          name: gnbsim
-          defaultMode: 420
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs
         hostPath:

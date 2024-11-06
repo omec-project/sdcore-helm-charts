@@ -3,7 +3,6 @@
 
 # SPDX-License-Identifier: Apache-2.0
 */}}
-
 {{- if .Values.config.upfadapter.deploy }}
 {{ tuple "upfadapter" . | include "5g-control-plane.service_account" }}
 ---
@@ -47,7 +46,7 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: ["/aether/script/upf-adapter-run.sh"]
+        command: ["/opt/upf-adapter-run.sh"]
         env:
         - name: POD_IP
           valueFrom:
@@ -58,21 +57,14 @@ spec:
 {{ toYaml .Values.resources.upfadapter | indent 10 }}
       {{- end }}
         volumeMounts:
-        - name: run-script
-          mountPath: /aether/script/upf-adapter-run.sh
-          subPath: upf-adapter-run.sh
-        - name: upfadapter-config
-          mountPath: /aether/config
+        - name: nf-config
+          mountPath: /opt
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
       volumes:
-      - name: run-script
-        configMap:
-          name: upf-adapter
-          defaultMode: 493
-      - name: upfadapter-config
+      - name: nf-config
         configMap:
           name: upf-adapter
           defaultMode: 493

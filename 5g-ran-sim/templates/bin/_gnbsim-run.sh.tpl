@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# Copyright 2024-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -7,12 +8,17 @@
 set -xe
 
 {{- if .Values.config.coreDump.enabled }}
-cp /gnbsim/bin/gnbsim /tmp/coredump/
+cp /usr/local/bin/gnbsim /tmp/coredump/
 {{- end }}
 
-cd /gnbsim
-cat ./config/gnb.conf
+CFGPATH=/home
+FILENAME=gnb.conf
+# copy config file from configmap (/opt) to a general directory (/home)
+cp /opt/$FILENAME $CFGPATH/$FILENAME
+cat $CFGPATH/$FILENAME
+echo ""
 cat /etc/hosts
+echo ""
 
 {{- define "gnbiplist" -}}
 {{- join "," .Values.config.gnbsim.gnb.ips }}
@@ -25,8 +31,7 @@ ip route replace {{ .upfAddr }} via {{ .upfGw }}
 {{- end }}
 
 {{- if .Values.config.gnbsim.httpServer.enable}}
-cd /gnbsim
-./bin/gnbsim --cfg ./config/gnb.conf
+gnbsim --cfg $CFGPATH/$FILENAME
 {{- else }}
 sleep infinity
 {{- end }}

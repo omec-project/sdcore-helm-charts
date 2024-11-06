@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# Copyright 2024-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -7,10 +8,14 @@
 set -xe
 
 {{- if .Values.config.coreDump.enabled }}
-cp /free5gc/ausf/ausf /tmp/coredump/
+cp /usr/local/bin/ausf /tmp/coredump/
 {{- end }}
 
-cd /free5gc
-cat config/ausfcfg.conf
+CFGPATH=/home
+FILENAME=ausfcfg.conf
+# copy config file from configmap (/opt) to a general directory (/home)
+cp /opt/$FILENAME $CFGPATH/$FILENAME
+cat $CFGPATH/$FILENAME
+echo ""
 
-GOTRACEBACK=crash ./ausf/ausf -ausfcfg config/ausfcfg.conf
+GOTRACEBACK=crash ausf -cfg $CFGPATH/$FILENAME

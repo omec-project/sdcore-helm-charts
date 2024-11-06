@@ -1,9 +1,9 @@
 {{/*
+# Copyright 2024-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
 */}}
-
 {{- if .Values.config.webui.deploy }}
 {{ tuple "webui" . | include "5g-control-plane.service_account" }}
 ---
@@ -69,26 +69,19 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: ["/free5gc/script/webui-run.sh"]
+        command: ["/opt/webui-run.sh"]
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.webui | indent 10 }}
       {{- end }}
         volumeMounts:
-        - name: run-script
-          mountPath: /free5gc/script/webui-run.sh
-          subPath: webui-run.sh
         - name: nf-config
-          mountPath: /free5gc/config
+          mountPath: /opt
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
       volumes:
-      - name: run-script
-        configMap:
-          name: webui
-          defaultMode: 493
       - name: nf-config
         configMap:
           name: webui

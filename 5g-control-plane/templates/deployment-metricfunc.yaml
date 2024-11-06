@@ -1,4 +1,5 @@
 {{/*
+# Copyright 2024-present Intel Corporation
 # Copyright 2022-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
@@ -46,7 +47,7 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: [ "/metricfunc/script/metricfunc-run.sh" ]
+        command: [ "/opt/metricfunc-run.sh" ]
         env:
       {{- if eq .Values.config.GIN.mode "release" }}
         - name: GIN_MODE
@@ -61,21 +62,14 @@ spec:
 {{ toYaml .Values.resources.metricfunc | indent 10 }}
       {{- end }}
         volumeMounts:
-        - name: run-script
-          mountPath: /metricfunc/script/metricfunc-run.sh
-          subPath: metricfunc-run.sh
-        - name: metricfunc-config
-          mountPath: /metricfunc/config
+        - name: nf-config
+          mountPath: /opt
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
       volumes:
-      - name: run-script
-        configMap:
-          name: metricfunc
-          defaultMode: 493
-      - name: metricfunc-config
+      - name: nf-config
         configMap:
           name: metricfunc
           defaultMode: 493
