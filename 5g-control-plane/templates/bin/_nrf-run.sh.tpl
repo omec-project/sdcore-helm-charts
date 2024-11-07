@@ -12,7 +12,7 @@ cp /usr/local/bin/nrf /tmp/coredump/
 {{- end }}
 
 CFGPATH=/home
-FILENAME=nrfcfg.conf
+FILENAME=nrfcfg.yaml
 # copy config file from configmap (/opt) to a general directory (/home)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME

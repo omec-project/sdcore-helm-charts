@@ -12,7 +12,7 @@ cp /usr/local/bin/nssf /tmp/coredump/
 {{- end }}
 
 CFGPATH=/home
-FILENAME=nssfcfg.conf
+FILENAME=nssfcfg.yaml
 # copy config file from configmap (/opt) to a general directory (/home)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME

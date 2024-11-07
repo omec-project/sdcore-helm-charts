@@ -12,8 +12,8 @@ cp /usr/local/bin/smf /tmp/coredump/
 {{- end }}
 
 CFGPATH=/home
-FILENAME=smfcfg.conf
-UEFILENAME=uerouting.conf
+FILENAME=smfcfg.yaml
+UEFILENAME=uerouting.yaml
 # copy config file from configmap (/opt) to a general directory (/home)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cp /opt/$UEFILENAME $CFGPATH/$UEFILENAME

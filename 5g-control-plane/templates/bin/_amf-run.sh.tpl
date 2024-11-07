@@ -12,7 +12,7 @@ cp /usr/local/bin/amf /tmp/coredump/
 {{- end }}
 
 CFGPATH=/home
-FILENAME=amfcfg.conf
+FILENAME=amfcfg.yaml
 # copy config file from configmap (/opt) to a general directory (/home)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME

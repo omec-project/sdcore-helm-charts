@@ -12,7 +12,7 @@ cp /usr/local/bin/ausf /tmp/coredump/
 {{- end }}
 
 CFGPATH=/home
-FILENAME=ausfcfg.conf
+FILENAME=ausfcfg.yaml
 # copy config file from configmap (/opt) to a general directory (/home)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME

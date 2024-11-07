@@ -7,7 +7,7 @@
 {{- if .Values.config.metricfunc.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $metricscfg := index .Values.config.metricfunc.cfgFiles "metricscfg.conf" }}
+{{- $metricscfg := index .Values.config.metricfunc.cfgFiles "metricscfg.yaml" }}
 
 {{- end }}
 

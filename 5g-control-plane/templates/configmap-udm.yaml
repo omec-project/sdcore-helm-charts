@@ -7,7 +7,7 @@
 {{- if .Values.config.udm.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $udmcfg := index .Values.config.udm.cfgFiles "udmcfg.conf" }}
+{{- $udmcfg := index .Values.config.udm.cfgFiles "udmcfg.yaml" }}
 {{- $sbi := index $udmcfg.configuration "sbi" }}
 
 {{- if not (hasKey $udmcfg "logger") -}}

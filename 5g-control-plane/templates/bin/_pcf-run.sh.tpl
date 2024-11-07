@@ -12,7 +12,7 @@ cp /usr/local/bin/pcf /tmp/coredump/
 {{- end }}
 
 CFGPATH=/home
-FILENAME=pcfcfg.conf
+FILENAME=pcfcfg.yaml
 # copy config file from configmap (/opt) to a general directory (/home)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME

@@ -7,7 +7,7 @@
 {{- if .Values.config.ausf.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $ausfcfg := index .Values.config.ausf.cfgFiles "ausfcfg.conf" }}
+{{- $ausfcfg := index .Values.config.ausf.cfgFiles "ausfcfg.yaml" }}
 {{- $sbi := index $ausfcfg.configuration "sbi" }}
 
 {{- if not (hasKey $ausfcfg "logger") -}}

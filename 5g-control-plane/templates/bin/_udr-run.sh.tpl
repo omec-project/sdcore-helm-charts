@@ -12,7 +12,7 @@ cp /usr/local/bin/udr /tmp/coredump/
 {{- end }}
 
 CFGPATH=/home
-FILENAME=udrcfg.conf
+FILENAME=udrcfg.yaml
 # copy config file from configmap (/opt) to a general directory (/home)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME

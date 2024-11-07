@@ -227,7 +227,7 @@ config:
         # - host: free5gc.local
         #   path: /
     cfgFiles:
-      webuicfg.conf:
+      webuicfg.yaml:
         info:
           version: 1.0.0
           description: WebUI initial local configuration
@@ -247,8 +247,8 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30074
     cfgFiles:
-      # https://github.com/omec-project/udm/blob/master/factory/udmcfg.yaml
-      udmcfg.conf:
+      # https://github.com/omec-project/udm/blob/main/factory/udmcfg.yaml
+      udmcfg.yaml:
         info:
           version: 1.0.0
           description: UDM initial local configuration
@@ -291,8 +291,8 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30074
     cfgFiles:
-      # https://github.com/omec-project/udr/blob/master/factory/config.example.yaml
-      udrcfg.conf:
+      # https://github.com/omec-project/udr/blob/main/factory/udr_config.yaml
+      udrcfg.yaml:
         info:
           version: 1.0.0
           description: UDR initial local configuration
@@ -322,8 +322,8 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30077
     cfgFiles:
-      # https://github.com/omec-project/pcf/blob/master/factory/pcfcfg.yaml
-      pcfcfg.conf:
+      # https://github.com/omec-project/pcf/blob/main/factory/pcfcfg.yaml
+      pcfcfg.yaml:
         info:
           version: 1.0.0
           description: PCF initial local configuration
@@ -365,7 +365,7 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30081
     cfgFiles:
-      nssfcfg.conf:
+      nssfcfg.yaml:
         info:
           version: 1.0.0
           description: NSSF initial local configuration
@@ -449,7 +449,7 @@ config:
       port: 38412
       #nodePort: 30071
     cfgFiles:
-      amfcfg.conf:
+      amfcfg.yaml:
         info:
           version: 1.0.0
           description: AMF initial configuration
@@ -555,7 +555,7 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30070
     cfgFiles:
-      nrfcfg.conf:
+      nrfcfg.yaml:
         info:
           version: 1.0.0
           description: NRF initial local configuration
@@ -594,13 +594,13 @@ config:
       port: 29502
       #nodePort: 30080
     cfgFiles:
-      # https://github.com/omec-project/smf/blob/master/config/uerouting.yaml
-      uerouting.conf:
+      # https://github.com/omec-project/smf/blob/main/config/uerouting.yaml
+      uerouting.yaml:
         info:
           version: 1.0.0
           description: Routing information for UE
-      # https://github.com/omec-project/smf/blob/master/config/smfcfg.yaml
-      smfcfg.conf:
+      # https://github.com/omec-project/smf/blob/main/config/smfcfg.yaml
+      smfcfg.yaml:
         info:
           version: 1.0.0
           description: SMF initial local configuration
@@ -681,8 +681,8 @@ config:
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30082
     cfgFiles:
-      # https://github.com/omec-project/ausf/blob/master/factory/ausfcfg.yaml
-      ausfcfg.conf:
+      # https://github.com/omec-project/ausf/blob/main/factory/ausfcfg.yaml
+      ausfcfg.yaml:
         info:
           version: 1.0.0
           description: AUSF initial local configuration
@@ -712,7 +712,7 @@ config:
     apiEndpoint:
       port: 9301
     cfgFiles:
-      metricscfg.conf:
+      metricscfg.yaml:
         configuration:
           controllerFlag: false
           nfStreams:

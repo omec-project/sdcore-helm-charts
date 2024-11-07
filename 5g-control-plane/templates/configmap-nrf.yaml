@@ -7,7 +7,7 @@
 {{- if .Values.config.nrf.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $nrfcfg := index .Values.config.nrf.cfgFiles "nrfcfg.conf" }}
+{{- $nrfcfg := index .Values.config.nrf.cfgFiles "nrfcfg.yaml" }}
 {{- $config := index $nrfcfg "configuration" }}
 {{- $sbi := index $config "sbi" }}
 

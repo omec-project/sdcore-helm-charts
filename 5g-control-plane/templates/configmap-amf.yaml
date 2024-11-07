@@ -7,7 +7,7 @@
 {{- if .Values.config.amf.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $amfcfg := index .Values.config.amf.cfgFiles "amfcfg.conf" }}
+{{- $amfcfg := index .Values.config.amf.cfgFiles "amfcfg.yaml" }}
 {{- $sbi := index $amfcfg.configuration "sbi" }}
 
 {{- if not (hasKey $sbi "port") -}}

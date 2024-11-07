@@ -12,7 +12,7 @@ cp /usr/local/bin/udm /tmp/coredump/
 {{- end }}
 
 CFGPATH=/home
-FILENAME=udmcfg.conf
+FILENAME=udmcfg.yaml
 # copy config file from configmap (/opt) to a general directory (/home)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
