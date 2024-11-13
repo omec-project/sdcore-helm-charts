@@ -15,7 +15,7 @@ images:
     pcf: omecproject/5gc-pcf:rel-1.6.0
     udr: omecproject/5gc-udr:rel-1.6.1
     udm: omecproject/5gc-udm:rel-1.6.0
-    webui: omecproject/5gc-webui:rel-1.7.0
+    webui: omecproject/5gc-webui:rel-1.8.0
     sctplb: omecproject/sctplb:rel-1.6.0
     metricfunc: omecproject/metricfunc:rel-1.6.0
     upfadapter: omecproject/upfadapter:rel-2.0.1
