@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# Copyright 2024-present Intel Corporation
 # Copyright 2021-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -7,11 +8,14 @@
 set -xe
 
 {{- if .Values.config.coreDump.enabled }}
-cp /sdcore/bin/sctplb /tmp/coredump/
+cp /usr/local/bin/sctplb /tmp/coredump/
 {{- end }}
 
-cd /sdcore
+CFGPATH=/home
+FILENAME=sctplb.yaml
+# copy config file from configmap (/opt) to a general directory (/home)
+cp /opt/$FILENAME $CFGPATH/$FILENAME
+cat $CFGPATH/$FILENAME
+echo ""
 
-cat config/sctplb.yaml
-
-GOTRACEBACK=crash ./bin/sctplb config/sctplb.yaml
+GOTRACEBACK=crash sctplb -cfg $CFGPATH/$FILENAME

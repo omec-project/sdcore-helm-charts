@@ -7,7 +7,7 @@
 {{- if .Values.config.pcf.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $pcfcfg := index .Values.config.pcf.cfgFiles "pcfcfg.conf" }}
+{{- $pcfcfg := index .Values.config.pcf.cfgFiles "pcfcfg.yaml" }}
 {{- $sbi := index $pcfcfg.configuration "sbi" }}
 {{- $config := index $pcfcfg "configuration" }}
 

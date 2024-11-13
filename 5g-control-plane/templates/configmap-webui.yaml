@@ -7,7 +7,7 @@
 {{- if .Values.config.webui.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $webuicfg := index .Values.config.webui.cfgFiles "webuicfg.conf" }}
+{{- $webuicfg := index .Values.config.webui.cfgFiles "webuicfg.yaml" }}
 {{- $config := index $webuicfg "configuration" }}
 
 {{- if not (hasKey $webuicfg "logger") -}}

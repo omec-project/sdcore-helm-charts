@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# Copyright 2024-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -7,11 +8,14 @@
 set -xe
 
 {{- if .Values.config.coreDump.enabled }}
-cp /free5gc/nssf/nssf /tmp/coredump/
+cp /usr/local/bin/nssf /tmp/coredump/
 {{- end }}
 
-cd /free5gc
+CFGPATH=/home
+FILENAME=nssfcfg.yaml
+# copy config file from configmap (/opt) to a general directory (/home)
+cp /opt/$FILENAME $CFGPATH/$FILENAME
+cat $CFGPATH/$FILENAME
+echo ""
 
-cat config/nssfcfg.conf
-
-GOTRACEBACK=crash ./nssf/nssf -nssfcfg config/nssfcfg.conf
+GOTRACEBACK=crash nssf -cfg $CFGPATH/$FILENAME

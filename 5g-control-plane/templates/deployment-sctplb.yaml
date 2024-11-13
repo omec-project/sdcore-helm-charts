@@ -1,9 +1,9 @@
 {{/*
+# Copyright 2024-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
 */}}
-
 {{- if .Values.config.sctplb.deploy }}
 {{ tuple "sctplb" . | include "5g-control-plane.service_account" }}
 ---
@@ -55,7 +55,7 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: ["/sdcore/script/sctplb-run.sh"]
+        command: ["/opt/sctplb-run.sh"]
         env:
         - name: GRPC_GO_LOG_VERBOSITY_LEVEL
           value: {{ .Values.config.grpc.golog_verbosity | quote }}
@@ -82,21 +82,14 @@ spec:
 {{ toYaml .Values.resources.sctplb | indent 10 }}
       {{- end }}
         volumeMounts:
-        - name: run-script
-          mountPath: /sdcore/script/sctplb-run.sh
-          subPath: sctplb-run.sh
-        - name: sctplb-config
-          mountPath: /sdcore/config
+        - name: nf-config
+          mountPath: /opt
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
       volumes:
-      - name: run-script
-        configMap:
-          name: sctplb
-          defaultMode: 493
-      - name: sctplb-config
+      - name: nf-config
         configMap:
           name: sctplb
           defaultMode: 493

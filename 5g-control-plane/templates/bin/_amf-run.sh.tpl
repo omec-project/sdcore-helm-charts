@@ -1,17 +1,21 @@
-#!/bin/bash
+#!/bin/sh
 
+# Copyright 2024-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
 
-IMGPATH={{ .Values.config.imagePath }}
 {{- if .Values.config.coreDump.enabled }}
-cp $IMGPATH/amf/amf /tmp/coredump/
+cp /usr/local/bin/amf /tmp/coredump/
 {{- end }}
 
-cd $IMGPATH
-cat config/amfcfg.conf
+CFGPATH=/home
+FILENAME=amfcfg.yaml
+# copy config file from configmap (/opt) to a general directory (/home)
+cp /opt/$FILENAME $CFGPATH/$FILENAME
+cat $CFGPATH/$FILENAME
+echo ""
 
-#GOTRACEBACK=crash ./amf/amf -amfcfg config/amfcfg.conf
+GOTRACEBACK=crash amf -cfg $CFGPATH/$FILENAME

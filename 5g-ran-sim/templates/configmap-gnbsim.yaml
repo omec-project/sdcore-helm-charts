@@ -7,7 +7,7 @@
 {{- if .Values.config.gnbsim.deploy }}
 {{- if not .Values.config.useExistingConfigMap }}
 {{- $config := index .Values.config "gnbsim" }}
-{{- $gnbconf := index .Values.config.gnbsim.yamlCfgFiles "gnb.conf" }}
+{{- $gnbconf := index .Values.config.gnbsim.cfgFiles "gnbsimcfg.yaml" }}
 {{- $configuration := index $gnbconf "configuration" }}
 
 {{- if not (hasKey $configuration "goProfile") -}}
@@ -31,7 +31,7 @@ metadata:
 data:
   gnbsim-run.sh: |
 {{ tuple "bin/_gnbsim-run.sh.tpl" . | include "5g-ransim-plane.template" | indent 4 }}
-{{- range $key, $value := .Values.config.gnbsim.yamlCfgFiles }}
+{{- range $key, $value := .Values.config.gnbsim.cfgFiles }}
   {{ $key }}: |-
 {{ toYaml $value | indent 4 }}
 {{- end }}

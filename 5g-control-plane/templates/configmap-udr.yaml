@@ -7,7 +7,7 @@
 {{- if .Values.config.udr.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $udrcfg := index .Values.config.udr.cfgFiles "udrcfg.conf" }}
+{{- $udrcfg := index .Values.config.udr.cfgFiles "udrcfg.yaml" }}
 {{- $config := index $udrcfg "configuration" }}
 {{- $sbi := index $config "sbi" }}
 

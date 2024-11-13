@@ -8,7 +8,7 @@
 {{- if .Values.config.upfadapter.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $upfadaptercfg := index .Values.config.upfadapter.cfgFiles "config.yaml" }}
+{{- $upfadaptercfg := index .Values.config.upfadapter.cfgFiles "upfadaptercfg.yaml" }}
 
 {{- if not (hasKey $upfadaptercfg "mongodb") -}}
 {{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $upfadaptercfg "mongodb" -}}

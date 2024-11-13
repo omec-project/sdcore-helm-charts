@@ -7,11 +7,14 @@
 set -xe
 
 {{- if .Values.config.coreDump.enabled }}
-cp /aether/upfadapter /tmp/coredump/
+cp /usr/local/bin/upfadapter /tmp/coredump/
 {{- end }}
 
-cd /aether
+CFGPATH=/home
+FILENAME=upfadaptercfg.yaml
+# copy config file from configmap (/opt) to a general directory (/home)
+cp /opt/$FILENAME $CFGPATH/$FILENAME
+cat $CFGPATH/$FILENAME
+echo ""
 
-cat config/config.yaml
-
-GOTRACEBACK=crash ./upfadapter -config config/config.yaml
+GOTRACEBACK=crash upfadapter -cfg $CFGPATH/$FILENAME

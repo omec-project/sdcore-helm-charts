@@ -8,7 +8,7 @@
 {{- if .Values.config.smf.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $smfcfg := index .Values.config.smf.cfgFiles "smfcfg.conf" }}
+{{- $smfcfg := index .Values.config.smf.cfgFiles "smfcfg.yaml" }}
 {{- $sbi := index $smfcfg.configuration "sbi" }}
 
 {{- if not (hasKey $smfcfg.configuration "mongodb") -}}

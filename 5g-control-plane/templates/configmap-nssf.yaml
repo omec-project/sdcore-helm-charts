@@ -7,7 +7,7 @@
 {{- if .Values.config.nssf.deploy }}
 
 {{- if not .Values.config.useExistingConfigMap -}}
-{{- $nssfcfg := index .Values.config.nssf.cfgFiles "nssfcfg.conf" }}
+{{- $nssfcfg := index .Values.config.nssf.cfgFiles "nssfcfg.yaml" }}
 {{- $sbi := index $nssfcfg.configuration "sbi" }}
 
 {{- if not (hasKey $nssfcfg "logger") -}}

@@ -1,9 +1,9 @@
 {{/*
+# Copyright 2024-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
 */}}
-
 {{- if .Values.config.simapp.deploy }}
 {{ tuple "simapp" . | include "omec-sub-provision.service_account" }}
 ---
@@ -53,7 +53,7 @@ spec:
       {{- end }}
         stdin: true
         tty: true
-        command: ["/simapp/script/simapp-run.sh"]
+        command: ["/opt/simapp-run.sh"]
         env:
         - name: POD_IP
           valueFrom:
@@ -64,20 +64,13 @@ spec:
 {{ toYaml .Values.resources.simapp | indent 10 }}
       {{- end }}
         volumeMounts:
-        - name: run-script
-          mountPath: /simapp/script/simapp-run.sh
-          subPath: simapp-run.sh
         - name: nf-config
-          mountPath: /simapp/config
+          mountPath: /opt
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
       volumes:
-      - name: run-script
-        configMap:
-          name: simapp
-          defaultMode: 493
       - name: nf-config
         configMap:
           name: simapp

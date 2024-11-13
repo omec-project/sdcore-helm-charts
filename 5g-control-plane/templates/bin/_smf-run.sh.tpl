@@ -1,19 +1,25 @@
-#!/bin/bash
+#!/bin/sh
 
+# Copyright 2024-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
 
-IMGPATH={{ .Values.config.imagePath }}
 {{- if .Values.config.coreDump.enabled }}
-cp /free5gc/smf/smf /tmp/coredump/
+cp /usr/local/bin/smf /tmp/coredump/
 {{- end }}
 
-cd $IMGPATH
+CFGPATH=/home
+FILENAME=smfcfg.yaml
+UEFILENAME=uerouting.yaml
+# copy config file from configmap (/opt) to a general directory (/home)
+cp /opt/$FILENAME $CFGPATH/$FILENAME
+cp /opt/$UEFILENAME $CFGPATH/$UEFILENAME
+cat $CFGPATH/$FILENAME
+echo ""
+cat $CFGPATH/$UEFILENAME
+echo ""
 
-cat config/smfcfg.conf
-cat uerouting/uerouting.conf
-
-#GOTRACEBACK=crash ./smf/smf -smfcfg config/smfcfg.conf -uerouting uerouting/uerouting.conf
+GOTRACEBACK=crash smf -cfg $CFGPATH/$FILENAME -uerouting $CFGPATH/$UEFILENAME

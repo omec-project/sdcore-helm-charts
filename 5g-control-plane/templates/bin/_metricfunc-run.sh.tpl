@@ -1,19 +1,21 @@
 #!/bin/sh
 
+# Copyright 2024-present Intel Corporation
 # Copyright 2022-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
 
-IMGPATH={{ .Values.config.imagePath }}
 {{- if .Values.config.coreDump.enabled }}
-cp /sdcore/metrics /tmp/coredump/
+cp /usr/local/bin/metricfunc /tmp/coredump/
 {{- end }}
 
-cd /metricfunc
-cat config/metricscfg.conf
+CFGPATH=/home
+FILENAME=metricscfg.yaml
+# copy config file from configmap (/opt) to a general directory (/home)
+cp /opt/$FILENAME $CFGPATH/$FILENAME
+cat $CFGPATH/$FILENAME
+echo ""
 
-echo $PWD
-
-GOTRACEBACK=crash /metricfunc/bin/metricfunc -metrics config/metricscfg.conf
+GOTRACEBACK=crash metricfunc -cfg $CFGPATH/$FILENAME
