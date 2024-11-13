@@ -763,7 +763,7 @@ config:
       port: 8090
       #nodePort: 30080
     cfgFiles:
-      config.yaml:
+      upfadaptercfg.yaml:
         info:
           version: 1.0.0
           description: UPF Adapter initial local configuration

@@ -67,8 +67,8 @@ config:
       nodePort:
         enabled: false
         port: 30071
-    yamlCfgFiles:
-      gnb.conf:
+    cfgFiles:
+      gnbsimcfg.yaml:
         info:
           version: 1.0.0
           description: gNodeB sim initial configuration
