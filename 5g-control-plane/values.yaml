@@ -145,7 +145,7 @@ config:
     enabled: false
     path: /tmp/coredump
   mongodb:
-    name: free5gc
+    name: aether
     url: mongodb://mongodb-arbiter-headless
     authKeysDbName: authentication
     authUrl: mongodb://mongodb-arbiter-headless
@@ -220,11 +220,11 @@ config:
       port: 9876
     ingress:
       enabled: false
-      hostname: free5gc.local
+      hostname: aether.local
       path: /
       pathType: Prefix
       # extraHosts:
-        # - host: free5gc.local
+        # - host: aether.local
         #   path: /
     cfgFiles:
       webuicfg.yaml:
