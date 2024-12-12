@@ -7,15 +7,15 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:rel-1.1.1
-    amf: omecproject/5gc-amf:rel-1.6.0
-    nrf: omecproject/5gc-nrf:rel-1.6.0
-    smf: omecproject/5gc-smf:rel-1.7.0
+    amf: omecproject/5gc-amf:rel-1.6.2
+    nrf: omecproject/5gc-nrf:rel-1.6.1
+    smf: omecproject/5gc-smf:rel-2.0.1
     ausf: omecproject/5gc-ausf:rel-1.6.0
     nssf: omecproject/5gc-nssf:rel-1.6.0
     pcf: omecproject/5gc-pcf:rel-1.6.0
     udr: omecproject/5gc-udr:rel-1.6.1
     udm: omecproject/5gc-udm:rel-1.6.0
-    webui: omecproject/5gc-webui:rel-1.8.0
+    webui: omecproject/5gc-webui:rel-1.8.1
     sctplb: omecproject/sctplb:rel-1.6.0
     metricfunc: omecproject/metricfunc:rel-1.6.0
     upfadapter: omecproject/upfadapter:rel-2.0.1
@@ -182,8 +182,6 @@ config:
   # library
     NAS:
       debugLevel: info
-    FSM:
-      debugLevel: info
     NGAP:
       debugLevel: info
     NamfCommunication:
@@ -199,6 +197,8 @@ config:
     Aper:
       debugLevel: info
     Config5g:
+      debugLevel: info
+    Util:
       debugLevel: info
     MongoDBLibrary:
       debugLevel: info
