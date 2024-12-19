@@ -120,14 +120,3 @@ Expand the name of the chart.
 {{- define "5g-control-plane.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
-
-{{/*
-Generate certificates for 5GC-CP
-*/}}
-{{- define "5g-control-plane.gen-certs" -}}
-{{- $altNames := list ( printf "%s.%s" (include "5g-control-plane.name" .) .Release.Namespace ) ( printf "%s.%s.svc" (include "5g-control-plane.name" .) .Release.Namespace ) -}}
-{{- $ca := genCA "5g-control-plane-ca" 365 -}}
-{{- $cert := genSignedCert ( include "5g-control-plane.name" . ) nil $altNames 365 $ca -}}
-tls.crt: {{ $cert.Cert | b64enc }}
-tls.key: {{ $cert.Key | b64enc }}
-{{- end -}}

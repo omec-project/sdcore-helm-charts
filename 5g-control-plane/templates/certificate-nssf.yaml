@@ -1,0 +1,26 @@
+{{/*
+# Copyright 2024 Intel Corporation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nssf-certificate
+  labels:
+{{ tuple "nssf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  secretName: nssf-certs
+  commonName: nssf-certs
+  subject:
+    organizations:
+    - Aether SD-Core
+  duration: 2160h # 90d
+  renewBefore: 1h
+  issuerRef:
+    name: ca-cluster-issuer
+    kind: ClusterIssuer
