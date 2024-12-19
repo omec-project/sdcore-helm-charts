@@ -136,6 +136,13 @@ mongodb:
   architecture: replicaset
   replicaCount: 1
 
+certmanager:
+  enabled: true
+  fullnameOverride: certmanager
+  namespace: cert-manager
+  crds:
+    enabled: true
+
 config:
   managedByConfigPod:      # config comes from helm by default, if enabled true, then discard
     enabled: true          # helm chart config and use the config from config Pod
@@ -278,10 +285,10 @@ config:
               pem: /var/run/certs/tls.crt
               key: /var/run/certs/tls.key
           keys:
-                udmProfileAHNPublicKey: 5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650
-                udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
-                udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
-                udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
+            udmProfileAHNPublicKey: 5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650
+            udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
+            udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
+            udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
   udr:
     deploy: true
     #podAnnotations:

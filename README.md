@@ -10,9 +10,28 @@ Note that these Helm Charts can be used to deploy the Aether SD-Core. However,
 the user should override the values.yaml file(s) to be able to properly deploy
 all pods. One simple way to do so is by using the
 [sdcore-5g-values.yaml](https://github.com/opennetworkinglab/aether-5gc/blob/master/roles/core/templates/sdcore-5g-values.yaml)
-file from [Aether-Onramp](https://docs.aetherproject.org/master/onramp/overview.html),
-however, some values need to be accordingly updated depending on the specific
+file from [Aether-Onramp](https://docs.aetherproject.org/master/onramp/overview.html).
+Morever, some values need to be accordingly updated depending on the specific
 deployment/setup as shown below.
+
+## Pre-requisites (If NOT using Aehter OnRamp)
+
+The only pre-requisite to use the Helm Charts by themselves is the creation of
+the namespace for `cert-manager` in Kubernetes. That is, by default, the Helm
+Charts will try to deploy `cert-manager` in the namespace called `cert-manager`,
+as shown below. Therefore, the user needs to create this namespace before
+installing the Helm Charts.
+
+```yaml
+certmanager:
+  enabled: true
+  fullnameOverride: certmanager
+  namespace: cert-manager
+  crds:
+    enabled: true
+```
+
+## Example of usage with Aether OnRamp
 
 It is strongly recommended to use [Aether-Onramp](https://docs.aetherproject.org/master/onramp/overview.html)
 for the deployment of the `SD-Core` because `OnRamp`, besides deploying the
