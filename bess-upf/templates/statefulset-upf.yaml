@@ -98,7 +98,7 @@ spec:
         {{- if .Values.config.upf.hugepage.enabled }}
           - bessd -f --allow="$PCIDEVICE_INTEL_COM_INTEL_SRIOV_DPDK" --grpc_url=0.0.0.0:10514
         {{- else }}
-          - bessd -m 0 -f --allow="$PCIDEVICE_INTEL_COM_INTEL_SRIOV_DPDK" --grpc_url=0.0.0.0:10514
+          - bessd -m 0 -f --grpc_url=0.0.0.0:10514
         {{- end }}
         lifecycle:
           postStart:
