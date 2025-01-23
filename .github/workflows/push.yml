@@ -107,7 +107,7 @@ jobs:
           done
 
       - name: rsync deployments
-        uses: burnett01/rsync-deployments@7.0.1
+        uses: burnett01/rsync-deployments@7.0.2
         with:
           switches: -avh
           path: ${{ env.CHARTS_DIR }}/
@@ -131,7 +131,7 @@ jobs:
           helm repo index ${{ env.CHARTS_DIR }} --url ${{ env.CHARTS_REPO_URL }} --merge ${{ env.REF_CHARTS_DIR }}/index.yaml
 
       - name: rsync deployments
-        uses: burnett01/rsync-deployments@7.0.1
+        uses: burnett01/rsync-deployments@7.0.2
         with:
           switches: -avh
           path: ${{ env.CHARTS_DIR }}/
