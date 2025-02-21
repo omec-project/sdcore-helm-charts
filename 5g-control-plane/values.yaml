@@ -6,19 +6,19 @@
 images:
   repository: "" #default docker hub
   tags:
-    init: omecproject/pod-init:rel-1.1.1
-    amf: omecproject/5gc-amf:rel-1.6.2
-    nrf: omecproject/5gc-nrf:rel-1.6.1
-    smf: omecproject/5gc-smf:rel-2.0.1
-    ausf: omecproject/5gc-ausf:rel-1.6.0
-    nssf: omecproject/5gc-nssf:rel-1.6.0
-    pcf: omecproject/5gc-pcf:rel-1.6.0
-    udr: omecproject/5gc-udr:rel-1.6.1
-    udm: omecproject/5gc-udm:rel-1.6.0
-    webui: omecproject/5gc-webui:rel-1.8.1
-    sctplb: omecproject/sctplb:rel-1.6.0
-    metricfunc: omecproject/metricfunc:rel-1.6.0
-    upfadapter: omecproject/upfadapter:rel-2.0.1
+    init: omecproject/pod-init:rel-1.1.2
+    amf: omecproject/5gc-amf:rel-1.6.3
+    nrf: omecproject/5gc-nrf:rel-1.6.2
+    smf: omecproject/5gc-smf:rel-2.0.2
+    ausf: omecproject/5gc-ausf:rel-1.6.1
+    nssf: omecproject/5gc-nssf:rel-1.6.1
+    pcf: omecproject/5gc-pcf:rel-1.6.1
+    udr: omecproject/5gc-udr:rel-1.6.2
+    udm: omecproject/5gc-udm:rel-1.6.1
+    webui: omecproject/5gc-webui:rel-1.8.3
+    sctplb: omecproject/sctplb:rel-1.6.1
+    metricfunc: omecproject/metricfunc:rel-1.6.1
+    upfadapter: omecproject/upfadapter:rel-2.0.2
   pullPolicy: IfNotPresent
 
 nodeSelectors:
@@ -135,13 +135,6 @@ mongodb:
   #clusterDomain: cluster.local
   architecture: replicaset
   replicaCount: 1
-
-certmanager:
-  enabled: true
-  fullnameOverride: certmanager
-  namespace: cert-manager
-  crds:
-    enabled: true
 
 config:
   managedByConfigPod:      # config comes from helm by default, if enabled true, then discard
