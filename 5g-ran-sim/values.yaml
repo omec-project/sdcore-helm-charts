@@ -5,8 +5,8 @@
 images:
   repository: "" #default docker hub
   tags:
-    init: omecproject/pod-init:rel-1.1.1
-    gnbsim: omecproject/5gc-gnbsim:rel-1.6.0
+    init: omecproject/pod-init:rel-1.1.2
+    gnbsim: omecproject/5gc-gnbsim:rel-1.6.1
   pullPolicy: IfNotPresent
 
 nodeSelectors:
@@ -150,7 +150,7 @@ config:
               profileName: profile2
               enable: true
               gnbName: gnb1
-              execInParallel: false #run all subscribers in this profile parallel
+              execInParallel: true #run all subscribers in this profile parallel
               stepTrigger: false #wait for trigger to move to next step
               startImsi: 208930100007492
               ueCount: 5
@@ -234,7 +234,7 @@ config:
               defaultAs: "192.168.250.1" #default icmp pkt destination
             - profileType: pdusessest
               profileName: profile8
-              enable: true
+              enable: false
               gnbName: gnb2
               execInParallel: false #run all subscribers in this profile parallel
               stepTrigger: false #wait for trigger to move to next step
