@@ -7,7 +7,7 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:rel-1.1.2
-    amf: omecproject/5gc-amf:rel-1.6.4
+    amf: omecproject/5gc-amf:rel-1.6.5
     nrf: omecproject/5gc-nrf:rel-1.6.3
     smf: omecproject/5gc-smf:rel-2.0.3
     ausf: omecproject/5gc-ausf:rel-1.6.2
@@ -15,9 +15,9 @@ images:
     pcf: omecproject/5gc-pcf:rel-1.6.2
     udr: omecproject/5gc-udr:rel-1.6.3
     udm: omecproject/5gc-udm:rel-1.6.2
-    webui: omecproject/5gc-webui:rel-1.8.3
+    webui: omecproject/5gc-webui:rel-1.8.5
     sctplb: omecproject/sctplb:rel-1.6.1
-    metricfunc: omecproject/metricfunc:rel-1.6.1
+    metricfunc: omecproject/metricfunc:rel-1.6.2
     upfadapter: omecproject/upfadapter:rel-2.0.2
   pullPolicy: IfNotPresent
 
@@ -744,7 +744,7 @@ config:
             addr: "aether-roc-umbrella-aether-roc-gui-v2-1-external.aether-roc.svc"
             port: 80
           metricFuncEndPoint:
-            addr: "metricfunc.omec.svc"
+            addr: "metricfunc.aether-5gc.svc"
             port: 5001
         info:
           description: Metrics initial local configuration
