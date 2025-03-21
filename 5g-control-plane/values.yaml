@@ -122,6 +122,10 @@ kafka:
       enabled: false
   persistence:
     enabled: false
+  initContainers:
+    - name: wait-for-zookeeper
+      image: busybox
+      command: ['sh', '-c', 'until nc -z sd-core-zookeeper 2181; do echo waiting for zookeeper; sleep 2; done;']
 
 mongodb:
   deploy: true
