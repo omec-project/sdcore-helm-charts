@@ -37,6 +37,13 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
+      initContainers:
+      {{- if .Values.kafka.deploy }}
+      - name: wait-kafka-module
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        command: ['sh', '-c', 'until nc -z kafka-headless 9092; do echo waiting for kafka; sleep 4; done;']
+      {{- end }}
       containers:
       - name: metricfunc
         image: {{ .Values.images.repository }}{{ .Values.images.tags.metricfunc }}
