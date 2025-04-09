@@ -14,23 +14,6 @@ file from [Aether-Onramp](https://docs.aetherproject.org/master/onramp/overview.
 Morever, some values need to be accordingly updated depending on the specific
 deployment/setup as shown below.
 
-## Pre-requisites (If NOT using Aehter OnRamp)
-
-The only pre-requisite to use the Helm Charts by themselves is the creation of
-the namespace for `cert-manager` in Kubernetes. That is, by default, the Helm
-Charts will try to deploy `cert-manager` in the namespace called `cert-manager`,
-as shown below. Therefore, the user needs to create this namespace before
-installing the Helm Charts.
-
-```yaml
-certmanager:
-  enabled: true
-  fullnameOverride: certmanager
-  namespace: cert-manager
-  crds:
-    enabled: true
-```
-
 ## Example of usage with Aether OnRamp
 
 It is strongly recommended to use [Aether-Onramp](https://docs.aetherproject.org/master/onramp/overview.html)
