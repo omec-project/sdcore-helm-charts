@@ -143,6 +143,10 @@ spec:
         env:
           - name: CONF_FILE
             value: /etc/bess/conf/upf.jsonc
+        {{- if .Values.config.upf.closedLoop }}
+          - name: CLOSED_LOOP_SOCKET_PATH
+            value: /pod-share/closedloop
+        {{- end }}
         volumeMounts:
           - name: shared-app
             mountPath: /pod-share
@@ -217,6 +221,27 @@ spec:
           requests:
             cpu: 128m
             memory: 64Mi
+    {{- end }}
+    {{- if .Values.config.upf.closedLoop }}
+      - name: closed-loop
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.bess }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        env:
+          - name: CLOSED_LOOP_PORT
+            value: {{ .Values.config.upf.closedLoopPort | quote }}
+          - name: CLOSED_LOOP_SOCKET_PATH
+            value: /pod-share/closedloop
+        command: ["/opt/bess/bessctl/conf/closed_loop_svr.py"]
+        resources:
+          limits:
+            cpu: 128m
+            memory: 256Mi
+          requests:
+            cpu: 128m
+            memory: 256Mi
+        volumeMounts:
+          - name: shared-app
+            mountPath: /pod-share
     {{- end }}
       volumes:
       - name: configs

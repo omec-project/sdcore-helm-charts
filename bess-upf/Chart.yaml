@@ -7,4 +7,4 @@ description: OMEC user plane based on BESS
 name: bess-upf
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 1.2.2
+version: 1.3.0

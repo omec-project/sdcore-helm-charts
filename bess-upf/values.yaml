@@ -5,8 +5,8 @@
 images:
   repository: "" #default docker hub
   tags:
-    bess: omecproject/upf-epc-bess:rel-2.0.2
-    pfcpiface: omecproject/upf-epc-pfcpiface:rel-2.0.2
+    bess: omecproject/upf-epc-bess:rel-2.1.0
+    pfcpiface: omecproject/upf-epc-pfcpiface:rel-2.1.0
     tools: omecproject/pod-init:rel-1.1.2
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.
@@ -95,6 +95,8 @@ config:
       #mac:
       #vlan:
       #iface:
+    closedLoop: false
+    closedLoopPort: 9301
     cfgFiles:
       upf.jsonc:
         mode: dpdk
