@@ -32,6 +32,11 @@ spec:
     nodePort: {{ .Values.service.nodePort }}
 {{- end }}
 {{- end }}
+{{- if .Values.config.upf.closedLoop }}
+  - name: closed-loop
+    protocol: TCP
+    port: {{ .Values.config.upf.closedLoopPort }}
+{{- end }}
 ---
 apiVersion: v1
 kind: Service
