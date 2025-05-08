@@ -745,7 +745,7 @@ config:
             addr: "userAppapp"
             port: 9301
           rocEndPoint:
-            addr: "aether-roc-umbrella-aether-roc-gui-v2-1-external.aether-roc.svc"
+            addr: "roc-aether-roc-gui-v2-1-external.aether-roc.svc"
             port: 80
           metricFuncEndPoint:
             addr: "metricfunc.aether-5gc.svc"
