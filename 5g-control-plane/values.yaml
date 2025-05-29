@@ -236,6 +236,7 @@ config:
           version: 1.0.0
           description: WebUI initial local configuration
         configuration:
+          enableAuthentication: false
           spec-compliant-sdf: false
           secure-grpc-server: false  # if 'true', you must set the path to where the credentials (pem and key) are located
           tls:
