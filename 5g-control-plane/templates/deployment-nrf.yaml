@@ -29,8 +29,17 @@ spec:
         helm.sh/hook-weight: "2"
         {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- if or .Values.confidentialContainers.enabled .Values.confidentialContainers.annotation.enabled }}
+      {{- if not .Values.config.nrf.podAnnotations }}
+      annotations:
+      {{- end }}
+{{ include "5g-control-plane.confidential_annotations" . | indent 8 }}
+    {{- end }}
     spec:
       serviceAccountName: nrf
+    {{- if .Values.confidentialContainers.enabled }}
+      runtimeClassName: {{ .Values.confidentialContainers.runtimeClassName }}
+    {{- end }}
     {{- if .Values.nodeSelectors.enabled }}
       nodeSelector:
         {{ .Values.nodeSelectors.label }}: {{ .Values.nodeSelectors.value }}
@@ -39,8 +48,9 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
-      {{- if .Values.config.coreDump.enabled }}
       initContainers:
+      {{- include "5g-control-plane.attestation_init" . | nindent 6 }}
+      {{- if .Values.config.coreDump.enabled }}
       {{ tuple "nrf" . | include "5g-control-plane.coredump_init" | indent 6 }}
       {{- end }}
       containers:

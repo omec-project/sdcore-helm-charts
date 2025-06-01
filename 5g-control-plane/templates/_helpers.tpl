@@ -131,3 +131,52 @@ Generate certificates for 5GC-CP
 tls.crt: {{ $cert.Cert | b64enc }}
 tls.key: {{ $cert.Key | b64enc }}
 {{- end -}}
+
+{{/*
+Render confidential container annotations
+*/}}
+{{- define "5g-control-plane.confidential_annotations" -}}
+{{- if or .Values.confidentialContainers.enabled .Values.confidentialContainers.annotation.enabled }}
+io.containerd.cri.runtime-handler: kata-qemu
+{{- if .Values.confidentialContainers.annotation.enabled }}
+{{- if .Values.confidentialContainers.annotation.kernelParams }}
+io.katacontainers.config.hypervisor.kernel_params: {{ .Values.confidentialContainers.annotation.kernelParams | quote }}
+{{- else if .Values.confidentialContainers.attestation.kbsAddress }}
+io.katacontainers.config.hypervisor.kernel_params: "agent.guest_components_rest_api=all agent.aa_kbc_params=cc_kbc::{{ .Values.confidentialContainers.attestation.kbsAddress }}"
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Render attestation init container
+*/}}
+{{- define "5g-control-plane.attestation_init" -}}
+{{- if .Values.confidentialContainers.attestation.enabled }}
+- name: init-attestation
+  image: {{ .Values.images.repository }}{{ .Values.images.tags.attestation }}
+  imagePullPolicy: {{ .Values.images.pullPolicy }}
+  command: ["/bin/sh","-c"]
+  args:
+    - |
+      echo "Starting attestation process...";
+      timeout={{ .Values.confidentialContainers.attestation.timeout | default 300 }};
+      elapsed=0;
+      while [ $elapsed -lt $timeout ]; do
+        if curl -s {{ .Values.confidentialContainers.attestation.attestationUrl }} | grep -iv "get token failed" | grep -iv "error" | grep -i token; then
+          echo "ATTESTATION COMPLETED SUCCESSFULLY";
+          exit 0;
+        fi;
+        echo "Attestation attempt failed, retrying...";
+        sleep 5;
+        elapsed=$((elapsed + 5));
+      done;
+      echo "ATTESTATION FAILED: Timeout after ${timeout} seconds";
+      {{- if .Values.confidentialContainers.attestation.required }}
+      exit 1;
+      {{- else }}
+      echo "Attestation not required, continuing...";
+      exit 0;
+      {{- end }}
+{{- end }}
+{{- end -}}

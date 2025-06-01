@@ -7,6 +7,7 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:rel-1.1.2
+    attestation: storytel/alpine-bash-curl:latest
     amf: omecproject/5gc-amf:rel-1.6.5
     nrf: omecproject/5gc-nrf:rel-1.6.3
     smf: omecproject/5gc-smf:rel-2.0.3
@@ -20,6 +21,20 @@ images:
     metricfunc: omecproject/metricfunc:rel-1.6.2
     upfadapter: omecproject/upfadapter:rel-2.0.2
   pullPolicy: IfNotPresent
+
+# Confidential Container Configuration
+confidentialContainers:
+  enabled: false                      # Enable confidential container runtime
+  runtimeClassName: "kata-qemu"       # Runtime class to use
+  annotation:
+    enabled: false                    # Enable kata annotation independently
+    kernelParams: ""                  # Custom kernel parameters, if empty will use default with KBS address
+  attestation:
+    enabled: false                    # Enable attestation init container
+    required: false                   # If true, pod will fail if attestation fails
+    kbsAddress: ""                    # e.g., "http://kbs-service:8080"
+    attestationUrl: "http://127.0.0.1:8006/aa/token?token_type=kbs"
+    timeout: 300                      # Attestation timeout in seconds
 
 nodeSelectors:
   enabled: false
