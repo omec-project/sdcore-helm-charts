@@ -27,8 +27,17 @@ spec:
       annotations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- if or .Values.confidentialContainers.enabled .Values.confidentialContainers.annotation.enabled }}
+      {{- if not .Values.config.amf.podAnnotations }}
+      annotations:
+      {{- end }}
+{{ include "5g-control-plane.confidential_annotations" . | indent 8 }}
+    {{- end }}
     spec:
       serviceAccountName: amf
+    {{- if .Values.confidentialContainers.enabled }}
+      runtimeClassName: {{ .Values.confidentialContainers.runtimeClassName }}
+    {{- end }}
     {{- if .Values.nodeSelectors.enabled }}
       nodeSelector:
         {{ .Values.nodeSelectors.label }}: {{ .Values.nodeSelectors.value }}
@@ -38,6 +47,7 @@ spec:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
       initContainers:
+      {{- include "5g-control-plane.attestation_init" . | nindent 6 }}
       {{- if .Values.kafka.deploy }}
       - name: wait-kafka-module
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
