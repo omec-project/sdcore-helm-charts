@@ -117,15 +117,9 @@ resources:
 kafka:
   deploy: false
   fullnameOverride: kafka
-  zookeeper:
+  controller:
     persistence:
       enabled: false
-  persistence:
-    enabled: false
-  initContainers:
-    - name: wait-for-zookeeper
-      image: busybox
-      command: ['sh', '-c', 'until nc -z sd-core-zookeeper 2181; do echo waiting for zookeeper; sleep 2; done;']
 
 mongodb:
   deploy: true
@@ -465,7 +459,7 @@ config:
           nrfCacheEvictionInterval: 900
           debugProfilePort: 5001
           kafkaInfo:
-            brokerUri: "kafka-headless"
+            brokerUri: "kafka-controller-headless"
             brokerPort: 9092
             topicName: "sdcore-data-source-amf"
           ngapIpList:
@@ -616,7 +610,7 @@ config:
           nrfCacheEvictionInterval: 900
           debugProfilePort: 5001
           kafkaInfo:
-            brokerUri: "kafka-headless"
+            brokerUri: "kafka-controller-headless"
             brokerPort: 9092
             topicName: "sdcore-data-source-smf"
           pfcp:
@@ -725,13 +719,13 @@ config:
                 topicGroup: analytics
                 topicName: sdcore-data-source-amf
               urls:
-                - uri: "kafka-headless"
+                - uri: "kafka-controller-headless"
                   port: 9092
             - topic:
                 topicGroup: analytics
                 topicName: sdcore-data-source-smf
               urls:
-                - uri: "kafka-headless"
+                - uri: "kafka-controller-headless"
                   port: 9092
           prometheusServer:
             addr: POD_IP
@@ -776,6 +770,6 @@ config:
           level: info
         configuration:
           kafkaInfo:
-            brokerUri: "kafka-headless"
+            brokerUri: "kafka-controller-headless"
             brokerPort: 9092
             topicName: "sdcore-data-source-smf"
