@@ -33,8 +33,5 @@ spec:
     port: {{ .Values.config.webui.grpc.port }}
     protocol: TCP
 {{- if eq .Values.config.webui.serviceType "NodePort" }}
-{{- if .Values.config.webui.grpc.nodePort }}
-    nodePort: {{ .Values.config.webui.grpc.nodePort }}
-{{- end }}
 {{- end }}
 {{- end }}
