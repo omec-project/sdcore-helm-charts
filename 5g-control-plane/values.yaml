@@ -590,49 +590,6 @@ config:
           serviceNameList:
             - nsmf-pdusession
             - nsmf-event-exposure
-          snssaiInfos:
-            - dnnInfos:
-              - dnn: "internet"
-                dns: # the IP address of DNS
-                   ipv4: "8.8.8.8"
-                   ipv6: "2001:4860:4860::8888"
-                ueSubnet: 172.250.0.0/16 # should be CIDR type
-              sNssai:
-                sd: "010203"
-                sst: 1
-          userplane_information:
-            up_nodes:
-              gNB1:
-                type: AN
-              UPF:
-                type: UPF
-                node_id: upf
-                sNssaiUpfInfos: # S-NSSAI information list for this UPF
-                  - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
-                      sst: 1 # Slice/Service Type (uinteger, range: 0~255)
-                      sd: "010203" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
-                    dnnUpfInfoList: # DNN information list for this S-NSSAI
-                      - dnn: "internet"
-                    plmnId:
-                      mcc: "208"
-                      mnc: "93"
-                  - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
-                      sst: 1 # Slice/Service Type (uinteger, range: 0~255)
-                      sd: "112233" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
-                    dnnUpfInfoList: # DNN information list for this S-NSSAI
-                      - dnn: "internet"
-                    plmnId:
-                      mcc: "208"
-                      mnc: "93"
-                interfaces: # Interface list for this UPF
-                  - interfaceType: N3 # the type of the interface (N3 or N9)
-                    endpoints: # the IP address of this N3/N9 interface on this UPF
-                      - upf
-                    networkInstance: internet # Data Network Name (DNN)
-
-            links:
-              - A: gNB1
-                B: UPF
   ausf:
     deploy: true
     #podAnnotations:
