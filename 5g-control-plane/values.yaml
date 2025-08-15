@@ -7,15 +7,15 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:rel-1.1.3
-    amf: omecproject/5gc-amf:rel-1.6.7
-    nrf: omecproject/5gc-nrf:rel-1.6.7
-    smf: omecproject/5gc-smf:rel-2.0.5
-    ausf: omecproject/5gc-ausf:rel-1.6.4
-    nssf: omecproject/5gc-nssf:rel-1.6.4
-    pcf: omecproject/5gc-pcf:rel-1.6.4
-    udr: omecproject/5gc-udr:rel-1.6.5
-    udm: omecproject/5gc-udm:rel-1.6.4
-    webui: omecproject/5gc-webui:rel-1.8.7
+    amf: omecproject/5gc-amf:rel-2.0.0
+    nrf: omecproject/5gc-nrf:rel-2.0.0
+    smf: omecproject/5gc-smf:rel-3.0.0
+    ausf: omecproject/5gc-ausf:rel-2.0.0
+    nssf: omecproject/5gc-nssf:rel-2.0.0
+    pcf: omecproject/5gc-pcf:rel-2.0.0
+    udr: omecproject/5gc-udr:rel-2.0.0
+    udm: omecproject/5gc-udm:rel-2.0.0
+    webui: omecproject/5gc-webui:rel-2.0.0
     sctplb: omecproject/sctplb:rel-1.6.3
     metricfunc: omecproject/metricfunc:rel-1.6.5
     upfadapter: omecproject/upfadapter:rel-2.0.3
@@ -141,9 +141,6 @@ mongodb:
   replicaCount: 1
 
 config:
-  managedByConfigPod:      # config comes from helm by default, if enabled true, then discard
-    enabled: true          # helm chart config and use the config from config Pod
-    syncUrl: ""            # Get the config from adapater in case control plane is down
   useExistingConfigMap: false
   coreDump:
     enabled: false
@@ -153,15 +150,11 @@ config:
     url: mongodb://mongodb-arbiter-headless
     authKeysDbName: authentication
     authUrl: mongodb://mongodb-arbiter-headless
-  grpc:
+  grpc:  # this is used by AMF and SCTPLB
     golog_verbosity: "0"
     severity: "info"
     trace: "none"
     verbosity: "none"
-    secure_server: false  # if 'true', you must set the path to where the credentials (pem and key) are located
-    tls:
-      crt: /var/run/certs/tls.crt
-      key: /var/run/certs/tls.key
 
   GIN:
     mode: release          # Possible options are: release, debug
@@ -200,8 +193,6 @@ config:
       debugLevel: info
     Aper:
       debugLevel: info
-    Config5g:
-      debugLevel: info
     Util:
       debugLevel: info
     MongoDBLibrary:
@@ -220,8 +211,10 @@ config:
       port: 5000
       # Provide nodePort when serviceType is NodePort
       #nodePort: 35000
-    grpc:
-      port: 9876
+    rest:
+      port: 5001
+      # Provide nodePort when serviceType is NodePort
+      # nodePort: 35001
     ingress:
       enabled: false
       hostname: aether.local
@@ -238,10 +231,12 @@ config:
         configuration:
           enableAuthentication: false
           spec-compliant-sdf: false
-          secure-grpc-server: false  # if 'true', you must set the path to where the credentials (pem and key) are located
-          tls:
-            pem: /var/run/certs/tls.crt
-            key: /var/run/certs/tls.key
+          # webui-tls:
+          #   pem: /var/run/certs/tls.crt
+          #   key: /var/run/certs/tls.key
+          # nfconfig-tls:
+          #   pem: /var/run/certs/tls.crt
+          #   key: /var/run/certs/tls.key
 
   udm:
     deploy: true
@@ -259,16 +254,9 @@ config:
           description: UDM initial local configuration
         configuration:
           nrfUri: https://nrf:29510
-          webuiUri: webui:9876
+          webuiUri: http://webui:5001
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
-          plmnList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-            - plmnId:
-                mcc: "222"
-                mnc: "88"
           serviceList:
             - nudm-sdm
             - nudm-uecm
@@ -287,6 +275,7 @@ config:
             udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
             udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
             udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
+
   udr:
     deploy: true
     #podAnnotations:
@@ -303,14 +292,7 @@ config:
           description: UDR initial local configuration
         configuration:
           nrfUri: https://nrf:29510
-          webuiUri: webui:9876
-          plmnSupportList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-            - plmnId:
-                mcc: "333"
-                mnc: "88"
+          webuiUri: http://webui:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -318,6 +300,7 @@ config:
             tls:
               pem: /var/run/certs/tls.crt
               key: /var/run/certs/tls.key
+
   pcf:
     deploy: true
     #podAnnotations:
@@ -335,6 +318,7 @@ config:
         configuration:
           pcfName: PCF
           nrfUri: https://nrf:29510
+          webuiUri: http://webui:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -345,13 +329,6 @@ config:
           defaultBdtRefId: BdtPolicyId-
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
-          plmnList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-            - plmnId:
-                mcc: "333"
-                mnc: "88"
           serviceList:
             - serviceName: npcf-am-policy-control
             - serviceName: npcf-smpolicycontrol
@@ -361,6 +338,7 @@ config:
               suppFeat: 3
             - serviceName: npcf-eventexposure
             - serviceName: npcf-ue-policy-control
+
   nssf:
     deploy: true
     #podAnnotations:
@@ -377,7 +355,7 @@ config:
         configuration:
           nssfName: NSSF
           nrfUri: https://nrf:29510
-          webuiUri: webui:9876
+          webuiUri: http://webui:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -388,16 +366,6 @@ config:
           serviceNameList:
             - nnssf-nsselection
             - nnssf-nssaiavailability
-          supportedPlmnList:
-            - mcc: "208"
-              mnc: "93"
-          supportedNssaiInPlmnList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-              supportedSnssaiList:
-                - sst: 1
-                  sd: "010203"
           nsiList:
             - snssai:
                 sst: 1
@@ -405,6 +373,7 @@ config:
               nsiInformationList:
                 - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
                   nsiId: 22
+
   sctplb:
     deploy: false
     podAnnotations:
@@ -432,6 +401,7 @@ config:
             - uri: "amf-headless"
           ngapIpList:
             - 0.0.0.0
+
   amf:
     deploy: true
     # serviceAnnotations:
@@ -471,8 +441,9 @@ config:
           ngapIpList:
             - "0.0.0.0"
           amfName: AMF
+          amfId: cafe00
           nrfUri: https://nrf:29510
-          webuiUri: webui:9876
+          webuiUri: http://webui:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -486,23 +457,6 @@ config:
             - namf-mt
             - namf-loc
             - namf-oam
-          servedGuamiList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-              amfId: cafe00
-          supportTaiList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-              tac: 1
-          plmnSupportList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-              snssaiList:
-                - sst: 1
-                  sd: "010203"
           supportDnnList:
             - internet
           security:
@@ -551,6 +505,11 @@ config:
             enable: true     # true or false
             expireTime: 6s   # default is 6 seconds
             maxRetryTimes: 4 # the max number of retransmission
+          telemetry:                                  # telemetry configuration
+            enabled: false                             # Optional; defaults to false (i.e., telemetry disabled).
+            otlp_endpoint: "otel-collector.svc:4317"  # Mandatory if enabled=true
+            ratio: 0.4                                # Optional; defaults to 1.0. If set to 0, AMF assumes 1.0.
+
   nrf:
     deploy: true
     #podAnnotations:
@@ -568,7 +527,7 @@ config:
           mongoDBStreamEnable: true
           nfProfileExpiryEnable: true
           nfKeepAliveTime: 60
-          webuiUri: webui:9876
+          webuiUri: http://webui:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -576,12 +535,10 @@ config:
             tls:
               pem: /var/run/certs/tls.crt
               key: /var/run/certs/tls.key
-          DefaultPlmnId:
-            mcc: "208"
-            mnc: "93"
           serviceNameList:
             - nnrf-nfm
             - nnrf-disc
+
   smf:
     deploy: true
     podAnnotations:
@@ -623,7 +580,7 @@ config:
              addr: "POD_IP"
           smfName: SMF
           nrfUri: https://nrf:29510
-          webuiUri: webui:9876
+          webuiUri: http://webui:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -634,49 +591,7 @@ config:
           serviceNameList:
             - nsmf-pdusession
             - nsmf-event-exposure
-          snssaiInfos:
-            - dnnInfos:
-              - dnn: "internet"
-                dns: # the IP address of DNS
-                   ipv4: "8.8.8.8"
-                   ipv6: "2001:4860:4860::8888"
-                ueSubnet: 172.250.0.0/16 # should be CIDR type
-              sNssai:
-                sd: "010203"
-                sst: 1
-          userplane_information:
-            up_nodes:
-              gNB1:
-                type: AN
-              UPF:
-                type: UPF
-                node_id: upf
-                sNssaiUpfInfos: # S-NSSAI information list for this UPF
-                  - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
-                      sst: 1 # Slice/Service Type (uinteger, range: 0~255)
-                      sd: "010203" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
-                    dnnUpfInfoList: # DNN information list for this S-NSSAI
-                      - dnn: "internet"
-                    plmnId:
-                      mcc: "208"
-                      mnc: "93"
-                  - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
-                      sst: 1 # Slice/Service Type (uinteger, range: 0~255)
-                      sd: "112233" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
-                    dnnUpfInfoList: # DNN information list for this S-NSSAI
-                      - dnn: "internet"
-                    plmnId:
-                      mcc: "208"
-                      mnc: "93"
-                interfaces: # Interface list for this UPF
-                  - interfaceType: N3 # the type of the interface (N3 or N9)
-                    endpoints: # the IP address of this N3/N9 interface on this UPF
-                      - upf
-                    networkInstance: internet # Data Network Name (DNN)
 
-            links:
-              - A: gNB1
-                B: UPF
   ausf:
     deploy: true
     #podAnnotations:
@@ -693,7 +608,7 @@ config:
           description: AUSF initial local configuration
         configuration:
           nrfUri: https://nrf:29510
-          webuiUri: webui:9876
+          webuiUri: http://webui:5001
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
           sbi:
@@ -705,10 +620,8 @@ config:
               key: /var/run/certs/tls.key
           serviceNameList:
             - nausf-auth
-          plmnSupportList:
-            - mcc: "208"
-              mnc: "93"
           groupId: ausfGroup001
+
   metricfunc:
     deploy: false
     serviceType: ClusterIP

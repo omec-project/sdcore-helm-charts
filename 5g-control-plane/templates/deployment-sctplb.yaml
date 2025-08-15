@@ -73,10 +73,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-      {{- if .Values.config.managedByConfigPod.enabled }}
-        - name: MANAGED_BY_CONFIG_POD
-          value: "true"
-      {{- end }}
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.sctplb | indent 10 }}
