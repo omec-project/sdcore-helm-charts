@@ -14,10 +14,6 @@
 {{- $_ := .Values.config.logger | set $webuicfg "logger" -}}
 {{- end }}
 
-{{- if not (hasKey $config "managedByConfigPod") -}}
-{{- $_ := .Values.config.managedByConfigPod | set $config "managedByConfigPod" -}}
-{{- end }}
-
 {{- if not (hasKey $config "mongodb") -}}
 {{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url "authKeysDbName" .Values.config.mongodb.authKeysDbName "authUrl" .Values.config.mongodb.authUrl "webuiDbName" .Values.config.mongodb.webuiDbName "webuiDbUrl" .Values.config.mongodb.webuiDbUrl | set $config "mongodb" -}}
 {{- end }}

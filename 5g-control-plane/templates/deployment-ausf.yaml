@@ -59,14 +59,6 @@ spec:
         tty: true
         command: ["/opt/ausf-run.sh"]
         env:
-        - name: GRPC_GO_LOG_VERBOSITY_LEVEL
-          value: {{ .Values.config.grpc.golog_verbosity | quote }}
-        - name: GRPC_GO_LOG_SEVERITY_LEVEL
-          value: {{ .Values.config.grpc.severity | quote }}
-        - name: GRPC_TRACE
-          value: {{ .Values.config.grpc.trace | quote }}
-        - name: GRPC_VERBOSITY
-          value: {{ .Values.config.grpc.verbosity | quote }}
       {{- if eq .Values.config.GIN.mode "release" }}
         - name: GIN_MODE
           value: release
@@ -75,10 +67,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-      {{- if .Values.config.managedByConfigPod.enabled }}
-        - name: MANAGED_BY_CONFIG_POD
-          value: "true"
-      {{- end }}
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.ausf | indent 10 }}
