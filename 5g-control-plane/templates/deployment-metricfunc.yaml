@@ -42,7 +42,7 @@ spec:
       - name: wait-kafka-module
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nc -z kafka-headless 9092; do echo waiting for kafka; sleep 4; done;']
+        command: ['sh', '-c', 'until nslookup kafka; do echo waiting for kafka; sleep 4; done;']
       {{- end }}
       containers:
       - name: metricfunc

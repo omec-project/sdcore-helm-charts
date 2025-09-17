@@ -7,9 +7,9 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:rel-1.1.3
-    amf: omecproject/5gc-amf:rel-2.0.0
+    amf: omecproject/5gc-amf:rel-2.0.2
     nrf: omecproject/5gc-nrf:rel-2.0.0
-    smf: omecproject/5gc-smf:rel-3.0.0
+    smf: omecproject/5gc-smf:rel-3.0.1
     ausf: omecproject/5gc-ausf:rel-2.0.0
     nssf: omecproject/5gc-nssf:rel-2.0.0
     pcf: omecproject/5gc-pcf:rel-2.0.0
@@ -17,7 +17,7 @@ images:
     udm: omecproject/5gc-udm:rel-2.0.0
     webui: omecproject/5gc-webui:rel-2.0.0
     sctplb: omecproject/sctplb:rel-1.6.3
-    metricfunc: omecproject/metricfunc:rel-1.6.5
+    metricfunc: omecproject/metricfunc:rel-1.7.0
     upfadapter: omecproject/upfadapter:rel-2.0.3
   pullPolicy: IfNotPresent
 
@@ -117,15 +117,19 @@ resources:
 kafka:
   deploy: false
   fullnameOverride: kafka
-  zookeeper:
+  listeners:
+    client:
+      protocol: PLAINTEXT
+    controller:
+      protocol: PLAINTEXT
+    interbroker:
+      protocol: PLAINTEXT
+    external:
+      protocol: PLAINTEXT
+  controller:
+    replicaCount: 1
     persistence:
       enabled: false
-  persistence:
-    enabled: false
-  initContainers:
-    - name: wait-for-zookeeper
-      image: busybox
-      command: ['sh', '-c', 'until nc -z sd-core-zookeeper 2181; do echo waiting for zookeeper; sleep 2; done;']
 
 mongodb:
   deploy: true
@@ -190,8 +194,6 @@ config:
     NudrDataRepository:
       debugLevel: info
     OpenApi:
-      debugLevel: info
-    Aper:
       debugLevel: info
     Util:
       debugLevel: info
@@ -435,7 +437,7 @@ config:
           nrfCacheEvictionInterval: 900
           debugProfilePort: 5001
           kafkaInfo:
-            brokerUri: "kafka-headless"
+            brokerUri: "kafka"
             brokerPort: 9092
             topicName: "sdcore-data-source-amf"
           ngapIpList:
@@ -573,7 +575,7 @@ config:
           nrfCacheEvictionInterval: 900
           debugProfilePort: 5001
           kafkaInfo:
-            brokerUri: "kafka-headless"
+            brokerUri: "kafka"
             brokerPort: 9092
             topicName: "sdcore-data-source-smf"
           pfcp:
@@ -635,16 +637,14 @@ config:
           controllerFlag: false
           nfStreams:
             - topic:
-                topicGroup: analytics
                 topicName: sdcore-data-source-amf
               urls:
-                - uri: "kafka-headless"
+                - uri: "kafka"
                   port: 9092
             - topic:
-                topicGroup: analytics
                 topicName: sdcore-data-source-smf
               urls:
-                - uri: "kafka-headless"
+                - uri: "kafka"
                   port: 9092
           prometheusServer:
             addr: POD_IP
@@ -689,6 +689,6 @@ config:
           level: info
         configuration:
           kafkaInfo:
-            brokerUri: "kafka-headless"
+            brokerUri: "kafka"
             brokerPort: 9092
             topicName: "sdcore-data-source-smf"
