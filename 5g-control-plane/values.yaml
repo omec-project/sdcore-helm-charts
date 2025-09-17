@@ -637,13 +637,11 @@ config:
           controllerFlag: false
           nfStreams:
             - topic:
-                topicGroup: analytics
                 topicName: sdcore-data-source-amf
               urls:
                 - uri: "kafka"
                   port: 9092
             - topic:
-                topicGroup: analytics
                 topicName: sdcore-data-source-smf
               urls:
                 - uri: "kafka"
