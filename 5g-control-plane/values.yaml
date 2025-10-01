@@ -130,6 +130,8 @@ kafka:
     replicaCount: 1
     persistence:
       enabled: false
+  image:
+    repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
 
 mongodb:
   deploy: true
@@ -143,6 +145,8 @@ mongodb:
   #clusterDomain: cluster.local
   architecture: replicaset
   replicaCount: 1
+  image:
+    repository: bitnamilegacy/mongodb # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/mongodb)
 
 config:
   useExistingConfigMap: false
