@@ -1,8 +1,0 @@
-# SPDX-FileCopyrightText: 2024-present Aether Project (Part of Linux Foundation) <dev@lists.aetherproject.org>
-# SPDX-FileCopyrightText: 2020-present Open Networking Foundation
-#
-# SPDX-License-Identifier: Apache-2.0
-
-charts/
-requirements.lock
-Chart.lock

@@ -130,6 +130,8 @@ kafka:
     replicaCount: 1
     persistence:
       enabled: false
+  image:
+    repository: bitnamilegacy/kafka
 
 mongodb:
   deploy: true
@@ -143,6 +145,8 @@ mongodb:
   #clusterDomain: cluster.local
   architecture: replicaset
   replicaCount: 1
+  image:
+    repository: bitnamilegacy/mongodb
 
 config:
   useExistingConfigMap: false
