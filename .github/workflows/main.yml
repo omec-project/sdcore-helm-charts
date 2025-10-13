@@ -12,40 +12,18 @@ on:
       - main
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: latest
-          token: ${{ secrets.GH_OMEC_PAT }}
-
-      - name: Find all Charts and Lint them
-        run: |
-          for dir in $(find . -maxdepth 1 -mindepth 1 -type d); do
-            if [[ -f "$dir/Chart.yaml" ]]; then
-              helm lint "$dir"
-            fi
-          done
+  lint-charts:
+    uses: omec-project/.github/.github/workflows/lint-charts.yml@main
+    secrets: inherit
+    with:
+      branch_name: ${{ github.ref }}
 
   license-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
+    uses: omec-project/.github/.github/workflows/license-check.yml@main
+    with:
+      branch_name: ${{ github.ref }}
 
-      - name: reuse lint
-        uses: fsfe/reuse-action@v6
-
-  fossa-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: FOSSA scan
-        uses: fossa-contrib/fossa-action@v3
-        with:
-          fossa-api-key: 0c3bbcdf20e157bbd487dae173751b28
+  fossa-scan:
+    uses: omec-project/.github/.github/workflows/fossa-scan.yml@main
+    with:
+      branch_name: ${{ github.ref }}
