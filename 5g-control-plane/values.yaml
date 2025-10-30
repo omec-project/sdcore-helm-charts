@@ -12,7 +12,7 @@ images:
     smf: omecproject/5gc-smf:rel-3.0.1
     ausf: omecproject/5gc-ausf:rel-2.0.0
     nssf: omecproject/5gc-nssf:rel-2.0.0
-    pcf: omecproject/5gc-pcf:rel-2.0.0
+    pcf: omecproject/5gc-pcf:rel-2.0.1
     udr: omecproject/5gc-udr:rel-2.0.0
     udm: omecproject/5gc-udm:rel-2.0.0
     webui: omecproject/5gc-webui:rel-2.0.0
