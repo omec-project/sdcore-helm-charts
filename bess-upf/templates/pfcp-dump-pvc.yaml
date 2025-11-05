@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-pfcp-dump-pvc
+  name: {{ printf "%s-pfcp-dump-pvc" (default .Release.Name .Values.upfDump.upfName) }}
   labels:
     release: {{ .Release.Name }}
     app: upf

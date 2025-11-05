@@ -1,13 +1,13 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 <!-- Copyright 2024-present Open Networking Foundation -->
 
-PFCP dump examples
+PFCP Dump Examples
 ===================
 
 This file contains example `values.yaml` snippets to enable the PFCP raw-dump feature for debugging parse errors in the `pfcp-agent` container.
 
 
-Use transient storage (emptyDir) — good for testing/local/dev
+## Use transient storage (emptyDir) — good for testing/local/dev
 
 ```yaml
 upfDump:
@@ -23,7 +23,7 @@ upfDump:
 
 This will mount an `emptyDir` into the pod at `/var/log/upf/pfcp_dumps` and the runtime will prune files when the directory exceeds `maxBytes` or `maxFiles`.
 
-Use persistent storage (PVC) — for production/long-term capture
+## Use persistent storage (PVC) — for production/long-term capture
 
 ```yaml
 upfDump:

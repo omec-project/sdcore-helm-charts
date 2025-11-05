@@ -278,12 +278,12 @@ spec:
           path: {{ .Values.config.coreDump.path }}
     {{- end }}
 
-    {{ if .Values.upfDump.enabled }}
+    {{- if .Values.upfDump.enabled }}
       - name: pfcp-dump
-        {{ if .Values.upfDump.persistence.enabled }}
+        {{- if .Values.upfDump.persistence.enabled }}
         persistentVolumeClaim:
           claimName: "{{ printf "%s-pfcp-dump-pvc" (default .Release.Name .Values.upfDump.upfName) }}"
-        {{ else }}
+        {{- else }}
         emptyDir: {}
-        {{ end }}
-    {{ end }}
+        {{- end }}
+    {{- end }}
