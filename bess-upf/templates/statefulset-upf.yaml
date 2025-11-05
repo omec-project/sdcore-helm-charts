@@ -192,16 +192,13 @@ spec:
           - /tmp/conf/upf.jsonc
         {{- if .Values.upfDump.enabled }}
         env:
-          - name: PFCP_DUMP_DIR
-            value: "{{ .Values.upfDump.dir }}"
-          - name: UPF_NAME
-            value: "{{ default .Release.Name .Values.upfDump.upfName }}"
-          - name: PFCP_DUMP_MAX_BYTES
-            value: "{{ .Values.upfDump.maxBytes | quote }}"
-          - name: PFCP_DUMP_MAX_FILES
-            value: "{{ .Values.upfDump.maxFiles | quote }}"
-          - name: PFCP_DUMP_TO_LOG
-            value: "{{ .Values.upfDump.toLog | quote }}"
+{{ toYaml (list
+    (dict "name" "PFCP_DUMP_DIR" "value" .Values.upfDump.dir)
+    (dict "name" "UPF_NAME" "value" (default .Release.Name .Values.upfDump.upfName))
+    (dict "name" "PFCP_DUMP_MAX_BYTES" "value" (quote .Values.upfDump.maxBytes))
+    (dict "name" "PFCP_DUMP_MAX_FILES" "value" (quote .Values.upfDump.maxFiles))
+    (dict "name" "PFCP_DUMP_TO_LOG" "value" (quote .Values.upfDump.toLog))
+) | indent 8 }}
         {{- end }}
       {{- if .Values.resources.enabled }}
         resources:
@@ -267,15 +264,6 @@ spec:
           defaultMode: 493
       - name: shared-app
         emptyDir: {}
-        {{- if .Values.upfDump.enabled }}
-        - name: pfcp-dump
-        {{- if .Values.upfDump.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-pfcp-dump-pvc
-        {{- else }}
-          emptyDir: {}
-        {{- end }}
-        {{- end }}
     {{- if .Values.config.upf.hugepage.enabled }}
       - name: hugepages
         emptyDir:
@@ -289,3 +277,13 @@ spec:
         hostPath:
           path: {{ .Values.config.coreDump.path }}
     {{- end }}
+
+    {{ if .Values.upfDump.enabled }}
+      - name: pfcp-dump
+        {{ if .Values.upfDump.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: "{{ printf "%s-pfcp-dump-pvc" (default .Release.Name .Values.upfDump.upfName) }}"
+        {{ else }}
+        emptyDir: {}
+        {{ end }}
+    {{ end }}

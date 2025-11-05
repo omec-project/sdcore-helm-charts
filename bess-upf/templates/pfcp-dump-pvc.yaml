@@ -1,0 +1,18 @@
+{{- if and .Values.upfDump.enabled .Values.upfDump.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-pfcp-dump-pvc
+  labels:
+    release: {{ .Release.Name }}
+    app: upf
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.upfDump.persistence.size | default "5Gi" }}
+  {{- if .Values.upfDump.persistence.storageClass }}
+  storageClassName: {{ .Values.upfDump.persistence.storageClass | quote }}
+  {{- end }}
+{{- end }}
