@@ -136,6 +136,32 @@ config:
             burst_duration_ms: 10
             priority: 7
 
+# PFCP raw dump configuration
+upfDump:
+  # Enable raw PFCP dump-to-disk for debugging parse errors. When enabled
+  # the `pfcp-agent` container will receive environment variables to
+  # control where dumps are written and how pruning is performed.
+  # Recommended defaults:
+  #  - For a single-node/test environment: keep persistence.enabled=false
+  #    (uses emptyDir), set maxBytes to limit total storage (default 100MiB)
+  #  - For production or long-term capture, enable persistence.enabled=true
+  #    and configure a PVC with an appropriate size (size & storageClass).
+  enabled: false
+  # Directory inside the container where dumps go (must match a volumeMount)
+  dir: /var/log/upf/pfcp_dumps
+  # Optional per-instance name used as a subdirectory; defaults to release
+  upfName: ""
+  # Pruning limits applied to the dump directory (set 0 to disable)
+  maxBytes: 104857600 # 100 MiB
+  maxFiles: 1000
+  # If true, also emit base64-encoded dump to application logs (may be noisy)
+  toLog: false
+  persistence:
+    # When true, the chart will create a PVC for the dump storage (claimName: <release>-pfcp-dump-pvc)
+    enabled: false
+    size: 5Gi
+    storageClass: ""
+
 service:
   type: ClusterIP
   #externalIp:
