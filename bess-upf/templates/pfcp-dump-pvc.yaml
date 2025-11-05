@@ -1,4 +1,9 @@
 {{- if and .Values.upfDump.enabled .Values.upfDump.persistence.enabled }}
+{{/*
+# Copyright 2024-present Open Networking Foundation
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+{{- if and .Values.upfDump.enabled .Values.upfDump.persistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
