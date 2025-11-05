@@ -1,0 +1,426 @@
+---
+# Source: bess-upf/templates/sriov-device-plugin.yaml
+# Copyright 2022-present Open Networking Foundation
+# SPDX-License-Identifier: Apache-2.0
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sriov-device-plugin
+---
+# Source: bess-upf/templates/configmap-upf.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: upf
+  labels:
+    release: release-name
+    app: upf
+data:
+  upf.jsonc: "{\"access\":{\"ifname\":\"access\"},\"core\":{\"ifname\":\"core\"},\"cpiface\":{\"dnn\":\"internet\",\"hostname\":\"upf\",\"http_port\":\"8080\"},\"enable_notify_bess\":true,\"log_level\":\"info\",\"max_sessions\":50000,\"measure_flow\":false,\"measure_upf\":true,\"mode\":\"dpdk\",\"notify_sockaddr\":\"/pod-share/notifycp\",\"qci_qos_config\":[{\"burst_duration_ms\":10,\"cbs\":50000,\"ebs\":50000,\"pbs\":50000,\"priority\":7,\"qci\":0}],\"slice_rate_limit_config\":{\"n3_bps\":1000000000,\"n3_burst_bytes\":12500000,\"n6_bps\":1000000000,\"n6_burst_bytes\":12500000},\"table_sizes\":{\"appQERLookup\":200000,\"farLookup\":150000,\"pdrLookup\":50000,\"sessionQERLookup\":100000},\"workers\":1}"
+  bessd-poststart.sh: |
+    #!/bin/bash
+    
+    # Copyright 2020-present Open Networking Foundation
+    #
+    # SPDX-License-Identifier: Apache-2.0set -ex
+    
+    until bessctl run /opt/bess/bessctl/conf/up4; do
+        sleep 2;
+    done;
+---
+# Source: bess-upf/templates/sriov-device-plugin-config.yaml
+# Copyright 2022-present Open Networking Foundation
+# SPDX-License-Identifier: Apache-2.0
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sriovdp-config
+data:
+  config.json: |
+    {
+      "resourceList": [
+        {
+          "resourcePrefix": "intel.com",
+          "resourceName": "intel_sriov_vfio_access",
+          "selectors": {
+            "pfNames": ["#0"],
+            "vendors": ["8086"],
+            "drivers": ["vfio-pci"]
+          }
+        },
+        {
+          "resourcePrefix": "intel.com",
+          "resourceName": "intel_sriov_vfio_core",
+          "selectors": {
+            "pfNames": ["#1"],
+            "vendors": ["8086"],
+            "drivers": ["vfio-pci"]
+          }
+        }
+      ]
+    }
+---
+# Source: bess-upf/templates/service-upf.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf
+  labels:
+    release: release-name
+    app: upf
+spec:
+  type: ClusterIP
+  selector:
+    release: release-name
+    app: upf
+  ports:
+  - name: pfcp
+    protocol: UDP
+    port: 8805
+---
+# Source: bess-upf/templates/service-upf.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf-http
+  labels:
+    release: release-name
+    app: upf
+spec:
+  type: ClusterIP
+  selector:
+    release: release-name
+    app: upf
+  ports:
+  - name: bess-web
+    protocol: TCP
+    port: 8000
+  - name: prometheus-exporter
+    protocol: TCP
+    port: 8080
+---
+# Source: bess-upf/templates/init-net.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: init-net
+spec:
+  selector:
+    matchLabels:
+      name: init-net
+  template:
+    metadata:
+      labels:
+        name: init-net
+    spec:
+      containers:
+      - name: init-sriov-plugin
+        image: docker.io/omecproject/omec-cni:1.1.4
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/bash", "-c"]
+        args:
+          - >
+            yes | cp /tmp/cni/bin/{vfioveth,static} /host/opt/cni/bin/;
+            chmod +x /host/opt/cni/bin/vfioveth;
+            chmod +x /host/opt/cni/bin/static;
+            trap : TERM INT; sleep infinity & wait;
+        volumeMounts:
+          - name: cni-bin
+            mountPath: /host/opt/cni/bin
+      volumes:
+      - name: cni-bin
+        hostPath:
+          path: /opt/cni/bin
+---
+# Source: bess-upf/templates/sriov-device-plugin.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kube-sriov-device-plugin-amd64
+  labels:
+    tier: node
+    app: sriovdp
+spec:
+  selector:
+    matchLabels:
+      name: sriov-device-plugin
+  template:
+    metadata:
+      labels:
+        name: sriov-device-plugin
+        tier: node
+        app: sriovdp
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        beta.kubernetes.io/arch: amd64
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+      initContainers:
+        - name: init-sriov-plugin
+          image: docker.io/omecproject/omec-cni:1.1.7
+          imagePullPolicy: IfNotPresent
+          command: ["bash", "-c"]
+          args:
+            - cp /tmp/cni/bin/{sriov,vfioveth,jq,static,dhcp} /host/opt/cni/bin/;
+              chmod +x /host/opt/cni/bin/vfioveth
+          volumeMounts:
+            - name: cni-bin
+              mountPath: /host/opt/cni/bin
+      serviceAccountName: sriov-device-plugin
+      containers:
+        - name: kube-sriovdp
+          image: docker.io/nfvpe/sriov-device-plugin:v3.3.2
+          imagePullPolicy: IfNotPresent
+          args:
+            - --log-dir=sriovdp
+            - --log-level=10
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: devicesock
+              mountPath: /var/lib/kubelet/
+              readOnly: false
+            - name: log
+              mountPath: /var/log
+            - name: config-volume
+              mountPath: /etc/pcidp
+            - name: device-info
+              mountPath: /var/run/k8s.cni.cncf.io/devinfo/dp
+      volumes:
+        - name: devicesock
+          hostPath:
+            path: /var/lib/kubelet/
+        - name: log
+          hostPath:
+            path: /var/log
+        - name: device-info
+          hostPath:
+            path: /var/run/k8s.cni.cncf.io/devinfo/dp
+            type: DirectoryOrCreate
+        - name: config-volume
+          configMap:
+            name: sriovdp-config
+            items:
+              - key: config.json
+                path: config.json
+        - name: cni-bin
+          hostPath:
+            path: /opt/cni/bin
+---
+# Source: bess-upf/templates/statefulset-upf.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: upf
+  labels:
+    release: release-name
+    app: upf
+spec:
+  replicas: 1
+  serviceName: upf-headless
+  selector:
+    matchLabels:
+      release: release-name
+      app: upf
+  template:
+    metadata:
+      labels:
+        release: release-name
+        app: upf
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[
+          {
+            "name": "access-net",
+            "interface": "access",
+            "ips": ["192.168.252.3/24"]
+          },
+          {
+            "name": "core-net",
+            "interface": "core",
+            "ips": ["192.168.250.3/24"]
+          }
+        ]'
+    spec:
+      shareProcessNamespace: true
+      imagePullSecrets:
+        - name: aether.registry
+      initContainers:
+      - name: bess-init
+        image: omecproject/upf-epc-bess:rel-2.1.1
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-xec"]
+        args:
+        - ip route replace 192.168.251.0/24 via 192.168.252.1;
+          ip route replace default via 192.168.250.1 metric 110;
+          iptables -I OUTPUT -p icmp --icmp-type port-unreachable -j DROP;
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        resources:
+          limits:
+            cpu: 128m
+            memory: 64Mi
+          requests:
+            cpu: 128m
+            memory: 64Mi
+      containers:
+      - name: bessd
+        image: omecproject/upf-epc-bess:rel-2.1.1
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          capabilities:
+            add:
+            - IPC_LOCK
+            - CAP_SYS_NICE
+        stdin: true
+        tty: true
+        command: ["/bin/bash", "-xc"]
+        args:
+          - bessd -f --allow="$PCIDEVICE_INTEL_COM_INTEL_SRIOV_DPDK" --grpc_url=0.0.0.0:10514
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/etc/bess/conf/bessd-poststart.sh"]
+        livenessProbe:
+          tcpSocket:
+            port: 10514
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+            hugepages-1Gi: 2Gi
+            intel.com/intel_sriov_vfio: 2
+          limits:
+            cpu: 2
+            memory: 2Gi
+            hugepages-1Gi: 2Gi
+            intel.com/intel_sriov_vfio: 2
+        env:
+          - name: CONF_FILE
+            value: /etc/bess/conf/upf.jsonc
+        volumeMounts:
+          - name: shared-app
+            mountPath: /pod-share
+          - name: hugepages
+            mountPath: /dev/hugepages
+          - name: configs
+            mountPath: /etc/bess/conf
+      - name: routectl
+        image: omecproject/upf-epc-bess:rel-2.1.1
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+        command: ["/opt/bess/bessctl/conf/route_control.py"]
+        args:
+          - -i
+          - access
+          - core
+        resources:
+          limits:
+            cpu: 256m
+            memory: 128Mi
+          requests:
+            cpu: 256m
+            memory: 128Mi
+      - name: web
+        image: omecproject/upf-epc-bess:rel-2.1.1
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/bash", "-xc", "bessctl http 0.0.0.0 8000"]
+        resources:
+          limits:
+            cpu: 256m
+            memory: 128Mi
+          requests:
+            cpu: 256m
+            memory: 128Mi
+      - name: pfcp-agent
+        image: omecproject/upf-epc-pfcpiface:rel-2.1.1
+        imagePullPolicy: IfNotPresent
+        command: ["pfcpiface"]
+        args:
+          - -config
+          - /tmp/conf/upf.jsonc
+        resources:
+          limits:
+            cpu: 256m
+            memory: 128Mi
+          requests:
+            cpu: 256m
+            memory: 128Mi
+        volumeMounts:
+          - name: shared-app
+            mountPath: /pod-share
+          - name: configs
+            mountPath: /tmp/conf
+      - name: arping
+        image: omecproject/pod-init:rel-1.1.3
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-xc"]
+        args:
+          - |
+            while true; do
+              # arping does not work - BESS graph is still disconnected
+              #arping -c 2 -I access 192.168.252.1
+              #arping -c 2 -I core 192.168.250.1
+              ping -c 2 192.168.252.1
+              ping -c 2 192.168.250.1
+              sleep 10
+            done
+        resources:
+          limits:
+            cpu: 128m
+            memory: 64Mi
+          requests:
+            cpu: 128m
+            memory: 64Mi
+      volumes:
+      - name: configs
+        configMap:
+          name: upf
+          defaultMode: 493
+      - name: shared-app
+        emptyDir: {}
+      - name: hugepages
+        emptyDir:
+          medium: HugePages
+---
+# Source: bess-upf/templates/networks.yaml
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: access-net
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: intel.com/intel_sriov_vfio
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "type": "vfioveth",
+    "ipam": {
+        "type": "static"
+    },
+    "capabilities": { "mac": true}
+  }'
+---
+# Source: bess-upf/templates/networks.yaml
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: core-net
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: intel.com/intel_sriov_vfio
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "type": "vfioveth",
+    "ipam": {
+        "type": "static"
+    },
+    "capabilities": { "mac": true}
+  }'
