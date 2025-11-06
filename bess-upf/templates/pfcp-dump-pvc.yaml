@@ -1,31 +1,9 @@
-##
-# Copyright 2024-present Open Networking Foundation
-# SPDX-FileCopyrightText: 2024-present Open Networking Foundation
+{{/*
+# Copyright 2020-present Open Networking Foundation
+
 # SPDX-License-Identifier: Apache-2.0
-##
-{{- if and .Values.upfDump.enabled .Values.upfDump.persistence.enabled }}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ printf "%s-pfcp-dump-pvc" (default .Release.Name .Values.upfDump.upfName) }}
-  labels:
-    release: {{ .Release.Name }}
-    app: upf
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: {{ .Values.upfDump.persistence.size | default "5Gi" }}
-  {{- if .Values.upfDump.persistence.storageClass }}
-  storageClassName: {{ .Values.upfDump.persistence.storageClass | quote }}
-  {{- end }}
-{{- end }}
-##
-# Copyright 2024-present Open Networking Foundation
-# SPDX-FileCopyrightText: 2024-present Open Networking Foundation
-# SPDX-License-Identifier: Apache-2.0
-##
+*/}}
+
 {{- if and .Values.upfDump.enabled .Values.upfDump.persistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
