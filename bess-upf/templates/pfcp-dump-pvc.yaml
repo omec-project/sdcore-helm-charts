@@ -4,11 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if and .Values.upfDump.enabled .Values.upfDump.persistence.enabled }}
+{{- if and .Values.config.upfDump.enabled .Values.config.upfDump.persistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ printf "%s-pfcp-dump-pvc" (default .Release.Name .Values.upfDump.upfName) }}
+  name: {{ printf "%s-pfcp-dump-pvc" (default .Release.Name .Values.config.upfDump.upfName) }}
   labels:
     release: {{ .Release.Name }}
     app: upf
@@ -17,8 +17,8 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.upfDump.persistence.size | default "5Gi" }}
-  {{- if .Values.upfDump.persistence.storageClass }}
-  storageClassName: {{ .Values.upfDump.persistence.storageClass | quote }}
+      storage: {{ .Values.config.upfDump.persistence.size | default "5Gi" }}
+  {{- if .Values.config.upfDump.persistence.storageClass }}
+  storageClassName: {{ .Values.config.upfDump.persistence.storageClass | quote }}
   {{- end }}
 {{- end }}

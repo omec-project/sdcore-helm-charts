@@ -190,14 +190,14 @@ spec:
         args:
           - -config
           - /tmp/conf/upf.jsonc
-        {{- if .Values.upfDump.enabled }}
+        {{- if .Values.config.upfDump.enabled }}
         env:
 {{ toYaml (list
-    (dict "name" "PFCP_DUMP_DIR" "value" .Values.upfDump.dir)
-    (dict "name" "UPF_NAME" "value" (default .Release.Name .Values.upfDump.upfName))
-    (dict "name" "PFCP_DUMP_MAX_BYTES" "value" (quote .Values.upfDump.maxBytes))
-    (dict "name" "PFCP_DUMP_MAX_FILES" "value" (quote .Values.upfDump.maxFiles))
-    (dict "name" "PFCP_DUMP_TO_LOG" "value" (quote .Values.upfDump.toLog))
+    (dict "name" "PFCP_DUMP_DIR" "value" .Values.config.upfDump.dir)
+    (dict "name" "UPF_NAME" "value" (default .Release.Name .Values.config.upfDump.upfName))
+    (dict "name" "PFCP_DUMP_MAX_BYTES" "value" (quote .Values.config.upfDump.maxBytes))
+    (dict "name" "PFCP_DUMP_MAX_FILES" "value" (quote .Values.config.upfDump.maxFiles))
+    (dict "name" "PFCP_DUMP_TO_LOG" "value" (quote .Values.config.upfDump.toLog))
 ) | indent 8 }}
         {{- end }}
       {{- if .Values.resources.enabled }}
@@ -209,9 +209,9 @@ spec:
             mountPath: /pod-share
           - name: configs
             mountPath: /tmp/conf
-          {{- if .Values.upfDump.enabled }}
+          {{- if .Values.config.upfDump.enabled }}
           - name: pfcp-dump
-            mountPath: "{{ .Values.upfDump.dir }}"
+            mountPath: "{{ .Values.config.upfDump.dir }}"
           {{- end }}
     {{- if .Values.config.gratuitousArp.enabled }}
       - name: arping
@@ -278,11 +278,11 @@ spec:
           path: {{ .Values.config.coreDump.path }}
     {{- end }}
 
-    {{- if .Values.upfDump.enabled }}
+    {{- if .Values.config.upfDump.enabled }}
       - name: pfcp-dump
-        {{- if .Values.upfDump.persistence.enabled }}
+        {{- if .Values.config.upfDump.persistence.enabled }}
         persistentVolumeClaim:
-          claimName: "{{ printf "%s-pfcp-dump-pvc" (default .Release.Name .Values.upfDump.upfName) }}"
+          claimName: "{{ printf "%s-pfcp-dump-pvc" (default .Release.Name .Values.config.upfDump.upfName) }}"
         {{- else }}
         emptyDir: {}
         {{- end }}
