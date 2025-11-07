@@ -277,7 +277,6 @@ spec:
         hostPath:
           path: {{ .Values.config.coreDump.path }}
     {{- end }}
-
     {{- if .Values.config.upfDump.enabled }}
       - name: pfcp-dump
         {{- if .Values.config.upfDump.persistence.enabled }}
