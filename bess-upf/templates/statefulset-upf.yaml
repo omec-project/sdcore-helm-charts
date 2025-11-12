@@ -190,6 +190,19 @@ spec:
         args:
           - -config
           - /tmp/conf/upf.jsonc
+        {{- if .Values.config.upfDump.enabled }}
+        env:
+        - name: PFCP_DUMP_DIR
+          value: {{ .Values.config.upfDump.dir | quote }}
+        - name: UPF_NAME
+          value: {{ .Values.config.upfDump.upfName | quote }}
+        - name: PFCP_DUMP_MAX_BYTES
+          value: {{ .Values.config.upfDump.maxBytes | quote }}
+        - name: PFCP_DUMP_MAX_FILES
+          value: {{ .Values.config.upfDump.maxFiles | quote }}
+        - name: PFCP_DUMP_TO_LOG
+          value: {{ .Values.config.upfDump.toLog | quote }}
+        {{- end }}
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.cpiface | indent 10 }}
@@ -199,6 +212,10 @@ spec:
             mountPath: /pod-share
           - name: configs
             mountPath: /tmp/conf
+          {{- if .Values.config.upfDump.enabled }}
+          - name: pfcp-dump
+            mountPath: "{{ .Values.config.upfDump.dir }}"
+          {{- end }}
     {{- if .Values.config.gratuitousArp.enabled }}
       - name: arping
         image: {{ .Values.images.repository }}{{ .Values.images.tags.tools }}
@@ -262,4 +279,13 @@ spec:
       - name: coredump
         hostPath:
           path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+    {{- if .Values.config.upfDump.enabled }}
+      - name: pfcp-dump
+        {{- if .Values.config.upfDump.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: "{{ printf "%s-pfcp-dump-pvc" (default .Release.Name .Values.config.upfDump.upfName) }}"
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
     {{- end }}

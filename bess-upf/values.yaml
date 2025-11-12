@@ -5,8 +5,8 @@
 images:
   repository: "" #default docker hub
   tags:
-    bess: omecproject/upf-epc-bess:rel-2.1.1
-    pfcpiface: omecproject/upf-epc-pfcpiface:rel-2.1.1
+    bess: omecproject/upf-epc-bess:rel-2.1.2
+    pfcpiface: omecproject/upf-epc-pfcpiface:rel-2.1.2
     tools: omecproject/pod-init:rel-1.1.3
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.
@@ -54,6 +54,27 @@ config:
   coreDump:
     enabled: false
     path: /tmp/coredump
+  # PFCP raw dump configuration
+  upfDump:
+    # Enable raw PFCP dump-to-disk for debugging parse errors. When enabled
+    # the `pfcp-agent` container will receive environment variables to
+    # control where dumps are written and how pruning is performed.
+    # Recommended defaults:
+    #  - For a single-node/test environment: keep persistence.enabled=false
+    #    (uses emptyDir), set maxBytes to limit total storage (default 100MiB)
+    #  - For production or long-term capture, enable persistence.enabled=true
+    #    and configure a PVC with an appropriate size (size & storageClass).
+    enabled: false
+    dir: /var/log/upf/pfcp_dumps
+    upfName: ""
+    maxBytes: 104857600 # 100 MiB
+    maxFiles: 1000
+    toLog: false
+    persistence:
+      # When true, the chart will create a PVC for the dump storage
+      enabled: false
+      size: 5Gi
+      storageClass: ""
   gratuitousArp:
     enabled: true
     interval: 10 # seconds

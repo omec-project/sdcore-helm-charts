@@ -1,0 +1,23 @@
+{{/*
+# Copyright 2020-present Open Networking Foundation
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if and .Values.config.upfDump.enabled .Values.config.upfDump.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ printf "%s-pfcp-dump-pvc" (default .Release.Name .Values.config.upfDump.upfName) }}
+  labels:
+    release: {{ .Release.Name }}
+    app: upf
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.config.upfDump.persistence.size | default "5Gi" }}
+  {{- if .Values.config.upfDump.persistence.storageClass }}
+  storageClassName: {{ .Values.config.upfDump.persistence.storageClass | quote }}
+  {{- end }}
+{{- end }}
