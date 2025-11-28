@@ -3,6 +3,8 @@ Copyright 2024-present Intel Corporation
 SPDX-License-Identifier: Apache-2.0
 -->
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/omec-project/sdcore-helm-charts/badge)](https://scorecard.dev/viewer/?uri=github.com/omec-project/sdcore-helm-charts)
+
 # SDCore Helm Charts
 This repository contains Helm charts for deploying `Aether SD-Core` on Kubernetes.
 
