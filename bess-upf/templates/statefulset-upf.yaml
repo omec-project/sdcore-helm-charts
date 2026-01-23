@@ -47,7 +47,7 @@ spec:
       shareProcessNamespace: true
     {{- if .Values.nodeSelectors.enabled }}
       nodeSelector:
-        {{ .Values.nodeSelectors.upf.label }}: {{ .Values.nodeSelectors.upf.value }}
+        {{ .Values.nodeSelectors.label }}: {{ .Values.nodeSelectors.value | quote }}
     {{- end }}
     {{- if hasKey .Values.images "pullSecrets" }}
       imagePullSecrets:

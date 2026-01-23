@@ -7,7 +7,7 @@ images:
   repository: "" #default docker hub
   tags:
     init: omecproject/pod-init:rel-1.1.3
-    amf: omecproject/5gc-amf:rel-2.0.2
+    amf: omecproject/5gc-amf:rel-2.1.0
     nrf: omecproject/5gc-nrf:rel-2.0.0
     smf: omecproject/5gc-smf:rel-3.0.1
     ausf: omecproject/5gc-ausf:rel-2.0.0
@@ -23,8 +23,8 @@ images:
 
 nodeSelectors:
   enabled: false
-  label: node-role.aetherproject.org
-  value: 5gc
+  label: node-role.aetherproject.org/5gc
+  value: true
 
 resources:
   enabled: false
@@ -130,6 +130,9 @@ kafka:
     replicaCount: 1
     persistence:
       enabled: false
+    # Enable nodeSelector if needed to control where to deploy the kafka instance(s)
+    # nodeSelector:
+    #   node-role.aetherproject.org/5gc: "true"
   image:
     repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
 
@@ -142,7 +145,12 @@ mongodb:
     enabled: false
   serviceAccount:
     create: false
-  #clusterDomain: cluster.local
+  # Enable nodeSelector if needed to control where to deploy the mongodb instances
+  # nodeSelector:
+  #   node-role.aetherproject.org/5gc: "true"
+  # arbiter:
+  #   nodeSelector:
+  #     node-role.aetherproject.org/5gc: "true"
   architecture: replicaset
   replicaCount: 1
   image:

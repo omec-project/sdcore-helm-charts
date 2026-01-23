@@ -9,6 +9,11 @@ images:
     simapp: omecproject/simapp:rel-1.6.3
   pullPolicy: IfNotPresent
 
+nodeSelectors:
+  enabled: false
+  label: node-role.aetherproject.org/5gc
+  value: true
+
 resources:
   enabled: false
   simapp:
