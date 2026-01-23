@@ -33,7 +33,7 @@ spec:
       serviceAccountName: nrf
     {{- if .Values.nodeSelectors.enabled }}
       nodeSelector:
-        {{ .Values.nodeSelectors.label }}: {{ .Values.nodeSelectors.value }}
+        {{ .Values.nodeSelectors.label }}: {{ .Values.nodeSelectors.value | quote }}
     {{- end }}
     {{- if hasKey .Values.images "pullSecrets" }}
       imagePullSecrets:

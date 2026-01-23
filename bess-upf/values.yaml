@@ -15,9 +15,8 @@ images:
 
 nodeSelectors:
   enabled: false
-  upf:
-    label: node-role.aetherproject.org
-    value: omec-upf
+  label: node-role.aetherproject.org/upf
+  value: true
 
 resources:
   enabled: true
