@@ -67,6 +67,9 @@ spec:
         volumeMounts:
         - name: nf-config
           mountPath: /opt
+        - name: certs
+          mountPath: /var/run/certs
+          readOnly: true
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
@@ -76,6 +79,9 @@ spec:
         configMap:
           name: webui
           defaultMode: 493
+      - name: certs
+        secret:
+          secretName: webui-certs
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs
         hostPath:
