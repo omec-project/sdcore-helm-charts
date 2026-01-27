@@ -10,7 +10,7 @@ name: sd-core
 description: SD-Core control plane services
 icon: https://guide.opencord.org/logos/cord.svg
 type: application
-version: 3.1.6
+version: 3.1.7
 home: https://opennetworking.org/sd-core/
 maintainers:
   - name: SD-Core Support
@@ -33,12 +33,12 @@ dependencies:
     condition: 5g-control-plane.enable5G
 
   - name: bess-upf
-    version: 1.3.3
+    version: 1.3.4
     repository: "file://../bess-upf"
     alias: omec-user-plane
     condition: omec-user-plane.enable
 
   - name: 5g-ran-sim
-    version: 2.0.3
+    version: 2.0.4
     repository: "file://../5g-ran-sim"
     condition: 5g-ran-sim.enable

@@ -3,9 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-apiVersion: v1
+apiVersion: v2
 description: 5G RAN Simulator Service
 name: 5g-ran-sim
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 2.0.3
+version: 2.0.4
