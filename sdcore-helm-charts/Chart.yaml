@@ -23,7 +23,7 @@ dependencies:
     condition: omec-control-plane.enable4G
 
   - name: omec-sub-provision
-    version: 2.1.1
+    version: 2.1.2
     repository: "file://../omec-sub-provision"
     condition: omec-sub-provision.enable
 
