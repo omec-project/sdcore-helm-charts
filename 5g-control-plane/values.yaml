@@ -133,8 +133,13 @@ kafka:
     # Enable nodeSelector if needed to control where to deploy the kafka instance(s)
     # nodeSelector:
     #   node-role.aetherproject.org/5gc: "true"
+  # global:
+  #   security:
+  #     allowInsecureImages: true # set to true when using images from local repo/registry
   image:
+    # registry: ""
     repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
+    # tag: 4.0.0-debian-12-r10
 
 mongodb:
   deploy: true
@@ -153,8 +158,13 @@ mongodb:
   #     node-role.aetherproject.org/5gc: "true"
   architecture: replicaset
   replicaCount: 1
+  # global:
+  #   security:
+  #     allowInsecureImages: true # set to true when using images from local repo/registry
   image:
+    # registry: ""
     repository: bitnamilegacy/mongodb # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/mongodb)
+    # tag: latest
 
 config:
   useExistingConfigMap: false

@@ -20,8 +20,8 @@ spec:
     spec:
       containers:
       - name: init-sriov-plugin
-        image: docker.io/omecproject/omec-cni:1.1.4
-        imagePullPolicy: IfNotPresent
+        image: {{ .Values.images.tags.sriov }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ["/bin/bash", "-c"]
         args:
           - >
