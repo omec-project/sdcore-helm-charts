@@ -7,7 +7,7 @@ images:
   tags:
     bess: omecproject/upf-epc-bess:rel-2.1.2
     pfcpiface: omecproject/upf-epc-pfcpiface:rel-2.1.2
-    sriov: docker.io/omecproject/aether-cni:rel-1.1.8
+    sriov: omecproject/aether-cni:rel-1.1.8
     tools: omecproject/pod-init:rel-1.1.3
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.
