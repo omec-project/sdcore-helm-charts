@@ -40,28 +40,10 @@ spec:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
       initContainers:
-      - name: wait-webui-ready
+      - name: wait-simapp-module2
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command:
-          - sh
-          - -c
-          - |
-            WEBUI_ADDR={{ index .Values.config.simapp.cfgFiles "simapp.yaml" "configuration" "sub-provision-endpt" "addr" }}
-            WEBUI_PORT={{ index .Values.config.simapp.cfgFiles "simapp.yaml" "configuration" "sub-provision-endpt" "port" }}
-            echo "Waiting for ${WEBUI_ADDR} service to be available..."
-            until nslookup ${WEBUI_ADDR}; do
-              echo "Waiting for ${WEBUI_ADDR} DNS resolution..."
-              sleep 2
-            done
-            echo "${WEBUI_ADDR} DNS resolved, checking HTTP endpoint readiness..."
-            until RESPONSE=$(wget --spider --timeout=2 -S http://${WEBUI_ADDR}:${WEBUI_PORT}/config/v1/ 2>&1) && echo "$RESPONSE" | grep -q "HTTP/"; do
-              echo "Waiting for ${WEBUI_ADDR} HTTP endpoint to be ready..."
-              echo "Endpoint check failed, response:"
-              echo "$RESPONSE" | head -n 5 || echo "Connection failed or timed out"
-              sleep 3
-            done
-            echo "${WEBUI_ADDR} is ready, starting simapp..."
+        command: ['sh', '-c', 'until nslookup simapp; do echo waiting for simapp; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
     {{ tuple "simapp" . | include "omec-sub-provision.coredump_init" | indent 6 }}
     {{- end }}
