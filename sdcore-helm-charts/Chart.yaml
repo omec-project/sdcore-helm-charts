@@ -10,7 +10,7 @@ name: sd-core
 description: SD-Core control plane services
 icon: https://guide.opencord.org/logos/cord.svg
 type: application
-version: 3.1.8
+version: 3.1.9
 home: https://opennetworking.org/sd-core/
 maintainers:
   - name: SD-Core Support
