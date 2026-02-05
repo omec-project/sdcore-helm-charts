@@ -173,9 +173,9 @@ config:
     path: /tmp/coredump
   mongodb:
     name: aether
-    url: mongodb://mongodb-arbiter-headless
+    url: mongodb://mongodb-headless:27017/?replicaSet=rs0 # note that architecture: replicaset
     authKeysDbName: authentication
-    authUrl: mongodb://mongodb-arbiter-headless
+    authUrl: mongodb://mongodb-headless:27017/?replicaSet=rs0 # note that architecture: replicaset
   grpc:  # this is used by AMF and SCTPLB
     golog_verbosity: "0"
     severity: "info"
