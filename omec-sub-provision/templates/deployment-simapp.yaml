@@ -55,8 +55,10 @@ spec:
               sleep 2
             done
             echo "${WEBUI_ADDR} DNS resolved, checking HTTP endpoint readiness..."
-            until wget -q -O- --timeout=2 http://${WEBUI_ADDR}:${WEBUI_PORT}/config/v1/ >/dev/null 2>&1; do
+            until wget --spider --timeout=2 -S http://${WEBUI_ADDR}:${WEBUI_PORT}/config/v1/ 2>&1 | grep -q "HTTP/"; do
               echo "Waiting for ${WEBUI_ADDR} HTTP endpoint to be ready..."
+              echo "Endpoint check failed, response:"
+              wget --spider --timeout=2 -S http://${WEBUI_ADDR}:${WEBUI_PORT}/config/v1/ 2>&1 | head -n 5 || echo "Connection failed or timed out"
               sleep 3
             done
             echo "${WEBUI_ADDR} is ready, starting simapp..."
