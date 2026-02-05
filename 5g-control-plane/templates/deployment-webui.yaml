@@ -60,26 +60,6 @@ spec:
         stdin: true
         tty: true
         command: ["/opt/webui-run.sh"]
-        readinessProbe:
-          httpGet:
-            path: /config/v1/
-            port: {{ .Values.config.webui.urlport.port }}
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
-          successThreshold: 1
-          failureThreshold: 3
-        livenessProbe:
-          httpGet:
-            path: /config/v1/
-            port: {{ .Values.config.webui.urlport.port }}
-            scheme: HTTP
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 3
-          successThreshold: 1
-          failureThreshold: 3
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.webui | indent 10 }}
