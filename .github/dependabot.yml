@@ -1,13 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2024 Intel Corporation
 
+# Timeline for each ecosystem is intentionally staggered to spread
+# Dependabot PRs over the week.
 version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "wednesday"
+      day: "tuesday"
       time: "21:00"
       timezone: "America/Los_Angeles"
     groups:
