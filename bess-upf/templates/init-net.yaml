@@ -3,7 +3,7 @@
 
 # SPDX-License-Identifier: Apache-2.0
 */}}
-
+{{- if .Values.config.upf.sriov.enabled }}
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: init-sriov-plugin
-        image: {{ .Values.images.tags.sriov }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.sriov }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ["/bin/bash", "-c"]
         args:
@@ -36,3 +36,4 @@ spec:
       - name: cni-bin
         hostPath:
           path: /opt/cni/bin
+{{- end }}
