@@ -3,10 +3,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 images:
-  repository: "" #default docker hub
+  repository: "ghcr.io/omec-project/" # default GitHub Registry
   tags:
-    init: omecproject/pod-init:rel-1.1.3
-    simapp: omecproject/simapp:rel-1.6.3
+    init: pod-init:rel-1.2.1
+    simapp: simapp:rel-1.7.0
   pullPolicy: IfNotPresent
 
 nodeSelectors:
