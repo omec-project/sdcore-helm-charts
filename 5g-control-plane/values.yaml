@@ -11,11 +11,11 @@ images:
     ausf: 5gc-ausf:rel-2.1.0
     nrf: 5gc-nrf:rel-2.1.0
     nssf: 5gc-nssf:rel-2.1.0
-    pcf: 5gc-pcf:rel-2.1.0
+    pcf: 5gc-pcf:rel-2.1.1
     smf: 5gc-smf:rel-3.1.0
     udm: 5gc-udm:rel-2.1.1
     udr: 5gc-udr:rel-2.1.0
-    webui: 5gc-webui:rel-2.1.0
+    webui: 5gc-webui:rel-2.1.1
     metricfunc: metricfunc:rel-1.8.1
     sctplb: sctplb:rel-1.7.0
     upfadapter: upfadapter:rel-2.1.0
