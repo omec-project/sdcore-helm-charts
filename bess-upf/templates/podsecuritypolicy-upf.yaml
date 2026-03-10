@@ -18,7 +18,7 @@ spec:
     {{ end }}
     allowedCapabilities:
     - IPC_LOCK
-    - CAP_SYS_NICE
+    - SYS_NICE
     - NET_ADMIN
     - NET_RAW
     volumes:
