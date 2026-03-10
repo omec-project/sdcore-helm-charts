@@ -91,6 +91,8 @@ spec:
             add:
             - IPC_LOCK
             - CAP_SYS_NICE
+            - NET_ADMIN
+            - NET_RAW
         stdin: true
         tty: true
         command: ["/bin/bash", "-xc"]
