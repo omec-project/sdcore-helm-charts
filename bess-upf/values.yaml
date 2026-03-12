@@ -5,8 +5,8 @@
 images:
   repository: "ghcr.io/omec-project/" # default GitHub Registry
   tags:
-    bess: upf-bess:rel-2.2.0
-    pfcpiface: upf-pfcpiface:rel-2.2.0
+    bess: upf-bess:rel-2.3.1
+    pfcpiface: upf-pfcpiface:rel-2.3.1
     sriov: aether-cni:rel-1.2.0
     tools: pod-init:rel-1.2.1
   pullPolicy: IfNotPresent
