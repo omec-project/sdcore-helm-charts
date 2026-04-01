@@ -16,7 +16,7 @@ jobs:
       contents: write
       actions: read
       id-token: write
-    uses: omec-project/.github/.github/workflows/tag-github.yml@ead90c247b15898cf138fa31300ee71de83905bd # v0.0.21
+    uses: omec-project/.github/.github/workflows/tag-github.yml@13844841ff9ff9944647b65f59ed015c6797f9d6 # v0.0.22
     secrets: inherit
 
   publish:
@@ -26,7 +26,7 @@ jobs:
       actions: read
       id-token: write
       attestations: write
-    uses: omec-project/.github/.github/workflows/publish-charts.yml@ead90c247b15898cf138fa31300ee71de83905bd # v0.0.21
+    uses: omec-project/.github/.github/workflows/publish-charts.yml@13844841ff9ff9944647b65f59ed015c6797f9d6 # v0.0.22
     secrets: inherit
     with:
       branch_name: ${{ github.ref }}
@@ -38,7 +38,7 @@ jobs:
       pull-requests: write
       actions: read
       id-token: write
-    uses: omec-project/.github/.github/workflows/update-version.yml@ead90c247b15898cf138fa31300ee71de83905bd # v0.0.21
+    uses: omec-project/.github/.github/workflows/update-version.yml@13844841ff9ff9944647b65f59ed015c6797f9d6 # v0.0.22
     with:
       changed: ${{ needs.tag-github.outputs.changed }}
       version: ${{ needs.tag-github.outputs.version }}
@@ -49,7 +49,7 @@ jobs:
     permissions:
       contents: read
       actions: read
-    uses: omec-project/.github/.github/workflows/sbom-source.yml@ead90c247b15898cf138fa31300ee71de83905bd # v0.0.21
+    uses: omec-project/.github/.github/workflows/sbom-source.yml@13844841ff9ff9944647b65f59ed015c6797f9d6 # v0.0.22
     with:
       changed: ${{ needs.tag-github.outputs.changed }}
       branch_name: ${{ github.ref }}
@@ -63,7 +63,7 @@ jobs:
       contents: read
       actions: read
       security-events: write # Required for SARIF upload to Code Scanning
-    uses: omec-project/.github/.github/workflows/grype-scan.yml@ead90c247b15898cf138fa31300ee71de83905bd # v0.0.21
+    uses: omec-project/.github/.github/workflows/grype-scan.yml@13844841ff9ff9944647b65f59ed015c6797f9d6 # v0.0.22
     with:
       changed: ${{ needs.tag-github.outputs.changed }}
       artifact_name: ${{ github.event.repository.name }}-${{ needs.tag-github.outputs.version }}.spdx.json
