@@ -129,10 +129,41 @@ jobs:
           process_chart() {
             local chart_dir="$1"
             local chart_type="$2"
-            local control_plane_chart_dir
             local chart_info
             local chart_name
             local chart_version
+
+            update_chart_dependencies() {
+              local dependency_chart_dir="$1"
+
+              echo "↘️  Preparing dependency chart: $dependency_chart_dir"
+              if [ ! -f "$dependency_chart_dir/Chart.yaml" ] && [ ! -f "$dependency_chart_dir/requirements.yaml" ]; then
+                echo "❌ Expected dependency chart metadata not found at $dependency_chart_dir"
+                FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                return 1
+              fi
+
+              if ! pushd "$dependency_chart_dir" >/dev/null; then
+                echo "❌ Failed to enter dependency chart directory: $dependency_chart_dir"
+                FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                return 1
+              fi
+
+              if ! helm dependency update .; then
+                echo "❌ Failed to update dependencies for $dependency_chart_dir"
+                FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                popd >/dev/null || true
+                return 1
+              fi
+
+              if ! popd >/dev/null; then
+                echo "❌ Failed to leave dependency chart directory: $dependency_chart_dir"
+                FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                return 1
+              fi
+
+              return 0
+            }
 
             echo "🔄 Processing $chart_type chart: $chart_dir"
 
@@ -159,25 +190,23 @@ jobs:
             fi
 
             if [[ "$chart_dir" == "${{ env.UMBRELLA_CHARTS }}" ]]; then
-              control_plane_chart_dir="$(dirname "$chart_dir")/5g-control-plane"
+              while IFS= read -r dependency_repo; do
+                [ -z "$dependency_repo" ] && continue
 
-              echo "↘️  Preparing umbrella dependency chart: $control_plane_chart_dir"
-              if [ ! -f "$control_plane_chart_dir/Chart.yaml" ]; then
-                echo "❌ Expected dependency chart not found at $control_plane_chart_dir"
-                FAILURE_COUNT=$((FAILURE_COUNT + 1))
-                return 1
-              fi
+                dependency_chart_dir=$(cd "$chart_dir" && cd "$dependency_repo" 2>/dev/null && pwd -P)
+                if [ -z "$dependency_chart_dir" ]; then
+                  echo "❌ Failed to resolve umbrella dependency path: $dependency_repo"
+                  FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                  return 1
+                fi
 
-              pushd "$control_plane_chart_dir" >/dev/null || return 1
-
-              if ! helm dependency update .; then
-                echo "❌ Failed to update dependencies for $control_plane_chart_dir"
-                FAILURE_COUNT=$((FAILURE_COUNT + 1))
-                popd >/dev/null || true
-                return 1
-              fi
-
-              popd >/dev/null || return 1
+                if ! update_chart_dependencies "$dependency_chart_dir"; then
+                  return 1
+                fi
+              done < <(
+                grep -E 'repository:[[:space:]]*"?file://' "$chart_dir/Chart.yaml" \
+                  | sed -E 's/.*repository:[[:space:]]*"?file:\/\/([^"[:space:]]+)"?.*/\1/'
+              )
             fi
 
             if ! helm dependency update "$chart_dir"; then
