@@ -132,6 +132,8 @@ jobs:
             local chart_info
             local chart_name
             local chart_version
+            local dependency_chart_dir
+            local dependency_repo
 
             update_chart_dependencies() {
               local dependency_chart_dir="$1"
@@ -167,8 +169,13 @@ jobs:
 
             echo "🔄 Processing $chart_type chart: $chart_dir"
 
-            chart_info=$(helm show chart "$chart_dir")
-            if [ $? -ne 0 ] || [ -z "$chart_info" ]; then
+            if ! chart_info=$(helm show chart "$chart_dir"); then
+              echo "❌ Failed to read chart information from $chart_dir"
+              FAILURE_COUNT=$((FAILURE_COUNT + 1))
+              return 1
+            fi
+
+            if [ -z "$chart_info" ]; then
               echo "❌ Failed to read chart information from $chart_dir"
               FAILURE_COUNT=$((FAILURE_COUNT + 1))
               return 1
@@ -193,7 +200,12 @@ jobs:
               while IFS= read -r dependency_repo; do
                 [ -z "$dependency_repo" ] && continue
 
-                dependency_chart_dir=$(cd "$chart_dir" && cd "$dependency_repo" 2>/dev/null && pwd -P)
+                if ! dependency_chart_dir=$(cd "$chart_dir" && cd "$dependency_repo" 2>/dev/null && pwd -P); then
+                  echo "❌ Failed to resolve umbrella dependency path: $dependency_repo"
+                  FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                  return 1
+                fi
+
                 if [ -z "$dependency_chart_dir" ]; then
                   echo "❌ Failed to resolve umbrella dependency path: $dependency_repo"
                   FAILURE_COUNT=$((FAILURE_COUNT + 1))
