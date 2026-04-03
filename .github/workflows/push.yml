@@ -19,18 +19,6 @@ jobs:
     uses: omec-project/.github/.github/workflows/tag-github.yml@13844841ff9ff9944647b65f59ed015c6797f9d6 # v0.0.22
     secrets: inherit
 
-  publish:
-    permissions:
-      contents: read
-      packages: write
-      actions: read
-      id-token: write
-      attestations: write
-    uses: omec-project/.github/.github/workflows/publish-charts.yml@13844841ff9ff9944647b65f59ed015c6797f9d6 # v0.0.22
-    secrets: inherit
-    with:
-      branch_name: ${{ github.ref }}
-
   update-version:
     needs: tag-github
     permissions:
@@ -67,3 +55,233 @@ jobs:
     with:
       changed: ${{ needs.tag-github.outputs.changed }}
       artifact_name: ${{ github.event.repository.name }}-${{ needs.tag-github.outputs.version }}.spdx.json
+
+  publish:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'omec-project'
+    permissions:
+      contents: read
+      packages: write
+    env:
+      CHARTS_DIR: charts
+      UMBRELLA_CHARTS: ./sdcore-helm-charts
+      REGISTRY: ghcr.io
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Helm
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2 # v5.0.0
+        with:
+          version: latest
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Find, package and publish charts
+        run: |
+          # Create unique temporary directory
+          TEMP_DIR=$(mktemp -d -t helm-charts-XXXXXX)
+          echo "📁 Created temporary directory: $TEMP_DIR"
+
+          # Set up cleanup trap
+          cleanup() {
+            if [ -n "$TEMP_DIR" ] && [ -d "$TEMP_DIR" ]; then
+              echo "🧹 Cleaning up temporary directory: $TEMP_DIR"
+              rm -rf "$TEMP_DIR"
+            fi
+          }
+          trap cleanup EXIT INT TERM
+
+          rm -rf "${{ env.CHARTS_DIR }}" && mkdir -p "${{ env.CHARTS_DIR }}"
+
+          # Initialize counters explicitly
+          SUCCESS_COUNT=0
+          SKIPPED_COUNT=0
+          FAILURE_COUNT=0
+
+          # Function to check if chart version exists
+          check_chart_exists() {
+            local chart_name="$1"
+            local chart_version="$2"
+            local registry_url="oci://${{ env.REGISTRY }}/${{ github.repository_owner }}"
+
+            echo "🔍 Checking if $chart_name:$chart_version exists..."
+
+            # Try to pull the chart to our shared temp directory
+            if helm pull "$registry_url/$chart_name" --version "$chart_version" --destination "$TEMP_DIR" >/dev/null 2>&1; then
+              echo "📦 Chart $chart_name:$chart_version already exists"
+              # Clean up the downloaded file
+              rm -f "$TEMP_DIR/$chart_name-$chart_version.tgz" 2>/dev/null || true
+              return 0
+            else
+              echo "✨ Chart $chart_name:$chart_version does not exist, will publish"
+              return 1
+            fi
+          }
+
+          # Function to process a chart (individual or umbrella)
+          process_chart() {
+            local chart_dir="$1"
+            local chart_type="$2"
+            local chart_info
+            local chart_name
+            local chart_version
+            local dependency_chart_dir
+            local dependency_repo
+
+            update_chart_dependencies() {
+              local dependency_chart_dir="$1"
+
+              echo "↘️  Preparing dependency chart: $dependency_chart_dir"
+              if [ ! -f "$dependency_chart_dir/Chart.yaml" ] && [ ! -f "$dependency_chart_dir/requirements.yaml" ]; then
+                echo "❌ Expected dependency chart metadata not found at $dependency_chart_dir"
+                FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                return 1
+              fi
+
+              if ! pushd "$dependency_chart_dir" >/dev/null; then
+                echo "❌ Failed to enter dependency chart directory: $dependency_chart_dir"
+                FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                return 1
+              fi
+
+              if ! helm dependency update .; then
+                echo "❌ Failed to update dependencies for $dependency_chart_dir"
+                FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                popd >/dev/null || true
+                return 1
+              fi
+
+              if ! popd >/dev/null; then
+                echo "❌ Failed to leave dependency chart directory: $dependency_chart_dir"
+                FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                return 1
+              fi
+
+              return 0
+            }
+
+            echo "🔄 Processing $chart_type chart: $chart_dir"
+
+            if ! chart_info=$(helm show chart "$chart_dir"); then
+              echo "❌ Failed to read chart information from $chart_dir"
+              FAILURE_COUNT=$((FAILURE_COUNT + 1))
+              return 1
+            fi
+
+            if [ -z "$chart_info" ]; then
+              echo "❌ Failed to read chart information from $chart_dir"
+              FAILURE_COUNT=$((FAILURE_COUNT + 1))
+              return 1
+            fi
+
+            chart_name=$(echo "$chart_info" | grep '^name:' | awk '{print $2}' | tr -d '\r')
+            chart_version=$(echo "$chart_info" | grep '^version:' | awk '{print $2}' | tr -d '\r')
+
+            if [ -z "$chart_name" ] || [ -z "$chart_version" ]; then
+              echo "❌ Could not extract chart name or version from $chart_dir"
+              FAILURE_COUNT=$((FAILURE_COUNT + 1))
+              return 1
+            fi
+
+            if check_chart_exists "$chart_name" "$chart_version"; then
+              echo "⏭️  Skipping $chart_type chart $chart_name:$chart_version (already exists)"
+              SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
+              return 0
+            fi
+
+            if [[ "$chart_dir" == "${{ env.UMBRELLA_CHARTS }}" ]]; then
+              while IFS= read -r dependency_repo; do
+                [ -z "$dependency_repo" ] && continue
+
+                if ! dependency_chart_dir=$(cd "$chart_dir" && cd "$dependency_repo" 2>/dev/null && pwd -P); then
+                  echo "❌ Failed to resolve umbrella dependency path: $dependency_repo"
+                  FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                  return 1
+                fi
+
+                if [ -z "$dependency_chart_dir" ]; then
+                  echo "❌ Failed to resolve umbrella dependency path: $dependency_repo"
+                  FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                  return 1
+                fi
+
+                if ! update_chart_dependencies "$dependency_chart_dir"; then
+                  return 1
+                fi
+              done < <(
+                grep -E 'repository:[[:space:]]*"?file://' "$chart_dir/Chart.yaml" \
+                  | sed -E 's/.*repository:[[:space:]]*"?file:\/\/([^"[:space:]]+)"?.*/\1/'
+              )
+            fi
+
+            if ! helm dependency update "$chart_dir"; then
+              echo "❌ Failed to update dependencies for $chart_dir"
+              FAILURE_COUNT=$((FAILURE_COUNT + 1))
+              return 1
+            fi
+
+            if ! helm package "$chart_dir" --destination "${{ env.CHARTS_DIR }}"; then
+              echo "❌ Failed to package chart $chart_dir"
+              FAILURE_COUNT=$((FAILURE_COUNT + 1))
+              return 1
+            fi
+
+            echo "📦 Publishing $chart_type chart $chart_name:$chart_version to OCI registry"
+
+            if helm push "${{ env.CHARTS_DIR }}/$chart_name-$chart_version.tgz" \
+              "oci://${{ env.REGISTRY }}/${{ github.repository_owner }}"; then
+              echo "✅ Successfully pushed $chart_type chart $chart_name:$chart_version"
+              SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+              return 0
+            else
+              echo "❌ Failed to push $chart_type chart $chart_name:$chart_version"
+              FAILURE_COUNT=$((FAILURE_COUNT + 1))
+              return 1
+            fi
+          }
+
+          echo "🚀 Starting individual charts processing..."
+          for dir in $(find . -maxdepth 1 -mindepth 1 -type d); do
+            if [[ -f "$dir/Chart.yaml" ]] && [[ "$dir" != "${{ env.UMBRELLA_CHARTS }}" ]]; then
+              process_chart "$dir" "individual"
+            fi
+          done
+
+          echo ""
+          echo "🚀 Starting umbrella chart processing..."
+          if [[ -f "${{ env.UMBRELLA_CHARTS }}/Chart.yaml" ]]; then
+            process_chart "${{ env.UMBRELLA_CHARTS }}" "umbrella"
+          else
+            echo "ℹ️  No umbrella chart found at ${{ env.UMBRELLA_CHARTS }}"
+          fi
+
+          echo ""
+          echo "📊 Final Summary:"
+          echo "  ✅ Successfully published: $SUCCESS_COUNT"
+          echo "  ⏭️  Skipped (already exists): $SKIPPED_COUNT"
+          echo "  ❌ Failed: $FAILURE_COUNT"
+          echo "  📈 Total processed: $((SUCCESS_COUNT + SKIPPED_COUNT + FAILURE_COUNT))"
+
+          if [ "$FAILURE_COUNT" -gt 0 ]; then
+            echo "❌ Workflow failed due to $FAILURE_COUNT chart(s) failing to publish"
+            exit 1
+          else
+            echo "🎉 All charts processed successfully!"
+          fi
+
+      - name: List published charts
+        if: always()
+        run: |
+          echo "📋 Charts in build directory:"
+          if ls "${{ env.CHARTS_DIR }}"/*.tgz >/dev/null 2>&1; then
+            ls -la "${{ env.CHARTS_DIR }}"/*.tgz
+          else
+            echo "No chart packages found in build directory"
+          fi
