@@ -40,7 +40,7 @@ data:
             "vendors": ["8086"],
             "drivers": ["vfio-pci"]
           }
-        },
+        }
 {{- else }}
         {
           "resourcePrefix": "{{ $accessResourcePrefix }}",
