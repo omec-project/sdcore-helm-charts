@@ -4,13 +4,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-{{- $config := "up4" -}}
-{{- if .Values.config.upf.closedLoop -}}
-{{- $config = "closed_loop" -}}
-{{- end -}}
+{{- $config := "up4" }}
+{{- if .Values.config.upf.closedLoop }}
+{{- $config = "closed_loop" }}
+{{- end }}
 
 set -ex
 
-until bessctl run /opt/bess/bessctl/conf/{{ $config }}; do
-    sleep 2;
-done;
+while true; do
+    bessctl daemon reset >/dev/null 2>&1 || true
+    if bessctl run /opt/bess/bessctl/conf/{{ $config }}; then
+        break
+    fi
+    sleep 2
+done

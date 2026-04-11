@@ -15,5 +15,7 @@ data:
 {{- range $key, $value := .Values.config.upf.cfgFiles }}
   {{ $key }}: {{ toJson $value | quote }}
 {{- end }}
+  bessd-start.sh: |
+{{ tuple "bin/_bessd-start.sh.tpl" . | include "omec-user-plane.template" | indent 4 }}
   bessd-poststart.sh: |
 {{ tuple "bin/_bessd-poststart.sh.tpl" . | include "omec-user-plane.template" | indent 4 }}

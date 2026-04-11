@@ -7,6 +7,7 @@
 {{- $upfConfig := index .Values.config.upf.cfgFiles "upf.jsonc" }}
 {{- $accessConfig := index $upfConfig "access" }}
 {{- $coreConfig := index $upfConfig "core" }}
+{{- $upfMode := index $upfConfig "mode" }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -25,6 +26,7 @@ spec:
       labels:
 {{ tuple "upf" . | include "omec-user-plane.metadata_labels" | indent 8 }}
       annotations:
+        checksum/upf-config: {{ include (print $.Template.BasePath "/configmap-upf.yaml") . | sha256sum }}
         k8s.v1.cni.cncf.io/networks: '[
           {
             "name": "access-net",
@@ -91,15 +93,13 @@ spec:
             add:
             - IPC_LOCK
             - SYS_NICE
+        {{- if eq $upfMode "af_packet" }}
+            - NET_ADMIN
+            - NET_RAW
+        {{- end }}
         stdin: true
         tty: true
-        command: ["/bin/bash", "-xc"]
-        args:
-        {{- if .Values.config.upf.hugepage.enabled }}
-          - bessd -f --allow="$PCIDEVICE_INTEL_COM_INTEL_SRIOV_DPDK" --grpc_url=0.0.0.0:10514
-        {{- else }}
-          - bessd -m 0 -f --allow="$PCIDEVICE_INTEL_COM_INTEL_SRIOV_DPDK" --grpc_url=0.0.0.0:10514
-        {{- end }}
+        command: ["/etc/bess/conf/bessd-start.sh"]
         lifecycle:
           postStart:
             exec:
