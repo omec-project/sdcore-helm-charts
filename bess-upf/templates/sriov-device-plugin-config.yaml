@@ -4,6 +4,25 @@
 # SPDX-License-Identifier: Apache-2.0
 */}}
 {{- if .Values.config.upf.sriov.enabled }}
+{{- $accessResourceName := .Values.config.upf.access.resourceName }}
+{{- $accessResourcePrefix := "intel.com" }}
+{{- $accessResourceParts := splitList "/" .Values.config.upf.access.resourceName }}
+{{- if eq (len $accessResourceParts) 2 }}
+{{- $accessResourcePrefix = index $accessResourceParts 0 }}
+{{- $accessResourceName = index $accessResourceParts 1 }}
+{{- end }}
+{{- $coreResourceName := .Values.config.upf.core.resourceName }}
+{{- $coreResourcePrefix := "intel.com" }}
+{{- $coreResourceParts := splitList "/" .Values.config.upf.core.resourceName }}
+{{- if eq (len $coreResourceParts) 2 }}
+{{- $coreResourcePrefix = index $coreResourceParts 0 }}
+{{- $coreResourceName = index $coreResourceParts 1 }}
+{{- end }}
+{{- $sharedResourcePool := eq .Values.config.upf.access.resourceName .Values.config.upf.core.resourceName }}
+{{- $sharedPoolIfaces := list .Values.config.upf.access.iface }}
+{{- if and $sharedResourcePool (ne .Values.config.upf.core.iface .Values.config.upf.access.iface) }}
+{{- $sharedPoolIfaces = append $sharedPoolIfaces .Values.config.upf.core.iface }}
+{{- end }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -12,9 +31,20 @@ data:
   config.json: |
     {
       "resourceList": [
+{{- if $sharedResourcePool }}
         {
-          "resourcePrefix": "intel.com",
-          "resourceName": "intel_sriov_vfio_access",
+          "resourcePrefix": "{{ $accessResourcePrefix }}",
+          "resourceName": "{{ $accessResourceName }}",
+          "selectors": {
+            "pfNames": [{{- range $index, $iface := $sharedPoolIfaces }}{{ if $index }}, {{ end }}"{{ $iface }}"{{- end }}],
+            "vendors": ["8086"],
+            "drivers": ["vfio-pci"]
+          }
+        },
+{{- else }}
+        {
+          "resourcePrefix": "{{ $accessResourcePrefix }}",
+          "resourceName": "{{ $accessResourceName }}",
           "selectors": {
             "pfNames": ["{{ .Values.config.upf.access.iface }}#0"],
             "vendors": ["8086"],
@@ -22,14 +52,15 @@ data:
           }
         },
         {
-          "resourcePrefix": "intel.com",
-          "resourceName": "intel_sriov_vfio_core",
+          "resourcePrefix": "{{ $coreResourcePrefix }}",
+          "resourceName": "{{ $coreResourceName }}",
           "selectors": {
             "pfNames": ["{{ .Values.config.upf.core.iface }}#1"],
             "vendors": ["8086"],
             "drivers": ["vfio-pci"]
           }
         }
+{{- end }}
       ]
     }
 {{- end }}
