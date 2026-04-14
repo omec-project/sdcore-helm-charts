@@ -184,7 +184,7 @@ spec:
 {{ toYaml .Values.resources.web | indent 10 }}
       {{- end }}
       - name: pfcp-agent
-        image: {{ .Values.images.repository }}{{ .Values.images.tags.pfcpiface }}
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.pfcp }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ["pfcpiface"]
         args:
