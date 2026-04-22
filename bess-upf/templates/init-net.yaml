@@ -19,19 +19,7 @@ spec:
         name: init-net
     spec:
       containers:
-      - name: init-sriov-plugin
-        image: {{ .Values.images.repository }}{{ .Values.images.tags.sriov }}
-        imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ["/bin/bash", "-c"]
-        args:
-          - >
-            yes | cp /tmp/cni/bin/{vfioveth,static} /host/opt/cni/bin/;
-            chmod +x /host/opt/cni/bin/vfioveth;
-            chmod +x /host/opt/cni/bin/static;
-            trap : TERM INT; sleep infinity & wait;
-        volumeMounts:
-          - name: cni-bin
-            mountPath: /host/opt/cni/bin
+{{ include "omec-user-plane.sriov_init_container" (dict "Values" .Values "mode" "init-net") | indent 6 }}
       volumes:
       - name: cni-bin
         hostPath:
