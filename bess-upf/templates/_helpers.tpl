@@ -46,3 +46,41 @@ Render init container for coredump.
     - name: host-rootfs
       mountPath: /mnt/host-rootfs
 {{- end -}}
+
+{{/*
+Render SR-IOV CNI init container. Use mode "init-net" for the init-net DaemonSet,
+or "sriov-device-plugin" for the sriov-device-plugin initContainer.
+*/}}
+{{- define "omec-user-plane.sriov_init_container" -}}
+{{- $mode := .mode | default "sriov-device-plugin" -}}
+- name: init-sriov-plugin
+  image: {{ .Values.images.repository }}{{ .Values.images.tags.sriov }}
+  imagePullPolicy: {{ .Values.images.pullPolicy }}
+  command: ["bash", "-c"]
+{{- if eq $mode "init-net" }}
+{{- $commands := list }}
+{{- range (list "vfioveth" "jq" "static") }}
+{{- $commands = append $commands (printf "yes | cp /tmp/cni/bin/%s /host/opt/cni/bin/" .) }}
+{{- end }}
+{{- range (list "vfioveth" "static") }}
+{{- $commands = append $commands (printf "chmod +x /host/opt/cni/bin/%s" .) }}
+{{- end }}
+{{- $commands = append $commands "trap : TERM INT" }}
+{{- $commands = append $commands "sleep infinity & wait" }}
+  args:
+    - {{ join "; " $commands | quote }}
+{{- else }}
+{{- $commands := list }}
+{{- range (list "sriov" "vfioveth" "jq" "static" "dhcp") }}
+{{- $commands = append $commands (printf "cp /tmp/cni/bin/%s /host/opt/cni/bin/" .) }}
+{{- end }}
+{{- range (list "vfioveth") }}
+{{- $commands = append $commands (printf "chmod +x /host/opt/cni/bin/%s" .) }}
+{{- end }}
+  args:
+    - {{ join "; " $commands | quote }}
+{{- end }}
+  volumeMounts:
+    - name: cni-bin
+      mountPath: /host/opt/cni/bin
+{{- end -}}
