@@ -6,19 +6,19 @@
 images:
   repository: "ghcr.io/omec-project/" # default GitHub Registry
   tags:
-    init: pod-init:rel-1.2.1
-    amf: 5gc-amf:rel-2.1.1
-    ausf: 5gc-ausf:rel-2.1.0
-    nrf: 5gc-nrf:rel-2.1.0
-    nssf: 5gc-nssf:rel-2.1.0
-    pcf: 5gc-pcf:rel-2.1.1
-    smf: 5gc-smf:rel-3.1.1
-    udm: 5gc-udm:rel-2.1.1
-    udr: 5gc-udr:rel-2.1.0
-    webui: 5gc-webui:rel-2.1.1
-    metricfunc: metricfunc:rel-1.8.1
-    sctplb: sctplb:rel-1.7.2
-    upfadapter: upfadapter:rel-2.1.0
+    init: pod-init:rel-1.2.2
+    amf: 5gc-amf:rel-2.2.1
+    ausf: 5gc-ausf:rel-2.1.1
+    nrf: 5gc-nrf:rel-2.1.1
+    nssf: 5gc-nssf:rel-2.1.1
+    pcf: 5gc-pcf:rel-2.1.2
+    smf: 5gc-smf:rel-3.1.2
+    udm: 5gc-udm:rel-2.1.2
+    udr: 5gc-udr:rel-2.1.1
+    webui: 5gc-webui:rel-2.1.2
+    metricfunc: metricfunc:rel-1.8.2
+    sctplb: sctplb:rel-1.7.3
+    upfadapter: upfadapter:rel-2.1.2
   pullPolicy: IfNotPresent
 
 nodeSelectors:

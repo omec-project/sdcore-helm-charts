@@ -5,8 +5,8 @@
 images:
   repository: "ghcr.io/omec-project/" # default GitHub Registry
   tags:
-    init: pod-init:rel-1.2.1
-    gnbsim: 5gc-gnbsim:rel-1.8.0
+    init: pod-init:rel-1.2.2
+    gnbsim: 5gc-gnbsim:rel-1.9.0
   pullPolicy: IfNotPresent
 
 nodeSelectors:
