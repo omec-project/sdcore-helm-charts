@@ -13,8 +13,10 @@ the user should override the values.yaml file(s) to be able to properly deploy
 all pods. One simple way to do so is by using the
 [sdcore-5g-values.yaml](https://github.com/opennetworkinglab/aether-5gc/blob/master/roles/core/templates/sdcore-5g-values.yaml)
 file from [Aether-Onramp](https://docs.aetherproject.org/master/onramp/overview.html).
-Morever, some values need to be accordingly updated depending on the specific
+Moreover, some values need to be accordingly updated depending on the specific
 deployment/setup as shown below.
+
+For the 5G control-plane chart, the shared CA private key is stored in a namespace Secret by default so leaf certificates can be regenerated across upgrades. In environments with tighter Secret-access requirements, set `5g-control-plane.config.certs.sharedCA.existingPrivateSecret` to a pre-created Secret containing non-empty `ca.crt` and `ca.key`, and restrict read access to that Secret. When this option is set, the chart now fails fast if that Secret is missing or incomplete instead of generating a replacement CA. Because the chart must read that CA private key at render time to sign the leaf certificates, this option requires rendering with cluster access; offline `helm template` without access to that Secret is not supported. If your cluster DNS domain is not `cluster.local`, set `5g-control-plane.config.certs.clusterDomain` accordingly or to an empty string to omit the fully-qualified service SAN. You can tune `5g-control-plane.config.certs.leafValidityDays` and `5g-control-plane.config.certs.clusterDomain` to affect newly rendered leaf certificates, and the chart will reissue leaf Secrets when those inputs change. `5g-control-plane.config.certs.sharedCA.validityDays` only affects newly generated CAs, so changing it does not automatically rotate an existing shared CA Secret. You can also set `5g-control-plane.config.certs.includeSystemRootBundle=false` if you want the generated CA bundle to contain only the shared CA instead of roots copied from the init image.
 
 ## Example of usage with Aether OnRamp
 

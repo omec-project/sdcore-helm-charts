@@ -23,9 +23,10 @@ spec:
     metadata:
       labels:
 {{ tuple "nssf" . | include "5g-control-plane.metadata_labels" | indent 8 }}
-    {{- with .Values.config.nssf.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+    {{- tuple "nssf" . | include "5g-control-plane.certs_pod_annotations" | nindent 8 }}
+    {{- with .Values.config.nssf.podAnnotations }}
+    {{- toYaml . | nindent 8 }}
     {{- end }}
     spec:
       serviceAccountName: nssf
@@ -42,17 +43,18 @@ spec:
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         command: ['sh', '-c', 'until nslookup nssf; do echo waiting for nssf; sleep 4; done;']
-    {{- if .Values.config.coreDump.enabled }}
-    {{ tuple "nssf" . | include "5g-control-plane.coredump_init" | indent 6 }}
-    {{- end }}
+    {{ tuple "nssf" . | include "5g-control-plane.certs_init" | nindent 6 }}
+      {{ if .Values.config.coreDump.enabled }}
+{{ tuple "nssf" . | include "5g-control-plane.coredump_init" | nindent 6 }}
+      {{ end }}
       containers:
       - name: nssf
         image: {{ .Values.images.repository }}{{ .Values.images.tags.nssf }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-      {{- if .Values.config.coreDump.enabled }}
+      {{ if .Values.config.coreDump.enabled }}
         securityContext:
           runAsUser: 0
-      {{- end }}
+      {{ end }}
         stdin: true
         tty: true
         command: ["/opt/nssf-run.sh"]
@@ -61,6 +63,8 @@ spec:
         - name: GIN_MODE
           value: release
       {{- end }}
+        - name: SSL_CERT_FILE
+          value: /var/run/certs/ca-bundle.crt
         - name: POD_IP
           valueFrom:
             fieldRef:
@@ -85,8 +89,22 @@ spec:
           name: nssf
           defaultMode: 493
       - name: certs
-        secret:
-          secretName: nssf-certs
+        emptyDir: {}
+      - name: certs-src
+        projected:
+          sources:
+            - secret:
+                name: nssf-certs
+                items:
+                  - key: tls.crt
+                    path: tls.crt
+                  - key: tls.key
+                    path: tls.key
+            - secret:
+                name: {{ include "5g-control-plane.shared-ca-secret-name" . }}
+                items:
+                  - key: ca.crt
+                    path: ca.crt
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs
         hostPath:
