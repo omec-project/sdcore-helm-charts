@@ -167,6 +167,13 @@ mongodb:
     # tag: latest
 
 config:
+  certs:
+    clusterDomain: cluster.local
+    includeSystemRootBundle: true
+    leafValidityDays: 365
+    sharedCA:
+      existingPrivateSecret: "" # set to reuse an existing Secret with non-empty ca.crt and ca.key instead of chart-managing the private CA key; requires render-time cluster access so the chart can read that key and sign leaf certs
+      validityDays: 365
   useExistingConfigMap: false
   coreDump:
     enabled: false
