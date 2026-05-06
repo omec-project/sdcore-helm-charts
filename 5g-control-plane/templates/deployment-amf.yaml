@@ -23,9 +23,10 @@ spec:
     metadata:
       labels:
 {{ tuple "amf" . | include "5g-control-plane.metadata_labels" | indent 8 }}
-    {{- with .Values.config.amf.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+    {{- tuple "amf" . | include "5g-control-plane.certs_pod_annotations" | nindent 8 }}
+    {{- with .Values.config.amf.podAnnotations }}
+    {{- toYaml . | nindent 8 }}
     {{- end }}
     spec:
       serviceAccountName: amf
@@ -42,19 +43,20 @@ spec:
       - name: wait-kafka-module
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup kafka; do echo waiting for kafka; sleep 4; done;']
+        command: ['sh', '-c', 'until nslookup kafka && nc -z -w 2 kafka 9092; do echo waiting for kafka listener; sleep 4; done;']
       {{- end }}
-      {{- if .Values.config.coreDump.enabled }}
-      {{ tuple "amf" . | include "5g-control-plane.coredump_init" | indent 6 }}
-      {{- end }}
+    {{ tuple "amf" . | include "5g-control-plane.certs_init" | nindent 6 }}
+      {{ if .Values.config.coreDump.enabled }}
+{{ tuple "amf" . | include "5g-control-plane.coredump_init" | nindent 6 }}
+      {{ end }}
       containers:
       - name: amf
         image: {{ .Values.images.repository }}{{ .Values.images.tags.amf }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-      {{- if .Values.config.coreDump.enabled }}
+      {{ if .Values.config.coreDump.enabled }}
         securityContext:
           runAsUser: 0
-      {{- end }}
+      {{ end }}
         stdin: true
         tty: true
         command: [ /opt/amf-run.sh ]
@@ -71,6 +73,7 @@ spec:
         - name: GIN_MODE
           value: release
       {{- end }}
+{{ tuple "amf" . | include "5g-control-plane.certs_env" | indent 8 }}
         - name: POD_IP
           valueFrom:
             fieldRef:
@@ -82,9 +85,7 @@ spec:
         volumeMounts:
         - name: nf-config
           mountPath: /opt
-        - name: certs
-          mountPath: /var/run/certs
-          readOnly: true
+{{ tuple "amf" . | include "5g-control-plane.certs_volume_mounts" | indent 8 }}
       {{- if .Values.config.coreDump.enabled }}
         - name: coredump
           mountPath: /tmp/coredump
@@ -95,8 +96,22 @@ spec:
           name: amf
           defaultMode: 493
       - name: certs
-        secret:
-          secretName: amf-certs
+        emptyDir: {}
+      - name: certs-src
+        projected:
+          sources:
+            - secret:
+                name: amf-certs
+                items:
+                  - key: tls.crt
+                    path: tls.crt
+                  - key: tls.key
+                    path: tls.key
+            - secret:
+                name: {{ include "5g-control-plane.shared-ca-secret-name" . }}
+                items:
+                  - key: ca.crt
+                    path: ca.crt
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs
         hostPath:
