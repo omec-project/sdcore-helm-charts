@@ -5,10 +5,10 @@
 images:
   repository: "ghcr.io/omec-project/" # default GitHub Registry
   tags:
-    bess: upf-bess:rel-2.4.1
-    pfcp: upf-pfcp:rel-2.4.1
-    sriov: aether-cni:rel-1.3.0
-    tools: pod-init:rel-1.2.2
+    bess: upf-bess:rel-2.4.2
+    pfcp: upf-pfcp:rel-2.4.2
+    sriov: aether-cni:rel-1.3.1
+    tools: pod-init:rel-1.2.3
   pullPolicy: IfNotPresent
   # Secrets must be manually created in the namespace.
   pullSecrets:
