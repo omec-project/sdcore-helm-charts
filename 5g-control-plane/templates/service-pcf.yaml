@@ -14,6 +14,10 @@ metadata:
 {{ tuple "pcf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
 spec:
   type: {{ .Values.config.pcf.serviceType }}
+{{- if .Values.config.pcf.externalIp }}
+  externalIPs:
+    - {{ .Values.config.pcf.externalIp }}
+{{- end }}
   selector:
 {{ tuple "pcf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
