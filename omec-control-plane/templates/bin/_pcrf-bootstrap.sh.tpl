@@ -10,4 +10,3 @@ until cqlsh --file /opt/c3po/pcrfdb/pcrf_cassandra.cql {{ .Values.config.pcrf.pc
     do echo "Provisioning PCRFDB";
     sleep 2;
 done
-

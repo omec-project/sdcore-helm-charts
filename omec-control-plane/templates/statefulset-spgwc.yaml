@@ -53,7 +53,7 @@ spec:
         stdin: true
         tty: true
         command: ["bash", "-xc"]
-        args: 
+        args:
         - /opt/cp/scripts/spgwc-run.sh ngic_controlplane
         livenessProbe:
           httpGet:
