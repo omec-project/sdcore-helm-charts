@@ -8,7 +8,7 @@
 {{ tuple "config4g" . | include "omec-control-plane.service_account" }}
 ---
 apiVersion: apps/v1
-kind: StatefulSet 
+kind: StatefulSet
 metadata:
   name: config4g
   labels:
