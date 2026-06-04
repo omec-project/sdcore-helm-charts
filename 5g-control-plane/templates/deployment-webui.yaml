@@ -13,7 +13,13 @@
 {{- $mongoAuthority := first (splitList "," $mongoAuthorityRaw) }}
 {{- $mongoHost := $mongoAuthority }}
 {{- $mongoPort := "27017" }}
-{{- if contains ":" $mongoAuthority }}
+{{- if hasPrefix "[" $mongoAuthority }}
+{{- $mongoHost = trimPrefix "[" (first (splitList "]" $mongoAuthority)) }}
+{{- $after := last (splitList "]" $mongoAuthority) }}
+{{- if hasPrefix ":" $after }}
+{{- $mongoPort = trimPrefix ":" $after }}
+{{- end }}
+{{- else if contains ":" $mongoAuthority }}
 {{- $mongoHost = first (splitList ":" $mongoAuthority) }}
 {{- $mongoPort = last (splitList ":" $mongoAuthority) }}
 {{- end }}

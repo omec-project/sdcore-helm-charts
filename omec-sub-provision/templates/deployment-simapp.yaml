@@ -5,8 +5,9 @@
 # SPDX-License-Identifier: Apache-2.0
 */}}
 {{- if .Values.config.simapp.deploy }}
-{{- $webuiAddr := dig "simapp.yaml" "configuration" "sub-provision-endpt" "addr" "webui" .Values.config.simapp.cfgFiles }}
-{{- $webuiPort := dig "simapp.yaml" "configuration" "sub-provision-endpt" "port" 5000 .Values.config.simapp.cfgFiles }}
+{{- $simappCfgFiles := default (dict) .Values.config.simapp.cfgFiles }}
+{{- $webuiAddr := dig "simapp.yaml" "configuration" "sub-provision-endpt" "addr" "webui" $simappCfgFiles }}
+{{- $webuiPort := dig "simapp.yaml" "configuration" "sub-provision-endpt" "port" 5000 $simappCfgFiles }}
 {{ tuple "simapp" . | include "omec-sub-provision.service_account" }}
 ---
 apiVersion: apps/v1
