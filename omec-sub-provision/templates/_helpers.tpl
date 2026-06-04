@@ -101,7 +101,7 @@ Render init container for coredump.
 {{- $pod := index . 0 -}}
 {{- $context := index . 1 -}}
 - name: {{ $pod }}-coredump-init
-  image: {{ $context.Values.images.tags.init | quote }}
+  image: {{ printf "%s%s" $context.Values.images.repository $context.Values.images.tags.init | quote }}
   imagePullPolicy: {{ $context.Values.images.pullPolicy }}
   securityContext:
     privileged: true
