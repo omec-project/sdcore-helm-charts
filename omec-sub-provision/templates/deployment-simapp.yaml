@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: Apache-2.0
 */}}
 {{- if .Values.config.simapp.deploy }}
+{{- $webuiAddr := dig "simapp.yaml" "configuration" "sub-provision-endpt" "addr" "webui" .Values.config.simapp.cfgFiles }}
+{{- $webuiPort := dig "simapp.yaml" "configuration" "sub-provision-endpt" "port" 5000 .Values.config.simapp.cfgFiles }}
 {{ tuple "simapp" . | include "omec-sub-provision.service_account" }}
 ---
 apiVersion: apps/v1
@@ -43,7 +45,7 @@ spec:
       - name: wait-webui
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup webui && nc -z webui 5000; do echo waiting for webui; sleep 4; done;']
+        command: ['sh', '-c', 'until nslookup {{ $webuiAddr }} && nc -z -w 2 {{ $webuiAddr }} {{ $webuiPort }}; do echo waiting for webui at {{ $webuiAddr }}:{{ $webuiPort }}; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
     {{ tuple "simapp" . | include "omec-sub-provision.coredump_init" | indent 6 }}
     {{- end }}
