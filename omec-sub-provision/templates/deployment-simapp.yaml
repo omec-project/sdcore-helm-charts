@@ -40,10 +40,10 @@ spec:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
       initContainers:
-      - name: wait-simapp-module2
+      - name: wait-webui
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup simapp; do echo waiting for simapp; sleep 4; done;']
+        command: ['sh', '-c', 'until nslookup webui && nc -z webui 5000; do echo waiting for webui; sleep 4; done;']
     {{- if .Values.config.coreDump.enabled }}
     {{ tuple "simapp" . | include "omec-sub-provision.coredump_init" | indent 6 }}
     {{- end }}
