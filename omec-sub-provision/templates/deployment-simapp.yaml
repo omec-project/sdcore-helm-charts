@@ -45,7 +45,7 @@ spec:
       - name: wait-webui
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup {{ $webuiAddr }} && nc -z -w 2 {{ $webuiAddr }} {{ $webuiPort }}; do echo waiting for webui at {{ $webuiAddr }}:{{ $webuiPort }}; sleep 4; done;']
+        command: ['sh', '-c', 'until nc -z -w 2 {{ $webuiAddr }} {{ $webuiPort }}; do echo waiting for webui at {{ $webuiAddr }}:{{ $webuiPort }}; sleep 4; done;']
 {{- if .Values.config.coreDump.enabled }}
 {{- tuple "simapp" . | include "omec-sub-provision.coredump_init" | nindent 6 }}
 {{- end }}
