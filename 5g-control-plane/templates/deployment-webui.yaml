@@ -59,7 +59,7 @@ spec:
       - name: wait-mongodb
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nc -z -w 2 -- "$1" "$2"; do printf "%s\n" "waiting for mongodb at $1:$2"; sleep 4; done;', '--', {{ $mongoHost | quote }}, {{ $mongoPort | quote }}]
+        command: ['sh', '-c', 'until nc -z -w 2 "$1" "$2"; do printf "%s\n" "waiting for mongodb at $1:$2"; sleep 4; done;', '--', {{ $mongoHost | quote }}, {{ $mongoPort | quote }}]
     {{ tuple "webui" . | include "5g-control-plane.certs_init" | nindent 6 }}
       {{ if .Values.config.coreDump.enabled }}
 {{ tuple "webui" . | include "5g-control-plane.coredump_init" | nindent 6 }}
