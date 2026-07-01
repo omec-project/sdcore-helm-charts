@@ -17,6 +17,14 @@ spec:
   selector:
 {{ tuple "ausf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
+  - name: prometheus-exporter
+    port: {{ .Values.config.ausf.prometheus.port }}
+    protocol: TCP
+{{- if eq .Values.config.ausf.serviceType "NodePort" }}
+{{- if .Values.config.ausf.prometheus.nodePort }}
+    nodePort: {{ .Values.config.ausf.prometheus.nodePort }}
+{{- end }}
+{{- end }}
   - name: sbi
     port: {{ .Values.config.ausf.sbi.port }}
     protocol: TCP
