@@ -21,6 +21,14 @@ spec:
   selector:
 {{ tuple "pcf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
+  - name: prometheus-exporter
+    port: {{ .Values.config.pcf.prometheus.port }}
+    protocol: TCP
+{{- if eq .Values.config.pcf.serviceType "NodePort" }}
+{{- if .Values.config.pcf.prometheus.nodePort }}
+    nodePort: {{ .Values.config.pcf.prometheus.nodePort }}
+{{- end }}
+{{- end }}
   - name: sbi
     port: {{ .Values.config.pcf.sbi.port }}
     protocol: TCP

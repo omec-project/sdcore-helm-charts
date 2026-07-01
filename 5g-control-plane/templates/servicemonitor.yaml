@@ -1,0 +1,42 @@
+{{/*
+# Copyright 2026-present Intel Corporation
+# Copyright 2020-present Open Networking Foundation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.servicemonitor.enabled }}
+{{- $monitors := list
+    (dict "name" "amf" "enabled" .Values.config.amf.deploy)
+    (dict "name" "ausf" "enabled" .Values.config.ausf.deploy)
+    (dict "name" "metricfunc" "enabled" .Values.config.metricfunc.deploy)
+    (dict "name" "nrf" "enabled" .Values.config.nrf.deploy)
+    (dict "name" "nssf" "enabled" .Values.config.nssf.deploy)
+    (dict "name" "pcf" "enabled" .Values.config.pcf.deploy)
+    (dict "name" "smf" "enabled" .Values.config.smf.deploy)
+    (dict "name" "udm" "enabled" .Values.config.udm.deploy)
+    (dict "name" "udr" "enabled" .Values.config.udr.deploy)
+    (dict "name" "webui" "enabled" .Values.config.webui.deploy)
+}}
+{{- range $monitor := $monitors }}
+{{- if $monitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $monitor.name }}
+  labels:
+{{ tuple $monitor.name $ | include "5g-control-plane.metadata_labels" | indent 4 }}
+{{- with $.Values.servicemonitor.additionalLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  endpoints:
+    - path: /metrics
+      port: prometheus-exporter
+  selector:
+    matchLabels:
+{{ tuple $monitor.name $ | include "5g-control-plane.metadata_labels" | indent 6 }}
+{{- end }}
+{{- end }}
+{{- end }}

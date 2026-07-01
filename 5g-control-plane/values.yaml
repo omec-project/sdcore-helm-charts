@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2022-present Intel Corporation
+# Copyright (c) 2022-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -234,8 +234,13 @@ config:
 
   webui:
     deploy: true
-    #podAnnotations:
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":8080,"schema":"HTTP"}]'
     serviceType: ClusterIP
+    prometheus:
+      port: 8080
+      # Provide nodePort when serviceType is NodePort
+      # nodePort:
     # serviceAnnotations:
     #   external-dns.alpha.kubernetes.io/hostname: "aether-config.tenant-site.company.com"
     urlport:
@@ -271,8 +276,13 @@ config:
 
   udm:
     deploy: true
-    #podAnnotations:
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":8080,"schema":"HTTP"}]'
     serviceType: ClusterIP
+    prometheus:
+      port: 8080
+      # Provide nodePort when serviceType is NodePort
+      # nodePort:
     sbi:
       port: 29503
       # Provide nodePort when serviceType is NodePort
@@ -309,8 +319,13 @@ config:
 
   udr:
     deploy: true
-    #podAnnotations:
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":8080,"schema":"HTTP"}]'
     serviceType: ClusterIP
+    prometheus:
+      port: 8080
+      # Provide nodePort when serviceType is NodePort
+      # nodePort:
     sbi:
       port: 29504
       # Provide nodePort when serviceType is NodePort
@@ -334,8 +349,13 @@ config:
 
   pcf:
     deploy: true
-    #podAnnotations:
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":8080,"schema":"HTTP"}]'
     serviceType: ClusterIP
+    prometheus:
+      port: 8080
+      # Provide nodePort when serviceType is NodePort
+      # nodePort:
     sbi:
       port: 29507
       # Provide nodePort when serviceType is NodePort
@@ -372,8 +392,13 @@ config:
 
   nssf:
     deploy: true
-    #podAnnotations:
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":8080,"schema":"HTTP"}]'
     serviceType: ClusterIP
+    prometheus:
+      port: 8080
+      # Provide nodePort when serviceType is NodePort
+      # nodePort:
     sbi:
       port: 29531
       # Provide nodePort when serviceType is NodePort
@@ -443,7 +468,7 @@ config:
     prometheus:
       port: 9089
       # Provide nodePort when serviceType is NodePort
-      #nodePort: 30084
+      # nodePort:
     sctp_grpc:
       port: 9000
       #nodePort: 30088
@@ -543,8 +568,13 @@ config:
 
   nrf:
     deploy: true
-    #podAnnotations:
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":8080,"schema":"HTTP"}]'
     serviceType: ClusterIP
+    prometheus:
+      port: 8080
+      # Provide nodePort when serviceType is NodePort
+      # nodePort:
     sbi:
       port: 29510
       # Provide nodePort when serviceType is NodePort
@@ -582,7 +612,8 @@ config:
       #nodePort: 30021
     prometheus:
       port: 9089
-      #nodePort: 30084
+      # Provide nodePort when serviceType is NodePort
+      # nodePort:
     sbi:
       port: 29502
       #nodePort: 30080
@@ -625,8 +656,13 @@ config:
 
   ausf:
     deploy: true
-    #podAnnotations:
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":8080,"schema":"HTTP"}]'
     serviceType: ClusterIP
+    prometheus:
+      port: 8080
+      # Provide nodePort when serviceType is NodePort
+      # nodePort:
     sbi:
       port: 29509
       # Provide nodePort when serviceType is NodePort
@@ -721,3 +757,7 @@ config:
             brokerUri: "kafka"
             brokerPort: 9092
             topicName: "sdcore-data-source-smf"
+
+servicemonitor:
+  enabled: false
+  additionalLabels: {}

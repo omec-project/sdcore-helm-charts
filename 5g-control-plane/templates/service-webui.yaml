@@ -21,6 +21,14 @@ spec:
   selector:
 {{ tuple "webui" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
+  - name: prometheus-exporter
+    port: {{ .Values.config.webui.prometheus.port }}
+    protocol: TCP
+{{- if eq .Values.config.webui.serviceType "NodePort" }}
+{{- if .Values.config.webui.prometheus.nodePort }}
+    nodePort: {{ .Values.config.webui.prometheus.nodePort }}
+{{- end }}
+{{- end }}
   - name: urlport-http
     port: {{ .Values.config.webui.urlport.port }}
     protocol: TCP

@@ -17,6 +17,14 @@ spec:
   selector:
 {{ tuple "udr" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
+  - name: prometheus-exporter
+    port: {{ .Values.config.udr.prometheus.port }}
+    protocol: TCP
+{{- if eq .Values.config.udr.serviceType "NodePort" }}
+{{- if .Values.config.udr.prometheus.nodePort }}
+    nodePort: {{ .Values.config.udr.prometheus.nodePort }}
+{{- end }}
+{{- end }}
   - name: sbi
     port: {{ .Values.config.udr.sbi.port }}
     protocol: TCP
