@@ -240,7 +240,7 @@ config:
     prometheus:
       port: 8080
       # Provide nodePort when serviceType is NodePort
-      # nodePort: 35002
+      # nodePort:
     # serviceAnnotations:
     #   external-dns.alpha.kubernetes.io/hostname: "aether-config.tenant-site.company.com"
     urlport:
@@ -282,7 +282,7 @@ config:
     prometheus:
       port: 8080
       # Provide nodePort when serviceType is NodePort
-      # nodePort: 30074
+      # nodePort:
     sbi:
       port: 29503
       # Provide nodePort when serviceType is NodePort
@@ -325,7 +325,7 @@ config:
     prometheus:
       port: 8080
       # Provide nodePort when serviceType is NodePort
-      # nodePort: 30074
+      # nodePort:
     sbi:
       port: 29504
       # Provide nodePort when serviceType is NodePort
@@ -355,7 +355,7 @@ config:
     prometheus:
       port: 8080
       # Provide nodePort when serviceType is NodePort
-      # nodePort: 30077
+      # nodePort:
     sbi:
       port: 29507
       # Provide nodePort when serviceType is NodePort
@@ -398,7 +398,7 @@ config:
     prometheus:
       port: 8080
       # Provide nodePort when serviceType is NodePort
-      # nodePort: 30081
+      # nodePort:
     sbi:
       port: 29531
       # Provide nodePort when serviceType is NodePort
@@ -468,7 +468,7 @@ config:
     prometheus:
       port: 9089
       # Provide nodePort when serviceType is NodePort
-      # nodePort: 30088
+      # nodePort:
     sctp_grpc:
       port: 9000
       #nodePort: 30088
@@ -574,7 +574,7 @@ config:
     prometheus:
       port: 8080
       # Provide nodePort when serviceType is NodePort
-      # nodePort: 30070
+      # nodePort:
     sbi:
       port: 29510
       # Provide nodePort when serviceType is NodePort
@@ -612,7 +612,8 @@ config:
       #nodePort: 30021
     prometheus:
       port: 9089
-      # nodePort: 30080
+      # Provide nodePort when serviceType is NodePort
+      # nodePort:
     sbi:
       port: 29502
       #nodePort: 30080
@@ -661,7 +662,7 @@ config:
     prometheus:
       port: 8080
       # Provide nodePort when serviceType is NodePort
-      # nodePort: 30082
+      # nodePort:
     sbi:
       port: 29509
       # Provide nodePort when serviceType is NodePort
