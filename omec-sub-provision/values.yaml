@@ -6,7 +6,7 @@ images:
   repository: "ghcr.io/omec-project/" # default GitHub Registry
   tags:
     init: pod-init:rel-1.2.3
-    simapp: simapp:rel-1.7.4
+    simapp: simapp:rel-1.8.0
   pullPolicy: IfNotPresent
 
 nodeSelectors:

@@ -135,7 +135,6 @@ config:
         enable_notify_bess: true
         notify_sockaddr: "/pod-share/notifycp"
         cpiface:
-          dnn: "internet"
           hostname: "upf"
           http_port: "8080"
         # Default global rate limits. Can be changed at runtime via BESS gRPC.
