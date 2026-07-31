@@ -258,7 +258,7 @@ Compute the desired shared CA once per render and cache it.
 {{- end -}}
 {{- $ca := "" -}}
 {{- if and $caCrt $caKey -}}
-{{- $ca = buildCustomCert ($caCrt | b64enc) ($caKey | b64enc) -}}
+{{- $ca = buildCustomCert (index $existingCaSecret.data "ca.crt" | default "") (index $existingCaSecret.data "ca.key" | default "") -}}
 {{- else -}}
 {{- $ca = genCA $privateCaName $sharedCaValidityDays -}}
 {{- end -}}
