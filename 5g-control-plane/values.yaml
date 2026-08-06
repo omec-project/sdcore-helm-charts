@@ -158,6 +158,22 @@ mongodb:
   #     node-role.aetherproject.org/5gc: "true"
   architecture: replicaset
   replicaCount: 1
+  # MongoDB is the control plane's shared datastore, and a single registration
+  # drives ~55 operations against it, so the Bitnami "small" preset (750m CPU /
+  # 768Mi) throttles attach throughput long before any NF is busy. Sizes below
+  # come from a CPU sweep against a live core: throughput scales hard up to
+  # ~4 CPU and then plateaus. The limit needs that much headroom even though the
+  # working set averages ~2 cores, because the per-attach operations arrive in
+  # bursts that a tighter limit throttles. Memory is raised to cover the ~1.6Gi
+  # working set the 768Mi default cannot hold.
+  resourcesPreset: "none"
+  resources:
+    requests:
+      cpu: 2
+      memory: 1Gi
+    limits:
+      cpu: 4
+      memory: 2Gi
   # global:
   #   security:
   #     allowInsecureImages: true # set to true when using images from local repo/registry
