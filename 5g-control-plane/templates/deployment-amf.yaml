@@ -69,6 +69,8 @@ spec:
           value: {{ .Values.config.grpc.trace | quote }}
         - name: GRPC_VERBOSITY
           value: {{ .Values.config.grpc.verbosity | quote }}
+        - name: GOGC
+          value: {{ .Values.config.gogc | quote }}
       {{- if eq .Values.config.GIN.mode "release" }}
         - name: GIN_MODE
           value: release
