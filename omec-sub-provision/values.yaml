@@ -5,8 +5,8 @@
 images:
   repository: "ghcr.io/omec-project/" # default GitHub Registry
   tags:
-    init: pod-init:rel-1.2.3
-    simapp: simapp:rel-1.8.0
+    init: pod-init:rel-1.3.0
+    simapp: simapp:rel-1.9.0
   pullPolicy: IfNotPresent
 
 nodeSelectors:
@@ -54,6 +54,7 @@ config:
             debugLevel: info
         configuration:
           provision-network-slice: false
+          max-workers: 50 # number of Go threads to send messages in parallel
           subscribers:
           - ueId-start: "208930100007500"
             ueId-end: "208930100007509"
