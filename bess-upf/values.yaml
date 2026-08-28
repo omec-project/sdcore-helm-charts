@@ -123,6 +123,10 @@ config:
         max_sessions: 50000
         table_sizes:
           pdrLookup: 50000
+          # Read by the config parser even when measure_flow is false. Omitting it
+          # makes the parser's single try/except abort part-way, silently discarding
+          # the three sizes below.
+          flowMeasure: 200000
           appQERLookup: 200000
           sessionQERLookup: 100000
           farLookup: 150000
