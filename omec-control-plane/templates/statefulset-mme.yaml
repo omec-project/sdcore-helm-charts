@@ -5,7 +5,7 @@
 */}}
 
 {{- if .Values.config.mme.deploy }}
-{{ tuple "mme" . | include "omec-control-plane.service_account" }}
+{{ tuple "mme" . | include "omec-control-plane.dep_check_service_account" }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet

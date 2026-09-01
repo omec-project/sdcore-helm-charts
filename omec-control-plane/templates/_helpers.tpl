@@ -45,9 +45,31 @@ Return domain name for Diameter identity, realm, and hostname for a given applic
 {{- end -}}
 
 {{/*
-Render ServiceAccount, Role, and RoleBinding required for kubernetes-entrypoint.
+Render the ServiceAccount used by network function Pods.
+No Role or RoleBinding is granted and token automounting is disabled
+(least privilege) since these network functions do not call the Kubernetes API.
 */}}
 {{- define "omec-control-plane.service_account" -}}
+{{- $context := index . 1 -}}
+{{- $saName := index . 0 -}}
+{{- $saNamespace := $context.Release.Namespace }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $saName }}
+  namespace: {{ $saNamespace }}
+  labels:
+{{ tuple $saName $context | include "omec-control-plane.metadata_labels" | indent 4 }}
+automountServiceAccountToken: false
+{{- end -}}
+
+{{/*
+Render ServiceAccount, Role, and RoleBinding for a Pod that runs the
+kubernetes-entrypoint dependency-check init container. Scoped to read-only
+access on Pods only, which is all kubernetes-entrypoint requires.
+*/}}
+{{- define "omec-control-plane.dep_check_service_account" -}}
 {{- $context := index . 1 -}}
 {{- $saName := index . 0 -}}
 {{- $saNamespace := $context.Release.Namespace }}
@@ -94,21 +116,11 @@ metadata:
 rules:
   - apiGroups:
       - ""
-      - extensions
-      - batch
-      - apps
     verbs:
       - get
       - list
-      - patch
     resources:
-      - statefulsets
-      - daemonsets
-      - jobs
       - pods
-      - services
-      - endpoints
-      - configmaps
 {{- end -}}
 
 {{/*

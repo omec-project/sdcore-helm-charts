@@ -28,7 +28,9 @@ Render the given template.
 {{- end -}}
 
 {{/*
-Render ServiceAccount, Role, and RoleBinding required for kubernetes-entrypoint.
+Render the ServiceAccount used by network function Pods.
+No network function in this chart calls the Kubernetes API, so no Role or
+RoleBinding is granted and token automounting is disabled (least privilege).
 */}}
 {{- define "5g-ransim-plane.service_account" -}}
 {{- $context := index . 1 -}}
@@ -42,56 +44,7 @@ metadata:
   namespace: {{ $saNamespace }}
   labels:
 {{ tuple $saName $context | include "5g-ransim-plane.metadata_labels" | indent 4 }}
----
-{{- if semverCompare ">=1.16-0" $context.Capabilities.KubeVersion.GitVersion }}
-apiVersion: rbac.authorization.k8s.io/v1
-{{- else }}
-apiVersion: rbac.authorization.k8s.io/v1beta1
-{{- end }}
-kind: RoleBinding
-metadata:
-  name: {{ $saName }}
-  namespace: {{ $saNamespace }}
-  labels:
-{{ tuple $saName $context | include "5g-ransim-plane.metadata_labels" | indent 4 }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: {{ $saName }}
-subjects:
-  - kind: ServiceAccount
-    name: {{ $saName }}
-    namespace: {{ $saNamespace }}
----
-{{- if semverCompare ">=1.16-0" $context.Capabilities.KubeVersion.GitVersion }}
-apiVersion: rbac.authorization.k8s.io/v1
-{{- else }}
-apiVersion: rbac.authorization.k8s.io/v1beta1
-{{- end }}
-kind: Role
-metadata:
-  name: {{ $saName }}
-  namespace: {{ $saNamespace }}
-  labels:
-{{ tuple $saName $context | include "5g-ransim-plane.metadata_labels" | indent 4 }}
-rules:
-  - apiGroups:
-      - ""
-      - extensions
-      - batch
-      - apps
-    verbs:
-      - get
-      - list
-      - patch
-    resources:
-      - statefulsets
-      - daemonsets
-      - jobs
-      - pods
-      - services
-      - endpoints
-      - configmaps
+automountServiceAccountToken: false
 {{- end -}}
 
 {{/*
