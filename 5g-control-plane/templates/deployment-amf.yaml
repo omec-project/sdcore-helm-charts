@@ -84,6 +84,16 @@ spec:
         resources:
 {{ toYaml .Values.resources.amf | indent 10 }}
       {{- end }}
+      {{- if and .Values.config.amf.livenessProbe .Values.config.amf.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.config.amf.livenessProbe.path }}
+            port: {{ .Values.config.amf.prometheus.port }}
+          initialDelaySeconds: {{ .Values.config.amf.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.config.amf.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.config.amf.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.config.amf.livenessProbe.failureThreshold }}
+      {{- end }}
         volumeMounts:
         - name: nf-config
           mountPath: /opt
