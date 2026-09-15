@@ -509,6 +509,21 @@ config:
     podAnnotations:
       field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
     serviceType: ClusterIP
+    # Points the AMF's liveness probe (probes.liveness) at the AMF's /healthz instead of
+    # its SBI port. That restarts an AMF that has held an NGAP association and then holds
+    # none: it stays up, keeps its listener bound, answers its SBI, and serves nobody, which
+    # a TCP connect cannot see. Needs an AMF that serves /healthz (omec-project/amf#814,
+    # in rel-3.3.2 and later).
+    # The endpoint reports healthy for an AMF that has never held an association, so this
+    # cannot restart a fresh deployment whose gNBs have not arrived yet, and cannot loop: a
+    # restarted AMF has served nothing and is left alone until a gNB attaches. It does not
+    # tell an AMF fault from a RAN one: when every gNB goes away, for a planned restart or a
+    # backhaul outage, the AMF is restarted too, about 30 s later with the default
+    # probes.liveness, and what it holds only in memory is lost.
+    # It has no effect with config.sctplb.deploy: gNBs then associate with the SCTP load
+    # balancer, the AMF holds no association of its own, and /healthz always reports healthy.
+    healthz:
+      enabled: false
     prometheus:
       port: 9089
       # Provide nodePort when serviceType is NodePort

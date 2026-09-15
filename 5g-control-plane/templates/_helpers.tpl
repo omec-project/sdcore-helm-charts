@@ -446,12 +446,18 @@ publishes. The startup probe gates the liveness probe: a function that waits
 for a peer at start (MongoDB, the NRF) does not open its port until the peer
 answers, and must not be restarted for that. Each probe is tuned or turned
 off under .Values.probes; every field besides "enabled" is passed to the probe
-as it is.
+as it is. An optional third element replaces the liveness probe's handler, for
+a function that can report more than an open port.
 Usage: {{ tuple <port> . | include "5g-control-plane.probes" | nindent 8 }}
+       {{ tuple <port> . <liveness handler> | include "5g-control-plane.probes" | nindent 8 }}
 */}}
 {{- define "5g-control-plane.probes" -}}
 {{- $port := index . 0 -}}
 {{- $probes := (index . 1).Values.probes -}}
+{{- $liveness := dict "tcpSocket" (dict "port" $port) -}}
+{{- if gt (len .) 2 }}
+{{- $liveness = index . 2 -}}
+{{- end }}
 {{- if $probes.startup.enabled }}
 startupProbe:
   tcpSocket:
@@ -460,8 +466,7 @@ startupProbe:
 {{- end }}
 {{- if $probes.liveness.enabled }}
 livenessProbe:
-  tcpSocket:
-    port: {{ $port }}
+{{- toYaml $liveness | nindent 2 }}
 {{- toYaml (omit $probes.liveness "enabled") | nindent 2 }}
 {{- end }}
 {{- if $probes.readiness.enabled }}
