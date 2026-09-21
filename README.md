@@ -40,15 +40,6 @@ index defb44a..bcd9f4b 100644
          port: 38412
 
      upfadapter:
-@@ -110,7 +110,7 @@ omec-sub-provision:
-       cfgFiles:
-         simapp.yaml:
-           configuration:
--            provision-network-slice: {{ core.standalone | string }} # if enabled, Device Groups & Slices configure by simapp
-+            provision-network-slice: true # if enabled, Device Groups & Slices configure by simapp
-             sub-provision-endpt:
-               addr: webui.aether-5gc.svc.cluster.local  # subscriber configuation endpoint.
-             # sub-proxy-endpt: # used if subscriber proxy is enabled in the ROC.
 @@ -315,20 +315,20 @@ omec-user-plane:
        hugepage:
          enabled: false    # Should be enabled if DPDK is enabled

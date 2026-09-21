@@ -15,7 +15,7 @@ images:
     smf: 5gc-smf:rel-4.3.2
     udm: 5gc-udm:rel-3.1.1
     udr: 5gc-udr:rel-3.1.1
-    webui: 5gc-webui:rel-3.1.1
+    webui: 5gc-webui:rel-3.1.2
     metricfunc: metricfunc:rel-2.1.1
     sctplb: sctplb:rel-1.9.1
     upfadapter: upfadapter:rel-2.2.0
