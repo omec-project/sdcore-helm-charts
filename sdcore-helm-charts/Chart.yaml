@@ -10,7 +10,7 @@ name: sd-core
 description: SD-Core control plane services
 icon: https://guide.opencord.org/logos/cord.svg
 type: application
-version: 4.2.5
+version: 4.2.6
 home: https://opennetworking.org/sd-core/
 maintainers:
   - name: SD-Core Support
@@ -23,7 +23,7 @@ dependencies:
     condition: omec-control-plane.enable4G
 
   - name: omec-sub-provision
-    version: 2.3.3
+    version: 2.3.4
     repository: "file://../omec-sub-provision"
     condition: omec-sub-provision.enable
 
