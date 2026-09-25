@@ -18,4 +18,4 @@ cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
 echo ""
 
-GOTRACEBACK=crash sctplb -cfg $CFGPATH/$FILENAME
+GOTRACEBACK=crash exec sctplb -cfg $CFGPATH/$FILENAME

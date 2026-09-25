@@ -18,4 +18,4 @@ cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
 echo ""
 
-GOTRACEBACK=crash simapp -cfg $CFGPATH/$FILENAME
+GOTRACEBACK=crash exec simapp -cfg $CFGPATH/$FILENAME

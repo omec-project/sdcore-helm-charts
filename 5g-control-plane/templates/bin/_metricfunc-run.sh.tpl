@@ -18,4 +18,4 @@ cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
 echo ""
 
-GOTRACEBACK=crash metricfunc -cfg $CFGPATH/$FILENAME
+GOTRACEBACK=crash exec metricfunc -cfg $CFGPATH/$FILENAME
