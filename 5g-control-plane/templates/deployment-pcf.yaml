@@ -68,6 +68,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        {{- tuple .Values.config.pcf.sbi.port . | include "5g-control-plane.probes" | nindent 8 }}
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.pcf | indent 10 }}

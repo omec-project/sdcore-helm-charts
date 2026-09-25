@@ -52,6 +52,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        {{- tuple .Values.config.upfadapter.rest.port . | include "5g-control-plane.probes" | nindent 8 }}
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.upfadapter | indent 10 }}

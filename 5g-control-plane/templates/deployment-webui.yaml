@@ -63,6 +63,7 @@ spec:
         stdin: true
         tty: true
         command: ["/opt/webui-run.sh"]
+        {{- tuple .Values.config.webui.urlport.port . | include "5g-control-plane.probes" | nindent 8 }}
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.webui | indent 10 }}
