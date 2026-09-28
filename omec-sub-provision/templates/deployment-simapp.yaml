@@ -63,6 +63,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        {{- tuple .Values.config.simapp.config.port . | include "omec-sub-provision.probes" | nindent 8 }}
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.simapp | indent 10 }}

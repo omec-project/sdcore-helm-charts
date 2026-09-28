@@ -438,3 +438,36 @@ Render pod template annotations that trigger a rollout when mounted cert sources
 checksum/sdcore-shared-ca: {{ $sharedCaChecksum | quote }}
 checksum/{{ $leafSecretName }}: {{ $leafChecksum | quote }}
 {{- end -}}
+
+{{/*
+Startup, liveness and readiness probes of a network function container: a TCP
+connect to the port the function serves on, the same port its Service
+publishes. The startup probe gates the liveness probe: a function that waits
+for a peer at start (MongoDB, the NRF) does not open its port until the peer
+answers, and must not be restarted for that. Each probe is tuned or turned
+off under .Values.probes; every field besides "enabled" is passed to the probe
+as it is.
+Usage: {{ tuple <port> . | include "5g-control-plane.probes" | nindent 8 }}
+*/}}
+{{- define "5g-control-plane.probes" -}}
+{{- $port := index . 0 -}}
+{{- $probes := (index . 1).Values.probes -}}
+{{- if $probes.startup.enabled }}
+startupProbe:
+  tcpSocket:
+    port: {{ $port }}
+{{- toYaml (omit $probes.startup "enabled") | nindent 2 }}
+{{- end }}
+{{- if $probes.liveness.enabled }}
+livenessProbe:
+  tcpSocket:
+    port: {{ $port }}
+{{- toYaml (omit $probes.liveness "enabled") | nindent 2 }}
+{{- end }}
+{{- if $probes.readiness.enabled }}
+readinessProbe:
+  tcpSocket:
+    port: {{ $port }}
+{{- toYaml (omit $probes.readiness "enabled") | nindent 2 }}
+{{- end }}
+{{- end -}}

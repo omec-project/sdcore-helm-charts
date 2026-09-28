@@ -26,6 +26,31 @@ nodeSelectors:
   label: node-role.aetherproject.org/5gc
   value: true
 
+# Startup, liveness and readiness probes of the network function containers: a
+# TCP connect to the port each function serves on (the SBI port on the 5G
+# functions). Every field besides `enabled` is passed to the probe as it is.
+# The startup probe gates the liveness probe: a function that waits for a peer
+# at start (MongoDB, the NRF) opens its port only once the peer answers, so it
+# gets up to failureThreshold x periodSeconds before liveness applies. After
+# that, a function that stops accepting connections for longer than
+# failureThreshold x periodSeconds is restarted.
+probes:
+  startup:
+    enabled: true
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 60
+  liveness:
+    enabled: true
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    enabled: true
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
 resources:
   enabled: false
   sctplb:
