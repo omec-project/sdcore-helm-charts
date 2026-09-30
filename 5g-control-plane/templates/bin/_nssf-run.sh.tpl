@@ -11,9 +11,9 @@ set -xe
 cp /usr/local/bin/nssf /tmp/coredump/
 {{- end }}
 
-CFGPATH=/home
+CFGPATH=/tmp
 FILENAME=nssfcfg.yaml
-# copy config file from configmap (/opt) to a general directory (/home)
+# copy config file from configmap (/opt) to a directory a non-root user can write (/tmp)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
 echo ""
