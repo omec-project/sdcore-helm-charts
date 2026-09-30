@@ -80,7 +80,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+      {{- if and .Values.config.amf.healthz .Values.config.amf.healthz.enabled }}
+        {{- /* The AMF serves /healthz on :9089 whatever config.amf.prometheus.port says: that value sets only the Service port. */}}
+        {{- tuple .Values.config.amf.sbi.port . (dict "httpGet" (dict "path" "/healthz" "port" 9089)) | include "5g-control-plane.probes" | nindent 8 }}
+      {{- else }}
         {{- tuple .Values.config.amf.sbi.port . | include "5g-control-plane.probes" | nindent 8 }}
+      {{- end }}
       {{- if .Values.resources.enabled }}
         resources:
 {{ toYaml .Values.resources.amf | indent 10 }}
