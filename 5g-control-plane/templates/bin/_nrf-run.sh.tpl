@@ -18,4 +18,7 @@ cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
 echo ""
 
-GOTRACEBACK=crash nrf -cfg $CFGPATH/$FILENAME
+# exec, so that the NRF replaces this shell and receives the SIGTERM Kubernetes sends on
+# a delete or a rollout, and runs its shutdown sequence.
+# Verified with its peers running; see #176 and the AMF script.
+exec env GOTRACEBACK=crash nrf -cfg $CFGPATH/$FILENAME
