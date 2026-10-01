@@ -39,8 +39,11 @@ probes:
     timeoutSeconds: 5
     failureThreshold: 3
 
+# Requests and limits of the network functions, applied by default. On a machine
+# too small for them (a test or CI installation) set enabled to false or lower
+# the requests.
 resources:
-  enabled: false
+  enabled: true
   simapp:
     requests:
       cpu: 1
