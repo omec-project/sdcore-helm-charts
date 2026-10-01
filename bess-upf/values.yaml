@@ -91,7 +91,7 @@ config:
     #routes:
     #  - to: 10.76.28.173/32
     #    via: 169.254.1.1
-    enb:
+    ran:
       subnet: 192.168.251.0/24
     access:
       ipam: static
