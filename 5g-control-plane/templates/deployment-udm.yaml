@@ -29,6 +29,10 @@ spec:
     {{- toYaml . | nindent 8 }}
     {{- end }}
     spec:
+    {{- if and .Values.podSecurityContext (not .Values.config.coreDump.enabled) }}
+      securityContext:
+{{ toYaml .Values.podSecurityContext | indent 8 }}
+    {{- end }}
       serviceAccountName: udm
     {{- if .Values.nodeSelectors.enabled }}
       nodeSelector:

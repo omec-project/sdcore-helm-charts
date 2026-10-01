@@ -11,10 +11,10 @@ set -xe
 cp /usr/local/bin/smf /tmp/coredump/
 {{- end }}
 
-CFGPATH=/home
+CFGPATH=/tmp
 FILENAME=smfcfg.yaml
 UEFILENAME=uerouting.yaml
-# copy config file from configmap (/opt) to a general directory (/home)
+# copy config file from configmap (/opt) to a directory a non-root user can write (/tmp)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cp /opt/$UEFILENAME $CFGPATH/$UEFILENAME
 cat $CFGPATH/$FILENAME
