@@ -47,7 +47,7 @@ index defb44a..bcd9f4b 100644
 -        - to: {{ ansible_default_ipv4.address }}
 +        - to: <your-host-IP> # Host where the UPF pod will be deployed
            via: 169.254.1.1
-       enb:
+       ran:
 -        subnet: {{ ran_subnet }} # Subnet for the gNB network
 +        subnet: <the-ran-subnet-to-use> # Subnet for the gNB network
        access:
