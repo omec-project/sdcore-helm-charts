@@ -195,7 +195,11 @@ mongodb:
   #   nodeSelector:
   #     node-role.aetherproject.org/5gc: "true"
   architecture: replicaset
-  replicaCount: 1
+  # Two data members besides the arbiter, so that the replica set keeps a
+  # primary while one member is moved (a node drain or upgrade) and the moved
+  # one syncs back from the other. With persistence off, a single member loses
+  # its replica-set identity with the pod and never rejoins the arbiter (#180).
+  replicaCount: 2
   # MongoDB is the control plane's shared datastore, and a single registration
   # drives ~55 operations against it, so the Bitnami "small" preset (750m CPU /
   # 768Mi) throttles attach throughput long before any NF is busy. Sizes below
