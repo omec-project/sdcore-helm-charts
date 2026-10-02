@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: 2026 Linux Foundation Networking
+# SPDX-License-Identifier: Apache-2.0
+# CNTi Test Suite configuration for the SD-Core control plane: which
+# components the job installs, and CPU requests a GitHub-hosted runner
+# (4 vCPU, three kind workers) can schedule, also after one worker is
+# drained. Nothing here changes a practice the cert tests judge.
+config_version: "v2"
+common:
+  hardcoded_ip_exceptions:
+    # The DNS resolver simapp hands to UEs, set per deployment.
+    - ip: 8.8.8.8
+deployments:
+  helm_dirs:
+    - name: sd-core
+      # Relative to this file.
+      helm_directory: ../../sdcore-helm-charts
+      namespace: sdcore
+      helm_values: >-
+        --set omec-user-plane.enable=false
+        --set 5g-ran-sim.enable=false
+        --set 5g-control-plane.enable5G=true
+        --set 5g-control-plane.kafka.deploy=false
+        --set omec-sub-provision.enable=true
+        --set 5g-control-plane.resources.amf.requests.cpu=200m
+        --set 5g-control-plane.resources.ausf.requests.cpu=200m
+        --set 5g-control-plane.resources.nrf.requests.cpu=200m
+        --set 5g-control-plane.resources.nssf.requests.cpu=200m
+        --set 5g-control-plane.resources.pcf.requests.cpu=200m
+        --set 5g-control-plane.resources.smf.requests.cpu=200m
+        --set 5g-control-plane.resources.udm.requests.cpu=200m
+        --set 5g-control-plane.resources.udr.requests.cpu=200m
+        --set 5g-control-plane.resources.webui.requests.cpu=200m
+        --set 5g-control-plane.resources.upfadapter.requests.cpu=200m
+        --set omec-sub-provision.resources.simapp.requests.cpu=100m
+        --set 5g-control-plane.mongodb.resources.requests.cpu=250m

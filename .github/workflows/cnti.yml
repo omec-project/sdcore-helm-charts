@@ -1,0 +1,89 @@
+# SPDX-FileCopyrightText: 2026 Linux Foundation Networking
+# SPDX-License-Identifier: Apache-2.0
+
+# Installs the SD-Core control plane on a kind cluster every night, runs the
+# CNTi Test Suite's cert tests against it and publishes the result as the
+# badge in the README. https://github.com/lfn-cnti/testsuite-action
+name: CNTi cert
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  # By hand, and on pull requests that change the job or its configuration.
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/cnti.yml
+      - .github/cnti/**
+
+permissions:
+  contents: read
+
+jobs:
+  # The nightly run and manual runs on main: the only runs that publish the
+  # badge, and the only ones with a write token. Forks that enable scheduled
+  # workflows do not run either job.
+  cert:
+    if: github.repository == 'omec-project/sdcore-helm-charts' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      # Publishes the badge to the orphan branch `badges`.
+      contents: write
+    env: &cert-env
+      # Twelve workloads share the runner's four cores: scaling and
+      # rollouts take longer than the suite's 60-second default.
+      CNTI_TESTSUITE_GENERIC_OPERATION_TIMEOUT: "180"
+    steps: &cert-steps
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The suite doesn't need the job's write token; the action passes it to
+          # the badge publisher on its own.
+          persist-credentials: false
+
+      # The umbrella chart depends on its siblings by file:// reference and
+      # 5g-control-plane pulls MongoDB and Kafka from Bitnami, so both
+      # dependency sets are built before the suite installs the chart.
+      - name: Build chart dependencies
+        run: |
+          set -euo pipefail
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm dependency build 5g-control-plane
+          helm dependency build sdcore-helm-charts
+
+      - uses: lfn-cnti/testsuite-action@05a9860905f31c6813f735d25e5cefd7c62a1e5a # v1.1.0
+        with:
+          version: v2.1.0
+          cnf_config: .github/cnti/cnti-testsuite.yaml
+          # Three workers, so that MongoDB's two data members and its arbiter
+          # stay on separate nodes while the node_drain test drains them in turn.
+          kind_config: .github/cnti/kind.yaml
+          install_timeout: 900
+          tests: cert
+          badge_branch: badges
+
+      # Why did a function not come up? Pod state, events and logs from the
+      # kind cluster the action created; it lives until the job ends.
+      - name: Diagnostics
+        if: failure()
+        run: |
+          set +e
+          echo "::group::pods"; kubectl get pods -A -o wide; echo "::endgroup::"
+          echo "::group::node allocation"; kubectl describe nodes | grep -A9 "Allocated resources"; echo "::endgroup::"
+          for pod in $(kubectl get pods -n sdcore -o name); do
+            echo "::group::describe $pod"; kubectl describe -n sdcore "$pod" | tail -60; echo "::endgroup::"
+            echo "::group::logs $pod"; kubectl logs -n sdcore "$pod" --all-containers --tail=60; echo "::endgroup::"
+          done
+          echo "::group::events"; kubectl get events -n sdcore --sort-by=.lastTimestamp | tail -60; echo "::endgroup::"
+
+  # Pull requests that change the job or its configuration, and manual runs on
+  # other branches: the same steps with a read-only token. The action publishes
+  # the badge only from the default branch, so nothing is published here.
+  cert-pr:
+    if: github.repository == 'omec-project/sdcore-helm-charts' && (github.event_name == 'pull_request' || github.ref != 'refs/heads/main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    env: *cert-env
+    steps: *cert-steps

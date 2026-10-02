@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Linux Foundation Networking
+# SPDX-License-Identifier: Apache-2.0
+# The kind cluster for the CNTi cert job: a control plane and three workers.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+  - role: worker
+  - role: worker
+  - role: worker
