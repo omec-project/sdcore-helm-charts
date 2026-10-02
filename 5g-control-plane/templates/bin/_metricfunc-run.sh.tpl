@@ -18,4 +18,8 @@ cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
 echo ""
 
-GOTRACEBACK=crash metricfunc -cfg $CFGPATH/$FILENAME
+# exec, so that metricfunc replaces this shell and receives the SIGTERM Kubernetes sends
+# on a delete or a rollout: it shuts its API and metrics servers down and exits
+# (metricfunc v2.1.3, omec-project/metricfunc#318).
+# Verified with its peers running; see #176.
+exec env GOTRACEBACK=crash metricfunc -cfg $CFGPATH/$FILENAME

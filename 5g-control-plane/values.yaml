@@ -15,10 +15,10 @@ images:
     smf: 5gc-smf:rel-4.3.3
     udm: 5gc-udm:rel-3.1.2
     udr: 5gc-udr:rel-3.1.2
-    webui: 5gc-webui:rel-3.1.3
-    metricfunc: metricfunc:rel-2.1.2
+    webui: 5gc-webui:rel-3.1.4
+    metricfunc: metricfunc:rel-2.1.3
     sctplb: sctplb:rel-1.9.2
-    upfadapter: upfadapter:rel-2.2.0
+    upfadapter: upfadapter:rel-2.2.1
   pullPolicy: IfNotPresent
 
 nodeSelectors:

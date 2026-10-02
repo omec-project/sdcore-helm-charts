@@ -18,4 +18,8 @@ cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
 echo ""
 
-GOTRACEBACK=crash simapp -cfg $CFGPATH/$FILENAME
+# exec, so that simapp replaces this shell and receives the SIGTERM Kubernetes sends on a
+# delete or a rollout: it shuts its /synchronize server down and exits (simapp v1.9.5,
+# omec-project/simapp#300).
+# Verified with its peers running; see #176.
+exec env GOTRACEBACK=crash simapp -cfg $CFGPATH/$FILENAME

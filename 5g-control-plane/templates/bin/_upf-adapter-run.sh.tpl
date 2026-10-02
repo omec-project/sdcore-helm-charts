@@ -17,4 +17,8 @@ cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
 echo ""
 
-GOTRACEBACK=crash upfadapter -cfg $CFGPATH/$FILENAME
+# exec, so that the UPF adapter replaces this shell and receives the SIGTERM Kubernetes
+# sends on a delete or a rollout: it shuts its HTTP server down, closes the PFCP socket
+# and exits (upfadapter v2.2.1, omec-project/upfadapter#126).
+# Verified with its peers running; see #176.
+exec env GOTRACEBACK=crash upfadapter -cfg $CFGPATH/$FILENAME
