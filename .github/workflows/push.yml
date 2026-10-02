@@ -67,9 +67,10 @@ jobs:
       UMBRELLA_CHARTS: ./sdcore-helm-charts
       REGISTRY: ghcr.io
     steps:
+      # The commit that triggered this run (checkout's default), not the tip of
+      # the branch: with a later push already on main, the branch tip would be
+      # published under this run's version.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.ref }}
 
       - name: Set up Helm
         uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
@@ -82,6 +83,30 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Every chart is published with the version from VERSION: X.Y.Z as is,
+      # X.Y.Z-dev as the pre-release X.Y.Z-dev.<run number>. It is set here, in
+      # the checkout only, so pull requests never edit chart versions.
+      - name: Set chart versions from VERSION
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          base=$(tr -d '[:space:]' < VERSION)
+          if [[ "$base" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            version="$base"
+          elif [[ "$base" =~ ^[0-9]+\.[0-9]+\.[0-9]+-dev$ ]]; then
+            version="$base.$RUN_NUMBER"
+          else
+            echo "::error::VERSION is '$base', expected X.Y.Z or X.Y.Z-dev"
+            exit 1
+          fi
+          export CHART_VERSION="$version"
+          for chart in */Chart.yaml; do
+            yq -i '.version = strenv(CHART_VERSION)' "$chart"
+            yq -i '(.dependencies[]? | select(.repository | test("^file://")) | .version) = strenv(CHART_VERSION)' "$chart"
+          done
+          echo "📌 Publishing every chart as $CHART_VERSION"
 
       - name: Find, package and publish charts
         run: |
