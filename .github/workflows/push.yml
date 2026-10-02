@@ -83,6 +83,30 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Every chart is published with the version from VERSION: X.Y.Z as is,
+      # X.Y.Z-dev as the pre-release X.Y.Z-dev.<run number>. It is set here, in
+      # the checkout only, so pull requests never edit chart versions.
+      - name: Set chart versions from VERSION
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          base=$(tr -d '[:space:]' < VERSION)
+          if [[ "$base" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            version="$base"
+          elif [[ "$base" =~ ^[0-9]+\.[0-9]+\.[0-9]+-dev$ ]]; then
+            version="$base.$RUN_NUMBER"
+          else
+            echo "::error::VERSION is '$base', expected X.Y.Z or X.Y.Z-dev"
+            exit 1
+          fi
+          export CHART_VERSION="$version"
+          for chart in */Chart.yaml; do
+            yq -i '.version = strenv(CHART_VERSION)' "$chart"
+            yq -i '(.dependencies[]? | select(.repository | test("^file://")) | .version) = strenv(CHART_VERSION)' "$chart"
+          done
+          echo "📌 Publishing every chart as $CHART_VERSION"
+
       - name: Find, package and publish charts
         run: |
           # Create unique temporary directory

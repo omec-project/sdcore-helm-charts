@@ -18,6 +18,22 @@ deployment/setup as shown below.
 
 For the 5G control-plane chart, the shared CA private key is stored in a namespace Secret by default so leaf certificates can be regenerated across upgrades. In environments with tighter Secret-access requirements, set `5g-control-plane.config.certs.sharedCA.existingPrivateSecret` to a pre-created Secret containing non-empty `ca.crt` and `ca.key`, and restrict read access to that Secret. When this option is set, the chart now fails fast if that Secret is missing or incomplete instead of generating a replacement CA. Because the chart must read that CA private key at render time to sign the leaf certificates, this option requires rendering with cluster access; offline `helm template` without access to that Secret is not supported. If your cluster DNS domain is not `cluster.local`, set `5g-control-plane.config.certs.clusterDomain` accordingly or to an empty string to omit the fully-qualified service SAN. You can tune `5g-control-plane.config.certs.leafValidityDays` and `5g-control-plane.config.certs.clusterDomain` to affect newly rendered leaf certificates, and the chart will reissue leaf Secrets when those inputs change. `5g-control-plane.config.certs.sharedCA.validityDays` only affects newly generated CAs, so changing it does not automatically rotate an existing shared CA Secret. You can also set `5g-control-plane.config.certs.includeSystemRootBundle=false` if you want the generated CA bundle to contain only the shared CA instead of roots copied from the init image.
 
+## Versioning
+
+All charts in this repository share one version, taken from the `VERSION` file
+when they are published; the `version` fields in the `Chart.yaml` files stay at
+`0.0.0` and are not edited in pull requests.
+
+- When `VERSION` is a release, for example `5.1.0`, every chart is published as
+  `5.1.0`, and the umbrella chart depends on its sibling charts at `5.1.0`.
+- On any other merge to `main`, with `VERSION` at `5.1.0-dev`, every chart is
+  published as a pre-release, `5.1.0-dev.<run number>`. Version ranges such as
+  `^5.0.0` or `5.1.x` don't select pre-releases, so they are installed only when
+  asked for by their exact version.
+
+A release is a pull request that removes `-dev` from `VERSION`, as in the
+component repositories; after the merge, `VERSION` moves on to the next `-dev`.
+
 ## Example of usage with Aether OnRamp
 
 It is strongly recommended to use [Aether-Onramp](https://docs.aetherproject.org/master/onramp/overview.html)

@@ -8,4 +8,6 @@ description: 5G RAN Simulator Service
 name: 5g-ran-sim
 icon: https://guide.opencord.org/logos/cord.svg
 
-version: 3.2.3
+# Set when the chart is published, from the VERSION file at the repository
+# root (see the README); not edited by hand.
+version: 0.0.0
