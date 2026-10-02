@@ -18,4 +18,8 @@ cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
 echo ""
 
-GOTRACEBACK=crash webconsole -cfg $CFGPATH/$FILENAME
+# exec, so that the WebUI replaces this shell and receives the SIGTERM Kubernetes sends on
+# a delete or a rollout: it shuts both of its servers down and exits (webconsole v3.1.4,
+# omec-project/webconsole#590).
+# Verified with its peers running; see #176.
+exec env GOTRACEBACK=crash webconsole -cfg $CFGPATH/$FILENAME
