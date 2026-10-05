@@ -53,7 +53,7 @@ jobs:
 
       - uses: lfn-cnti/testsuite-action@05a9860905f31c6813f735d25e5cefd7c62a1e5a # v1.1.0
         with:
-          version: v2.1.0
+          version: v2.2.0
           cnf_config: .github/cnti/cnti-testsuite.yaml
           # Three workers, so that MongoDB's two data members and its arbiter
           # stay on separate nodes while the node_drain test drains them in turn.
