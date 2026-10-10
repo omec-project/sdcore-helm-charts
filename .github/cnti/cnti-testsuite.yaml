@@ -3,7 +3,7 @@
 # CNTi Test Suite configuration for the SD-Core control plane: which
 # components the job installs, and CPU requests a GitHub-hosted runner
 # (4 vCPU, three kind workers) can schedule, also after one worker is
-# drained. Nothing here changes a practice the cert tests judge.
+# drained. Nothing here changes a practice the essential tests judge.
 config_version: "v2"
 common:
   hardcoded_ip_exceptions:
