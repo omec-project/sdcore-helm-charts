@@ -553,6 +553,15 @@ config:
       #nodePort: 30088
     ngapp:
       #externalIp:
+      # Set to Local so that the AMF sees each gNB's own address on N2. With the default
+      # (Cluster) kube-proxy masquerades every association that arrives on externalIp, so the
+      # AMF's logs (ran_addr), its gnb_session_profile metric and its traces show every gNB as
+      # one node address, which is whichever address the node registered first at boot and
+      # can change between reboots. Local keeps the gNB's address and delivers only to AMF pods
+      # on the node that owns externalIp, so the AMF must run on that node (nodeSelectors).
+      # On a ClusterIP Service the field needs Kubernetes 1.29 or later; older API servers
+      # reject it.
+      #externalTrafficPolicy: Local
       port: 38412
       #nodePort: 30071
     cfgFiles:
