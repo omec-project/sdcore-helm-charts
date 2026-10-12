@@ -22,6 +22,9 @@ spec:
   externalIPs:
     - {{ .Values.config.amf.ngapp.externalIp }}
 {{- end }}
+{{- if .Values.config.amf.ngapp.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.config.amf.ngapp.externalTrafficPolicy }}
+{{- end }}
   selector:
 {{ tuple "amf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
