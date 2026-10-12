@@ -135,6 +135,11 @@ config:
         measure_flow: false
         enable_notify_bess: true
         notify_sockaddr: "/pod-share/notifycp"
+        # The SMF asks for End Marker packets on the old N3 tunnel when it switches a
+        # session to a new gNB (SNDEM, TS 29.244 8.2.31); the pfcp-agent builds them and
+        # bessd sends them, through a socket the two containers must share.
+        enable_end_marker: true
+        endmarker_sockaddr: "/pod-share/pfcpport"
         cpiface:
           hostname: "upf"
           http_port: "8080"
