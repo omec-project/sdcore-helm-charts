@@ -18,4 +18,8 @@ cp /opt/$FILENAME $CFGPATH/$FILENAME
 cat $CFGPATH/$FILENAME
 echo ""
 
-GOTRACEBACK=crash sctplb -cfg $CFGPATH/$FILENAME
+# exec, so that sctplb replaces this shell and receives the SIGTERM Kubernetes sends on a
+# delete or a rollout: it drains its streams to the AMF and closes its connections before
+# it exits (sctplb v1.9.4, omec-project/sctplb#306).
+# Verified with its peers running; see #176.
+exec env GOTRACEBACK=crash sctplb -cfg $CFGPATH/$FILENAME
