@@ -21,7 +21,7 @@ jobs:
       checks: write
       id-token: write
       attestations: write
-    uses: omec-project/.github/.github/workflows/lint-charts.yml@4e868da104f24faa67be0699b937f9455b75b3d4 # v0.0.33
+    uses: omec-project/.github/.github/workflows/lint-charts.yml@f920a09dd4b3fca4d6a40f36bb75f3cd2217bd59 # v0.0.34
     secrets: inherit
     with:
       branch_name: ${{ github.ref }}
@@ -31,7 +31,7 @@ jobs:
       contents: read
       id-token: write
       attestations: write
-    uses: omec-project/.github/.github/workflows/license-check.yml@4e868da104f24faa67be0699b937f9455b75b3d4 # v0.0.33
+    uses: omec-project/.github/.github/workflows/license-check.yml@f920a09dd4b3fca4d6a40f36bb75f3cd2217bd59 # v0.0.34
     with:
       branch_name: ${{ github.ref }}
 
@@ -41,7 +41,7 @@ jobs:
       security-events: write
       id-token: write
       attestations: write
-    uses: omec-project/.github/.github/workflows/fossa-scan.yml@4e868da104f24faa67be0699b937f9455b75b3d4 # v0.0.33
+    uses: omec-project/.github/.github/workflows/fossa-scan.yml@f920a09dd4b3fca4d6a40f36bb75f3cd2217bd59 # v0.0.34
     with:
       branch_name: ${{ github.ref }}
 
@@ -67,6 +67,6 @@ jobs:
       security-events: write
       statuses: read
       vulnerability-alerts: read
-    uses: omec-project/.github/.github/workflows/scorecard-analysis.yml@4e868da104f24faa67be0699b937f9455b75b3d4 # v0.0.33
+    uses: omec-project/.github/.github/workflows/scorecard-analysis.yml@f920a09dd4b3fca4d6a40f36bb75f3cd2217bd59 # v0.0.34
     with:
       branch_name: ${{ github.ref }}
