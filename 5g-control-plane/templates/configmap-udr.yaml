@@ -12,7 +12,7 @@
 {{- $sbi := index $config "sbi" }}
 
 {{- if not (hasKey $config "mongodb") -}}
-{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url "authKeysDbName" .Values.config.mongodb.authKeysDbName "authUrl" .Values.config.mongodb.authUrl | set $config "mongodb" -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" (include "5g-control-plane.mongodbUrl" .) "authKeysDbName" .Values.config.mongodb.authKeysDbName "authUrl" (include "5g-control-plane.mongodbAuthUrl" .) | set $config "mongodb" -}}
 {{- end }}
 
 {{- if not (hasKey $udrcfg "logger") -}}
@@ -26,12 +26,12 @@
 
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: {{ include "5g-control-plane.nfConfigKind" . }}
 metadata:
   name: udr
   labels:
 {{ tuple "udr" . | include "5g-control-plane.metadata_labels" | indent 4 }}
-data:
+{{ include "5g-control-plane.nfConfigData" . }}:
   udr-run.sh: |
 {{ tuple "bin/_udr-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
 {{- if not .Values.config.useExistingConfigMap -}}

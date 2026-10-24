@@ -1,0 +1,87 @@
+{{- /*
+SPDX-FileCopyrightText: 2026-present Aether Project (Part of Linux Foundation) <dev@lists.aetherproject.org>
+SPDX-License-Identifier: Apache-2.0
+*/ -}}
+{{- if .Values.mongodbCommunity.enabled }}
+{{- if .Values.mongodb.deploy }}
+{{- fail "mongodbCommunity.enabled replaces Bitnami's MongoDB: set mongodb.deploy to false" }}
+{{- end }}
+{{- $m := .Values.mongodbCommunity }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ printf "%s-password" $m.name | quote }}
+  labels:
+{{ tuple "mongodb" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+type: Opaque
+stringData:
+  password: {{ required "mongodbCommunity.password must be set when mongodbCommunity.enabled is true" $m.password | quote }}
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: {{ $m.name | quote }}
+  labels:
+{{ tuple "mongodb" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  type: ReplicaSet
+  version: {{ $m.version | quote }}
+  members: {{ $m.members }}
+  arbiters: {{ $m.arbiters }}
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: {{ $m.user | quote }}
+      db: admin
+      passwordSecretRef:
+        name: {{ printf "%s-password" $m.name | quote }}
+      scramCredentialsSecretName: {{ printf "%s-scram" $m.name | quote }}
+      roles:
+        - name: readWriteAnyDatabase
+          db: admin
+        - name: dbAdminAnyDatabase
+          db: admin
+        - name: clusterMonitor
+          db: admin
+  # Applies to the data members and the arbiter. Interim settings until the
+  # operator release that contains each fix is pinned: the operator's pods run
+  # with group 0 (mongodb/mongodb-kubernetes#1698) and mongod has no liveness
+  # probe (mongodb/mongodb-kubernetes#1628, #1700).
+  statefulSet:
+    spec:
+      template:
+        spec:
+          # The operator replaces its pod securityContext with this one rather
+          # than merging the fields, so the whole context is repeated here:
+          # a group without a user fails the pod sandbox.
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: mongod
+              securityContext:
+                runAsGroup: 2000
+              resources:
+                {{- toYaml $m.resources.mongod | nindent 16 }}
+              # Generous on purpose: the automation agent stops and restarts
+              # mongod during upgrades and reconfiguration, and the probe must
+              # not race it. Restarts mongod only after five minutes without
+              # its port.
+              livenessProbe:
+                tcpSocket:
+                  port: 27017
+                initialDelaySeconds: 60
+                periodSeconds: 30
+                timeoutSeconds: 5
+                failureThreshold: 10
+            - name: mongodb-agent
+              securityContext:
+                runAsGroup: 2000
+              resources:
+                {{- toYaml $m.resources.agent | nindent 16 }}
+{{- end }}

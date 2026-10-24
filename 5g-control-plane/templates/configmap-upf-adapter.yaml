@@ -11,7 +11,7 @@
 {{- $upfadaptercfg := index .Values.config.upfadapter.cfgFiles "upfadaptercfg.yaml" }}
 
 {{- if not (hasKey $upfadaptercfg "mongodb") -}}
-{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $upfadaptercfg "mongodb" -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" (include "5g-control-plane.mongodbUrl" .) | set $upfadaptercfg "mongodb" -}}
 {{- end }}
 {{- if not (hasKey $upfadaptercfg "logger") -}}
 {{- $_ := .Values.config.logger | set $upfadaptercfg "logger" -}}
@@ -24,12 +24,12 @@
 
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: {{ include "5g-control-plane.nfConfigKind" . }}
 metadata:
   name: upf-adapter
   labels:
 {{ tuple "upfadapter" . | include "5g-control-plane.metadata_labels" | indent 4 }}
-data:
+{{ include "5g-control-plane.nfConfigData" . }}:
   upf-adapter-run.sh: |
 {{ tuple "bin/_upf-adapter-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
 {{- if not .Values.config.useExistingConfigMap -}}
