@@ -22,9 +22,14 @@ spec:
     metadata:
       labels:
 {{ tuple "upfadapter" . | include "5g-control-plane.metadata_labels" | indent 8 }}
-    {{- with .Values.config.upfadapter.podAnnotations }}
+    {{- if or .Values.config.upfadapter.podAnnotations .Values.mongodbCommunity.enabled }}
       annotations:
+    {{- if .Values.mongodbCommunity.enabled }}
+        checksum/mongodb-credentials: {{ include "5g-control-plane.mongodbCredentialsChecksum" . | quote }}
+    {{- end }}
+    {{- with .Values.config.upfadapter.podAnnotations }}
         {{- toYaml . | nindent 8 }}
+    {{- end }}
     {{- end }}
     spec:
     {{- if and .Values.podSecurityContext (not .Values.config.coreDump.enabled) }}
@@ -70,8 +75,13 @@ spec:
       {{- end }}
       volumes:
       - name: nf-config
+        {{- if .Values.mongodbCommunity.enabled }}
+        secret:
+          secretName: upf-adapter
+        {{- else }}
         configMap:
           name: upf-adapter
+        {{- end }}
           defaultMode: 493
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs

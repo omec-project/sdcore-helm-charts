@@ -12,7 +12,7 @@
 {{- $sbi := index $smfcfg.configuration "sbi" }}
 
 {{- if not (hasKey $smfcfg.configuration "mongodb") -}}
-{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $smfcfg.configuration "mongodb" -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" (include "5g-control-plane.mongodbUrl" .) | set $smfcfg.configuration "mongodb" -}}
 {{- end }}
 
 {{- if not (hasKey $smfcfg "logger") -}}
@@ -32,12 +32,12 @@
 
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: {{ include "5g-control-plane.nfConfigKind" . }}
 metadata:
   name: smf
   labels:
 {{ tuple "smf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
-data:
+{{ include "5g-control-plane.nfConfigData" . }}:
   smf-run.sh: |
 {{ tuple "bin/_smf-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
 {{- if not .Values.config.useExistingConfigMap -}}

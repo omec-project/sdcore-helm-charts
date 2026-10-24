@@ -25,6 +25,9 @@ spec:
 {{ tuple "amf" . | include "5g-control-plane.metadata_labels" | indent 8 }}
       annotations:
     {{- tuple "amf" . | include "5g-control-plane.certs_pod_annotations" | nindent 8 }}
+    {{- if .Values.mongodbCommunity.enabled }}
+        checksum/mongodb-credentials: {{ include "5g-control-plane.mongodbCredentialsChecksum" . | quote }}
+    {{- end }}
     {{- with .Values.config.amf.podAnnotations }}
     {{- toYaml . | nindent 8 }}
     {{- end }}
@@ -104,8 +107,13 @@ spec:
       {{- end }}
       volumes:
       - name: nf-config
+        {{- if .Values.mongodbCommunity.enabled }}
+        secret:
+          secretName: amf
+        {{- else }}
         configMap:
           name: amf
+        {{- end }}
           defaultMode: 493
       - name: certs
         emptyDir: {}

@@ -20,18 +20,18 @@
 {{- end }}
 
 {{- if not (hasKey $config "mongodb") -}}
-{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $config "mongodb" -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" (include "5g-control-plane.mongodbUrl" .) | set $config "mongodb" -}}
 {{- end }}
 {{- end }}
 
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: {{ include "5g-control-plane.nfConfigKind" . }}
 metadata:
   name: pcf
   labels:
 {{ tuple "pcf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
-data:
+{{ include "5g-control-plane.nfConfigData" . }}:
   pcf-run.sh: |
 {{ tuple "bin/_pcf-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
 {{- if not .Values.config.useExistingConfigMap -}}

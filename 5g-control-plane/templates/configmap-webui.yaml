@@ -15,19 +15,19 @@
 {{- end }}
 
 {{- if not (hasKey $config "mongodb") -}}
-{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url "authKeysDbName" .Values.config.mongodb.authKeysDbName "authUrl" .Values.config.mongodb.authUrl "webuiDbName" .Values.config.mongodb.webuiDbName "webuiDbUrl" .Values.config.mongodb.webuiDbUrl | set $config "mongodb" -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" (include "5g-control-plane.mongodbUrl" .) "authKeysDbName" .Values.config.mongodb.authKeysDbName "authUrl" (include "5g-control-plane.mongodbAuthUrl" .) "webuiDbName" .Values.config.mongodb.webuiDbName "webuiDbUrl" .Values.config.mongodb.webuiDbUrl | set $config "mongodb" -}}
 {{- end }}
 
 {{- end }}
 
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: {{ include "5g-control-plane.nfConfigKind" . }}
 metadata:
   name: webui
   labels:
 {{ tuple "webui" . | include "5g-control-plane.metadata_labels" | indent 4 }}
-data:
+{{ include "5g-control-plane.nfConfigData" . }}:
   webui-run.sh: |
 {{ tuple "bin/_webui-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
 {{- if not .Values.config.useExistingConfigMap -}}

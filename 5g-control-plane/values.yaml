@@ -179,6 +179,9 @@ kafka:
     repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
     # tag: 4.0.0-debian-12-r10
 
+# Bitnami's MongoDB chart, the default. Its images are the frozen
+# bitnamilegacy ones (#85, #203); mongodbCommunity below is the replacement
+# being introduced. Set deploy to false when enabling it.
 mongodb:
   deploy: true
   fullnameOverride: mongodb
@@ -223,6 +226,56 @@ mongodb:
     # registry: ""
     repository: bitnamilegacy/mongodb # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/mongodb)
     # tag: latest
+
+# MongoDB through MongoDB's own operator (MongoDB Controllers for Kubernetes,
+# https://github.com/mongodb/mongodb-kubernetes), instead of Bitnami's chart
+# (#203). Opt-in for now. Prerequisites and differences:
+# - The operator and its CRDs are installed in the cluster first, watching
+#   this release's namespace, e.g.
+#   helm install mongodb-kubernetes mongodb/mongodb-kubernetes -n <ns>
+#     --set operator.watchNamespace=<ns>
+# - Authentication is always on: the operator creates the SCRAM user below,
+#   and the chart writes its credentials into the network functions' MongoDB
+#   URL, built from name and the operator's Service <name>-svc
+#   (config.mongodb.url and authUrl are not used then). The configuration of
+#   AMF, NRF, PCF, SMF, UDR, UPF adapter and WebUI is therefore rendered as
+#   Secrets instead of ConfigMaps.
+# - Every member gets a persistent volume, so the cluster needs a default
+#   StorageClass; node drains need storage that can follow a pod.
+# - Set mongodb.deploy to false. There is no data to move from a default
+#   install, which runs Bitnami's MongoDB without persistence.
+mongodbCommunity:
+  enabled: false
+  # The MongoDBCommunity resource and replica set name; the Service is
+  # <name>-svc.
+  name: mongodb
+  version: "8.0.13"
+  # Two data members and an arbiter, as with the Bitnami chart (#180).
+  members: 2
+  arbiters: 1
+  # The user the network functions connect as, with readWrite and dbAdmin on
+  # every database.
+  user: aether
+  # Required when enabled; kept in a Secret and in the functions' configuration
+  # Secrets.
+  password: ""
+  resources:
+    # The sizes the Bitnami chart uses for MongoDB.
+    mongod:
+      requests:
+        cpu: 2
+        memory: 1Gi
+      limits:
+        cpu: 4
+        memory: 2Gi
+    # The automation agent next to each mongod.
+    agent:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
 
 config:
   certs:
