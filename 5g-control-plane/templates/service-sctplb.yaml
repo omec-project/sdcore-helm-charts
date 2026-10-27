@@ -1,4 +1,5 @@
 {{/*
+# Copyright (c) 2026 Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
@@ -21,12 +22,5 @@ spec:
   selector:
 {{ tuple "sctplb" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
-  - name: ngapp
-    port: {{ .Values.config.sctplb.ngapp.port }}
-    protocol: SCTP
-{{- if eq .Values.config.sctplb.serviceType "NodePort" }}
-{{- if .Values.config.sctplb.ngapp.nodePort }}
-    nodePort: {{ .Values.config.sctplb.ngapp.nodePort }}
-{{- end }}
-{{- end }}
+{{- tuple "ngapp" .Values.config.sctplb.ngapp "SCTP" .Values.config.sctplb.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
 {{- end }}

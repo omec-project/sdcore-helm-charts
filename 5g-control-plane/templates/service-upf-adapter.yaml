@@ -1,5 +1,5 @@
 {{/*
-# SPDX-FileCopyrightText: 2022-present Intel Corporation
+# Copyright (c) 2022-present Intel Corporation
 
 # SPDX-License-Identifier: Apache-2.0
 */}}
@@ -17,14 +17,7 @@ spec:
   selector:
 {{ tuple "upfadapter" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
-  - name: pfcp
-    port: {{ .Values.config.upfadapter.n4.port }}
-    protocol: UDP
-{{- if eq .Values.config.upfadapter.serviceType "NodePort" }}
-{{- if .Values.config.upfadapter.n4.nodePort }}
-    nodePort: {{ .Values.config.upfadapter.n4.nodePort }}
-{{- end }}
-{{- end }}
+{{- tuple "pfcp" .Values.config.upfadapter.n4 "UDP" .Values.config.upfadapter.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
   - name: upfadapter-rest
     port: {{ .Values.config.upfadapter.rest.port }}
     protocol: TCP

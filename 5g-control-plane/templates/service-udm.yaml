@@ -1,4 +1,5 @@
 {{/*
+# Copyright (c) 2026 Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
@@ -17,20 +18,6 @@ spec:
   selector:
 {{ tuple "udm" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
-  - name: prometheus-exporter
-    port: {{ .Values.config.udm.prometheus.port }}
-    protocol: TCP
-{{- if eq .Values.config.udm.serviceType "NodePort" }}
-{{- if .Values.config.udm.prometheus.nodePort }}
-    nodePort: {{ .Values.config.udm.prometheus.nodePort }}
-{{- end }}
-{{- end }}
-  - name: sbi
-    port: {{ .Values.config.udm.sbi.port }}
-    protocol: TCP
-{{- if eq .Values.config.udm.serviceType "NodePort" }}
-{{- if .Values.config.udm.sbi.nodePort }}
-    nodePort: {{ .Values.config.udm.sbi.nodePort }}
-{{- end }}
-{{- end }}
+{{- tuple "prometheus-exporter" .Values.config.udm.prometheus "TCP" .Values.config.udm.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- tuple "sbi" .Values.config.udm.sbi "TCP" .Values.config.udm.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
 {{- end }}

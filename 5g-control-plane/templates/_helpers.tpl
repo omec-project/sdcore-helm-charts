@@ -1,5 +1,6 @@
 {{- /*
 
+# Copyright (c) 2026 Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -542,4 +543,95 @@ new URL.
 */}}
 {{- define "5g-control-plane.mongodbCredentialsChecksum" -}}
 {{- printf "%s:%s" .Values.mongodbCommunity.user .Values.mongodbCommunity.password | sha256sum -}}
+{{- end -}}
+
+{{/*
+Render one port of a network function Service. The nodePort is only set when
+the Service is of type NodePort and the port's values carry one.
+Usage: {{- tuple "sbi" .Values.config.<nf>.sbi "TCP" .Values.config.<nf>.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+*/}}
+{{- define "5g-control-plane.service_port" -}}
+{{- $name := index . 0 -}}
+{{- $port := index . 1 -}}
+{{- $protocol := index . 2 -}}
+{{- $serviceType := index . 3 -}}
+- name: {{ $name }}
+  port: {{ $port.port }}
+  protocol: {{ $protocol }}
+{{- if and (eq $serviceType "NodePort") $port.nodePort }}
+  nodePort: {{ $port.nodePort }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Render the pod spec fields every network function Pod shares: the security
+context, the ServiceAccount, the node selector and the image pull secrets.
+Usage: {{- tuple "<nf>" . | include "5g-control-plane.pod_common" | nindent 6 }}
+*/}}
+{{- define "5g-control-plane.pod_common" -}}
+{{- $serviceAccount := index . 0 -}}
+{{- $context := index . 1 -}}
+{{- if and $context.Values.podSecurityContext (not $context.Values.config.coreDump.enabled) }}
+securityContext:
+{{ toYaml $context.Values.podSecurityContext | indent 2 }}
+{{- end }}
+serviceAccountName: {{ $serviceAccount }}
+{{- if $context.Values.nodeSelectors.enabled }}
+nodeSelector:
+  {{ $context.Values.nodeSelectors.label }}: {{ $context.Values.nodeSelectors.value | quote }}
+{{- end }}
+{{- if hasKey $context.Values.images "pullSecrets" }}
+imagePullSecrets:
+{{ toYaml $context.Values.images.pullSecrets | indent 2 }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Render init container that waits for a Service name to resolve in DNS.
+Usage: {{- tuple "wait-<nf>-module" "<service>" . | include "5g-control-plane.wait_dns" | nindent 6 }}
+*/}}
+{{- define "5g-control-plane.wait_dns" -}}
+{{- $name := index . 0 -}}
+{{- $service := index . 1 -}}
+{{- $context := index . 2 -}}
+- name: {{ $name }}
+  image: {{ $context.Values.images.repository }}{{ $context.Values.images.tags.init }}
+  imagePullPolicy: {{ $context.Values.images.pullPolicy }}
+  command: ['sh', '-c', 'until nslookup {{ $service }}; do echo waiting for {{ $service }}; sleep 4; done;']
+{{- end -}}
+
+{{/*
+Render the volumes that hold the certificates of a network function (the
+emptyDir the certs init container fills, and the Secrets it reads) and, with
+config.coreDump.enabled, the host paths the coredump init container needs.
+Usage: {{- tuple "<nf>" . | include "5g-control-plane.certs_volumes" | nindent 6 }}
+*/}}
+{{- define "5g-control-plane.certs_volumes" -}}
+{{- $name := index . 0 -}}
+{{- $context := index . 1 -}}
+- name: certs
+  emptyDir: {}
+- name: certs-src
+  projected:
+    sources:
+      - secret:
+          name: {{ $name }}-certs
+          items:
+            - key: tls.crt
+              path: tls.crt
+            - key: tls.key
+              path: tls.key
+      - secret:
+          name: {{ include "5g-control-plane.shared-ca-secret-name" $context }}
+          items:
+            - key: ca.crt
+              path: ca.crt
+{{- if $context.Values.config.coreDump.enabled }}
+- name: host-rootfs
+  hostPath:
+    path: /
+- name: coredump
+  hostPath:
+    path: {{ $context.Values.config.coreDump.path }}
+{{- end }}
 {{- end -}}

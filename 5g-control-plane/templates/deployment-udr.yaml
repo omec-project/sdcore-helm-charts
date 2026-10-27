@@ -32,27 +32,12 @@ spec:
     {{- toYaml . | nindent 8 }}
     {{- end }}
     spec:
-    {{- if and .Values.podSecurityContext (not .Values.config.coreDump.enabled) }}
-      securityContext:
-{{ toYaml .Values.podSecurityContext | indent 8 }}
-    {{- end }}
-      serviceAccountName: udr
-    {{- if .Values.nodeSelectors.enabled }}
-      nodeSelector:
-        {{ .Values.nodeSelectors.label }}: {{ .Values.nodeSelectors.value | quote }}
-    {{- end }}
-    {{- if hasKey .Values.images "pullSecrets" }}
-      imagePullSecrets:
-{{ toYaml .Values.images.pullSecrets | indent 8 }}
-    {{- end }}
+    {{- tuple "udr" . | include "5g-control-plane.pod_common" | trim | nindent 6 }}
       initContainers:
       {{- if .Values.config.webui.deploy }}
       {{- tuple . | include "5g-control-plane.wait_webui" | nindent 6 }}
       {{- end }}
-      - name: wait-udr-module
-        image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
-        imagePullPolicy: {{ .Values.images.pullPolicy }}
-        command: ['sh', '-c', 'until nslookup udr; do echo waiting for udr; sleep 4; done;']
+      {{- tuple "wait-udr-module" "udr" . | include "5g-control-plane.wait_dns" | nindent 6 }}
     {{ tuple "udr" . | include "5g-control-plane.certs_init" | nindent 6 }}
       {{ if .Values.config.coreDump.enabled }}
 {{ tuple "udr" . | include "5g-control-plane.coredump_init" | nindent 6 }}
@@ -101,29 +86,5 @@ spec:
           name: udr
         {{- end }}
           defaultMode: 493
-      - name: certs
-        emptyDir: {}
-      - name: certs-src
-        projected:
-          sources:
-            - secret:
-                name: udr-certs
-                items:
-                  - key: tls.crt
-                    path: tls.crt
-                  - key: tls.key
-                    path: tls.key
-            - secret:
-                name: {{ include "5g-control-plane.shared-ca-secret-name" . }}
-                items:
-                  - key: ca.crt
-                    path: ca.crt
-    {{- if .Values.config.coreDump.enabled }}
-      - name: host-rootfs
-        hostPath:
-          path: /
-      - name: coredump
-        hostPath:
-          path: {{ .Values.config.coreDump.path }}
-    {{- end }}
+      {{- tuple "udr" . | include "5g-control-plane.certs_volumes" | nindent 6 }}
 {{- end }}

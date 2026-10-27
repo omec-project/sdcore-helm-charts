@@ -32,19 +32,7 @@ spec:
     {{- toYaml . | nindent 8 }}
     {{- end }}
     spec:
-    {{- if and .Values.podSecurityContext (not .Values.config.coreDump.enabled) }}
-      securityContext:
-{{ toYaml .Values.podSecurityContext | indent 8 }}
-    {{- end }}
-      serviceAccountName: smf
-    {{- if .Values.nodeSelectors.enabled }}
-      nodeSelector:
-        {{ .Values.nodeSelectors.label }}: {{ .Values.nodeSelectors.value | quote }}
-    {{- end }}
-    {{- if hasKey .Values.images "pullSecrets" }}
-      imagePullSecrets:
-{{ toYaml .Values.images.pullSecrets | indent 8 }}
-    {{- end }}
+    {{- tuple "smf" . | include "5g-control-plane.pod_common" | trim | nindent 6 }}
       initContainers:
       {{- if .Values.config.webui.deploy }}
       {{- tuple . | include "5g-control-plane.wait_webui" | nindent 6 }}
@@ -105,29 +93,5 @@ spec:
           name: smf
         {{- end }}
           defaultMode: 493
-      - name: certs
-        emptyDir: {}
-      - name: certs-src
-        projected:
-          sources:
-            - secret:
-                name: smf-certs
-                items:
-                  - key: tls.crt
-                    path: tls.crt
-                  - key: tls.key
-                    path: tls.key
-            - secret:
-                name: {{ include "5g-control-plane.shared-ca-secret-name" . }}
-                items:
-                  - key: ca.crt
-                    path: ca.crt
-    {{- if .Values.config.coreDump.enabled }}
-      - name: host-rootfs
-        hostPath:
-          path: /
-      - name: coredump
-        hostPath:
-          path: {{ .Values.config.coreDump.path }}
-    {{- end }}
+      {{- tuple "smf" . | include "5g-control-plane.certs_volumes" | nindent 6 }}
 {{- end }}

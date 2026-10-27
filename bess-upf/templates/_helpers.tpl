@@ -1,5 +1,6 @@
 {{- /*
 
+# Copyright (c) 2026 Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -83,4 +84,50 @@ or "sriov-device-plugin" for the sriov-device-plugin initContainer.
   volumeMounts:
     - name: cni-bin
       mountPath: /host/opt/cni/bin
+{{- end -}}
+
+{{/*
+Render a Service's metadata and the spec up to its ports: labels, annotations,
+type, external IP and selector. The caller adds the ports.
+Usage: {{ tuple "upf-http" "upf" . | include "omec-user-plane.service_head" }}
+*/}}
+{{- define "omec-user-plane.service_head" -}}
+{{- $name := index . 0 -}}
+{{- $app := index . 1 -}}
+{{- $context := index . 2 -}}
+metadata:
+  name: {{ $name }}
+  labels:
+{{ tuple $app $context | include "omec-user-plane.metadata_labels" | indent 4 }}
+{{- with $context.Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+spec:
+  type: {{ $context.Values.service.type }}
+{{- if $context.Values.service.externalIp }}
+  externalIPs:
+    - {{ $context.Values.service.externalIp }}
+{{- end }}
+  selector:
+{{ tuple $app $context | include "omec-user-plane.metadata_labels" | indent 4 }}
+{{- end -}}
+
+{{/*
+Render one port of the UPF Services. The nodePort is only set when the Service
+is of type NodePort.
+Usage: {{- tuple "pfcp" "UDP" 8805 .Values.service.nodePort . | include "omec-user-plane.service_port" | nindent 2 }}
+*/}}
+{{- define "omec-user-plane.service_port" -}}
+{{- $name := index . 0 -}}
+{{- $protocol := index . 1 -}}
+{{- $port := index . 2 -}}
+{{- $nodePort := index . 3 -}}
+{{- $context := index . 4 -}}
+- name: {{ $name }}
+  protocol: {{ $protocol }}
+  port: {{ $port }}
+{{- if and (eq $context.Values.service.type "NodePort") $nodePort }}
+  nodePort: {{ $nodePort }}
+{{- end }}
 {{- end -}}

@@ -1,4 +1,5 @@
 {{/*
+# Copyright (c) 2026 Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
@@ -28,38 +29,10 @@ spec:
   selector:
 {{ tuple "amf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
-  - name: prometheus-exporter
-    port: {{ .Values.config.amf.prometheus.port }}
-    protocol: TCP
-{{- if eq .Values.config.amf.serviceType "NodePort" }}
-{{- if .Values.config.amf.prometheus.nodePort }}
-    nodePort: {{ .Values.config.amf.prometheus.nodePort }}
-{{- end }}
-{{- end }}
-  - name: sbi
-    port: {{ .Values.config.amf.sbi.port }}
-    protocol: TCP
-{{- if eq .Values.config.amf.serviceType "NodePort" }}
-{{- if .Values.config.amf.sbi.nodePort }}
-    nodePort: {{ .Values.config.amf.sbi.nodePort }}
-{{- end }}
-{{- end }}
-  - name: ngapp
-    port: {{ .Values.config.amf.ngapp.port }}
-    protocol: SCTP
-{{- if eq .Values.config.amf.serviceType "NodePort" }}
-{{- if .Values.config.amf.ngapp.nodePort }}
-    nodePort: {{ .Values.config.amf.ngapp.nodePort }}
-{{- end }}
-{{- end }}
-  - name: sctp-grpc
-    port: {{ .Values.config.amf.sctp_grpc.port }}
-    protocol: TCP
-{{- if eq .Values.config.amf.serviceType "NodePort" }}
-{{- if .Values.config.amf.sctp_grpc.nodePort }}
-    nodePort: {{ .Values.config.amf.sctp_grpc.nodePort }}
-{{- end }}
-{{- end }}
+{{- tuple "prometheus-exporter" .Values.config.amf.prometheus "TCP" .Values.config.amf.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- tuple "sbi" .Values.config.amf.sbi "TCP" .Values.config.amf.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- tuple "ngapp" .Values.config.amf.ngapp "SCTP" .Values.config.amf.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- tuple "sctp-grpc" .Values.config.amf.sctp_grpc "TCP" .Values.config.amf.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
 ---
 apiVersion: v1
 kind: Service

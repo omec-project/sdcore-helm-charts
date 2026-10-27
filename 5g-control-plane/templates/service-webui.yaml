@@ -1,4 +1,5 @@
 {{/*
+# Copyright (c) 2026 Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
@@ -21,28 +22,7 @@ spec:
   selector:
 {{ tuple "webui" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
-  - name: prometheus-exporter
-    port: {{ .Values.config.webui.prometheus.port }}
-    protocol: TCP
-{{- if eq .Values.config.webui.serviceType "NodePort" }}
-{{- if .Values.config.webui.prometheus.nodePort }}
-    nodePort: {{ .Values.config.webui.prometheus.nodePort }}
-{{- end }}
-{{- end }}
-  - name: urlport-http
-    port: {{ .Values.config.webui.urlport.port }}
-    protocol: TCP
-{{- if eq .Values.config.webui.serviceType "NodePort" }}
-{{- if .Values.config.webui.urlport.nodePort }}
-    nodePort: {{ .Values.config.webui.urlport.nodePort }}
-{{- end }}
-{{- end }}
-  - name: rest
-    port: {{ .Values.config.webui.rest.port }}
-    protocol: TCP
-{{- if eq .Values.config.webui.serviceType "NodePort" }}
-{{- if .Values.config.webui.rest.nodePort }}
-    nodePort: {{ .Values.config.webui.rest.nodePort }}
-{{- end }}
-{{- end }}
+{{- tuple "prometheus-exporter" .Values.config.webui.prometheus "TCP" .Values.config.webui.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- tuple "urlport-http" .Values.config.webui.urlport "TCP" .Values.config.webui.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- tuple "rest" .Values.config.webui.rest "TCP" .Values.config.webui.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
 {{- end }}
