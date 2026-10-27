@@ -14,7 +14,12 @@ CFGPATH=/tmp
 FILENAME=upfadaptercfg.yaml
 # copy config file from configmap (/opt) to a directory a non-root user can write (/tmp)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
+{{- if .Values.mongodbCommunity.enabled }}
+# The MongoDB URL carries the operator's password: printed without it.
+sed -E 's#(mongodb://[^:/@]*:)[^@]*@#\1****@#g' $CFGPATH/$FILENAME
+{{- else }}
 cat $CFGPATH/$FILENAME
+{{- end }}
 echo ""
 
 # exec, so that the UPF adapter replaces this shell and receives the SIGTERM Kubernetes

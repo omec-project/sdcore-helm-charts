@@ -23,7 +23,7 @@
 {{- end }}
 
 {{- if not (hasKey $amfcfg.configuration "mongodb") -}}
-{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $amfcfg.configuration "mongodb" -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" (include "5g-control-plane.mongodbUrl" .) | set $amfcfg.configuration "mongodb" -}}
 {{- end }}
 
 {{- if not (hasKey $amfcfg "logger") -}}
@@ -43,12 +43,12 @@
 
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: {{ include "5g-control-plane.nfConfigKind" . }}
 metadata:
   name: amf
   labels:
 {{ tuple "amf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
-data:
+{{ include "5g-control-plane.nfConfigData" . }}:
   amf-run.sh: |
 {{ tuple "bin/_amf-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
 {{- if not .Values.config.useExistingConfigMap -}}

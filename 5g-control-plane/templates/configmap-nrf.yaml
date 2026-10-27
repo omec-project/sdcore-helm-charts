@@ -12,7 +12,7 @@
 {{- $sbi := index $config "sbi" }}
 
 {{- if not (hasKey $config "mongodb") -}}
-{{- $_ := dict "name" .Values.config.mongodb.name "url" .Values.config.mongodb.url | set $config "mongodb" -}}
+{{- $_ := dict "name" .Values.config.mongodb.name "url" (include "5g-control-plane.mongodbUrl" .) | set $config "mongodb" -}}
 {{- end }}
 
 {{- if not (hasKey $config "MongoDBName") -}}
@@ -20,7 +20,7 @@
 {{- end }}
 
 {{- if not (hasKey $config "MongoDBUrl") -}}
-{{- $_ := .Values.config.mongodb.url | set $config "MongoDBUrl" -}}
+{{- $_ := (include "5g-control-plane.mongodbUrl" .) | set $config "MongoDBUrl" -}}
 {{- end }}
 
 {{- if not (hasKey $nrfcfg "logger") -}}
@@ -34,12 +34,12 @@
 
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: {{ include "5g-control-plane.nfConfigKind" . }}
 metadata:
   name: nrf
   labels:
 {{ tuple "nrf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
-data:
+{{ include "5g-control-plane.nfConfigData" . }}:
   nrf-run.sh: |
 {{ tuple "bin/_nrf-run.sh.tpl" . | include "5g-control-plane.template" | indent 4 }}
 {{- if not .Values.config.useExistingConfigMap -}}

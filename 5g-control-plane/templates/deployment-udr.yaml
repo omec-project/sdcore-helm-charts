@@ -25,6 +25,9 @@ spec:
 {{ tuple "udr" . | include "5g-control-plane.metadata_labels" | indent 8 }}
       annotations:
     {{- tuple "udr" . | include "5g-control-plane.certs_pod_annotations" | nindent 8 }}
+    {{- if .Values.mongodbCommunity.enabled }}
+        checksum/mongodb-credentials: {{ include "5g-control-plane.mongodbCredentialsChecksum" . | quote }}
+    {{- end }}
     {{- with .Values.config.udr.podAnnotations }}
     {{- toYaml . | nindent 8 }}
     {{- end }}
@@ -87,8 +90,13 @@ spec:
       {{- end }}
       volumes:
       - name: nf-config
+        {{- if .Values.mongodbCommunity.enabled }}
+        secret:
+          secretName: udr
+        {{- else }}
         configMap:
           name: udr
+        {{- end }}
           defaultMode: 493
       - name: certs
         emptyDir: {}

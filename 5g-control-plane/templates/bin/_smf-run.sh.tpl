@@ -17,7 +17,12 @@ UEFILENAME=uerouting.yaml
 # copy config file from configmap (/opt) to a directory a non-root user can write (/tmp)
 cp /opt/$FILENAME $CFGPATH/$FILENAME
 cp /opt/$UEFILENAME $CFGPATH/$UEFILENAME
+{{- if .Values.mongodbCommunity.enabled }}
+# The MongoDB URL carries the operator's password: printed without it.
+sed -E 's#(mongodb://[^:/@]*:)[^@]*@#\1****@#g' $CFGPATH/$FILENAME
+{{- else }}
 cat $CFGPATH/$FILENAME
+{{- end }}
 echo ""
 cat $CFGPATH/$UEFILENAME
 echo ""
