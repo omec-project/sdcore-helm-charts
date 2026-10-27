@@ -354,6 +354,22 @@ Return desired leaf certificate checksum.
 {{- end -}}
 
 {{/*
+Render init container that waits for webui to accept connections on the REST
+port. The network functions poll webui for their configuration (webuiUri) and
+back off exponentially while it is down, and the TCP probes on their SBI ports
+pass long before that, so without this wait they start serving late (e.g. UDM
+registers with the NRF only after its retry timer expires and AUSF finds no UDM).
+Usage: {{ tuple . | include "5g-control-plane.wait_webui" | nindent 6 }}
+*/}}
+{{- define "5g-control-plane.wait_webui" -}}
+{{- $context := index . 0 -}}
+- name: wait-webui-config
+  image: {{ $context.Values.images.repository }}{{ $context.Values.images.tags.init }}
+  imagePullPolicy: {{ $context.Values.images.pullPolicy }}
+  command: ['sh', '-c', 'until nslookup webui && nc -z -w 2 webui {{ $context.Values.config.webui.rest.port }}; do echo waiting for webui config port; sleep 4; done;']
+{{- end -}}
+
+{{/*
 Render init container that builds a CA bundle with system roots plus the shared CA.
 */}}
 {{- define "5g-control-plane.certs_init" -}}
