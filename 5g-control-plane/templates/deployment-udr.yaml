@@ -46,6 +46,9 @@ spec:
 {{ toYaml .Values.images.pullSecrets | indent 8 }}
     {{- end }}
       initContainers:
+      {{- if .Values.config.webui.deploy }}
+      {{- tuple . | include "5g-control-plane.wait_webui" | nindent 6 }}
+      {{- end }}
       - name: wait-udr-module
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
