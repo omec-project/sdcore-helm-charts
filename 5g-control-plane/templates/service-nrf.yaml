@@ -1,4 +1,5 @@
 {{/*
+# Copyright (c) 2026 Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
@@ -21,20 +22,6 @@ spec:
   selector:
 {{ tuple "nrf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
-  - name: prometheus-exporter
-    port: {{ .Values.config.nrf.prometheus.port }}
-    protocol: TCP
-{{- if eq .Values.config.nrf.serviceType "NodePort" }}
-{{- if .Values.config.nrf.prometheus.nodePort }}
-    nodePort: {{ .Values.config.nrf.prometheus.nodePort }}
-{{- end }}
-{{- end }}
-  - name: sbi
-    port: {{ .Values.config.nrf.sbi.port }}
-    protocol: TCP
-{{- if eq .Values.config.nrf.serviceType "NodePort" }}
-{{- if .Values.config.nrf.sbi.nodePort }}
-    nodePort: {{ .Values.config.nrf.sbi.nodePort }}
-{{- end }}
-{{- end }}
+{{- tuple "prometheus-exporter" .Values.config.nrf.prometheus "TCP" .Values.config.nrf.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- tuple "sbi" .Values.config.nrf.sbi "TCP" .Values.config.nrf.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
 {{- end }}

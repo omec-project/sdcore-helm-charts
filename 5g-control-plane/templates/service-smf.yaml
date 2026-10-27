@@ -1,4 +1,5 @@
 {{/*
+# Copyright (c) 2026 Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 
 # SPDX-License-Identifier: Apache-2.0
@@ -18,29 +19,8 @@ spec:
 {{ tuple "smf" . | include "5g-control-plane.metadata_labels" | indent 4 }}
   ports:
 {{- if eq .Values.config.upfadapter.deploy false }}
-  - name: pfcp
-    port: {{ .Values.config.smf.n4.port }}
-    protocol: UDP
-{{- if eq .Values.config.smf.serviceType "NodePort" }}
-{{- if .Values.config.smf.n4.nodePort }}
-    nodePort: {{ .Values.config.smf.n4.nodePort }}
+{{- tuple "pfcp" .Values.config.smf.n4 "UDP" .Values.config.smf.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
 {{- end }}
-{{- end }}
-{{- end }}
-  - name: prometheus-exporter
-    port: {{ .Values.config.smf.prometheus.port }}
-    protocol: TCP
-{{- if eq .Values.config.smf.serviceType "NodePort" }}
-{{- if .Values.config.smf.prometheus.nodePort }}
-    nodePort: {{ .Values.config.smf.prometheus.nodePort }}
-{{- end }}
-{{- end }}
-  - name: sbi
-    port: {{ .Values.config.smf.sbi.port }}
-    protocol: TCP
-{{- if eq .Values.config.smf.serviceType "NodePort" }}
-{{- if .Values.config.smf.sbi.nodePort }}
-    nodePort: {{ .Values.config.smf.sbi.nodePort }}
-{{- end }}
-{{- end }}
+{{- tuple "prometheus-exporter" .Values.config.smf.prometheus "TCP" .Values.config.smf.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- tuple "sbi" .Values.config.smf.sbi "TCP" .Values.config.smf.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
 {{- end }}
