@@ -1,0 +1,75 @@
+{{- /*
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+*/ -}}
+{{- if .Values.kafkaStrimzi.enabled }}
+{{- if .Values.kafka.deploy }}
+{{- fail "kafkaStrimzi.enabled replaces Bitnami's Kafka: set kafka.deploy to false" }}
+{{- end }}
+{{- $k := .Values.kafkaStrimzi }}
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: dual
+  labels:
+    strimzi.io/cluster: {{ $k.name }}
+{{ tuple "kafka" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: {{ $k.replicas }}
+  roles:
+    - controller
+    - broker
+  storage:
+    {{- toYaml $k.storage | nindent 4 }}
+  resources:
+    {{- toYaml $k.resources | nindent 4 }}
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: {{ $k.name }}
+  annotations:
+    strimzi.io/node-pools: enabled
+    strimzi.io/kraft: enabled
+  labels:
+{{ tuple "kafka" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  kafka:
+    version: {{ $k.version | quote }}
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+    config:
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+      default.replication.factor: 1
+      min.insync.replicas: 1
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+---
+# Every network function's config hardcodes the broker address "kafka:9092"
+# (config.*.kafkaInfo.brokerUri/brokerPort); this Service keeps that name
+# working against the operator-managed broker pods instead of the Bitnami
+# Service it replaces. The selector matches the broker-role label the
+# operator sets on Kafka pods.
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+{{ tuple "kafka" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  selector:
+    strimzi.io/cluster: {{ $k.name }}
+    strimzi.io/name: {{ $k.name }}-kafka
+    strimzi.io/kind: Kafka
+    strimzi.io/broker-role: "true"
+  ports:
+    - name: plain
+      port: 9092
+      targetPort: 9092
+{{- end }}
