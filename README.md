@@ -5,6 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/omec-project/sdcore-helm-charts/badge)](https://scorecard.dev/viewer/?uri=github.com/omec-project/sdcore-helm-charts)
 [![CNTi essential](https://github.com/omec-project/sdcore-helm-charts/raw/badges/cnti-badge.svg)](https://github.com/omec-project/sdcore-helm-charts/actions/workflows/cnti.yml)
+[![GitHub latest release (SemVer)](https://img.shields.io/github/v/release/omec-project/sdcore-helm-charts?sort=semver)](https://github.com/omec-project/sdcore-helm-charts/releases)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://spdx.org/licenses/Apache-2.0.html)
 
 # SDCore Helm Charts
 This repository contains Helm charts for deploying `Aether SD-Core` on Kubernetes.
@@ -12,8 +14,8 @@ This repository contains Helm charts for deploying `Aether SD-Core` on Kubernete
 Note that these Helm Charts can be used to deploy the Aether SD-Core. However,
 the user should override the values.yaml file(s) to be able to properly deploy
 all pods. One simple way to do so is by using the
-[sdcore-5g-values.yaml](https://github.com/opennetworkinglab/aether-5gc/blob/master/roles/core/templates/sdcore-5g-values.yaml)
-file from [Aether-Onramp](https://docs.aetherproject.org/master/onramp/overview.html).
+[sdcore-5g-values.yaml](https://github.com/opennetworkinglab/aether-onramp/blob/master/deps/5gc/roles/core/templates/sdcore-5g-values.yaml)
+file from [Aether-Onramp](https://docs.aetherproject.org/onramp/overview.html).
 Moreover, some values need to be accordingly updated depending on the specific
 deployment/setup as shown below.
 
@@ -37,7 +39,7 @@ component repositories; after the merge, `VERSION` moves on to the next `-dev`.
 
 ## Example of usage with Aether OnRamp
 
-It is strongly recommended to use [Aether-Onramp](https://docs.aetherproject.org/master/onramp/overview.html)
+It is strongly recommended to use [Aether-Onramp](https://docs.aetherproject.org/onramp/overview.html)
 for the deployment of the `SD-Core` because `OnRamp`, besides deploying the
 `SD-Core`, it also takes care of the networking required for the packets to be
 forwarded across the 5GC.
