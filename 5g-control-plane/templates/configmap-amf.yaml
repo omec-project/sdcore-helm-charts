@@ -35,7 +35,7 @@
 {{- end }}
 
 {{- if not (hasKey $amfcfg.configuration.kafkaInfo "enableKafka") -}}
-{{- $_ := .Values.kafka.deploy | set $amfcfg.configuration.kafkaInfo "enableKafka" -}}
+{{- $_ := .Values.kafka.enabled | set $amfcfg.configuration.kafkaInfo "enableKafka" -}}
 {{- end }}
 
 {{- end }}

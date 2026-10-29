@@ -496,28 +496,28 @@ readinessProbe:
 
 
 {{/*
-The MongoDB URL the network functions use. With mongodbCommunity.enabled it
+The MongoDB URL the network functions use. With mongodb.enabled it
 points at the replica set MongoDB's operator runs: the Service <name>-svc, the
 replica set <name>, and the SCRAM user the operator creates, whose password
 the URL carries. Otherwise config.mongodb.url (or authUrl) as set.
 */}}
-{{- define "5g-control-plane.mongodbCommunityUrl" -}}
-{{- $m := .Values.mongodbCommunity -}}
-{{- $password := required "mongodbCommunity.password must be set when mongodbCommunity.enabled is true" $m.password -}}
+{{- define "5g-control-plane.mongodbOperatorUrl" -}}
+{{- $m := .Values.mongodb -}}
+{{- $password := required "mongodb.password must be set when mongodb.enabled is true" $m.password -}}
 {{- printf "mongodb://%s:%s@%s-svc:27017/?replicaSet=%s&authSource=admin" (urlquery $m.user | replace "+" "%20") (urlquery $password | replace "+" "%20") $m.name $m.name -}}
 {{- end -}}
 
 {{- define "5g-control-plane.mongodbUrl" -}}
-{{- if .Values.mongodbCommunity.enabled -}}
-{{- include "5g-control-plane.mongodbCommunityUrl" . -}}
+{{- if .Values.mongodb.enabled -}}
+{{- include "5g-control-plane.mongodbOperatorUrl" . -}}
 {{- else -}}
 {{- .Values.config.mongodb.url -}}
 {{- end -}}
 {{- end -}}
 
 {{- define "5g-control-plane.mongodbAuthUrl" -}}
-{{- if .Values.mongodbCommunity.enabled -}}
-{{- include "5g-control-plane.mongodbCommunityUrl" . -}}
+{{- if .Values.mongodb.enabled -}}
+{{- include "5g-control-plane.mongodbOperatorUrl" . -}}
 {{- else -}}
 {{- .Values.config.mongodb.authUrl -}}
 {{- end -}}
@@ -529,11 +529,11 @@ a Secret when that URL has the operator's password in it, a ConfigMap
 otherwise.
 */}}
 {{- define "5g-control-plane.nfConfigKind" -}}
-{{- if .Values.mongodbCommunity.enabled }}Secret{{ else }}ConfigMap{{ end -}}
+{{- if .Values.mongodb.enabled }}Secret{{ else }}ConfigMap{{ end -}}
 {{- end -}}
 
 {{- define "5g-control-plane.nfConfigData" -}}
-{{- if .Values.mongodbCommunity.enabled }}stringData{{ else }}data{{ end -}}
+{{- if .Values.mongodb.enabled }}stringData{{ else }}data{{ end -}}
 {{- end -}}
 
 {{/*
@@ -542,7 +542,7 @@ configuration carries them, so that a password change rolls them out with the
 new URL.
 */}}
 {{- define "5g-control-plane.mongodbCredentialsChecksum" -}}
-{{- printf "%s:%s" .Values.mongodbCommunity.user .Values.mongodbCommunity.password | sha256sum -}}
+{{- printf "%s:%s" .Values.mongodb.user .Values.mongodb.password | sha256sum -}}
 {{- end -}}
 
 {{/*

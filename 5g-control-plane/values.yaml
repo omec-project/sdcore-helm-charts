@@ -152,51 +152,20 @@ resources:
       cpu: 1
       memory: 1Gi
 
-kafka:
-  deploy: false
-  fullnameOverride: kafka
-  listeners:
-    client:
-      protocol: PLAINTEXT
-    controller:
-      protocol: PLAINTEXT
-    interbroker:
-      protocol: PLAINTEXT
-    external:
-      protocol: PLAINTEXT
-  controller:
-    replicaCount: 1
-    persistence:
-      enabled: false
-    # Enable nodeSelector if needed to control where to deploy the kafka instance(s)
-    # nodeSelector:
-    #   node-role.aetherproject.org/5gc: "true"
-  # global:
-  #   security:
-  #     allowInsecureImages: true # set to true when using images from local repo/registry
-  image:
-    # registry: ""
-    repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
-    # tag: 4.0.0-debian-12-r10
-
-# Kafka through the Strimzi Kafka Operator (https://strimzi.io), the
-# maintained alternative to the Bitnami chart above, which is off by default
-# (kafka.deploy=false) and whose images are frozen. The operator and its CRDs
+# Kafka through the Strimzi Kafka Operator (https://strimzi.io), off by
+# default. The operator and its CRDs
 # are a cluster prerequisite, installed once and watching this chart's
 # namespace, like cert-manager; this chart only declares the Kafka and
 # KafkaNodePool resources. Every network function's config hardcodes the
 # broker address "kafka:9092" (config.*.kafkaInfo.brokerUri/brokerPort), so
 # the chart also adds a plain Service named "kafka" in front of the
-# operator-managed broker pods, instead of changing that address. It cannot
-# be combined with kafka.deploy=true, which would create a second Service
-# named "kafka". This has no tested reference deployment yet (#203); treat it
-# as a starting point.
-kafkaStrimzi:
+# operator-managed broker pods, instead of changing that address. This has no
+# tested reference deployment yet (#203); treat it as a starting point.
+kafka:
   enabled: false
   name: kafka
   version: "4.0.0"
-  # A single dual-role (broker + controller) node, matching the Bitnami
-  # chart's single-broker default above.
+  # A single dual-role (broker + controller) node.
   replicas: 1
   storage:
     type: ephemeral
@@ -208,57 +177,10 @@ kafkaStrimzi:
       cpu: 1
       memory: 1Gi
 
-# Bitnami's MongoDB chart, the default. Its images are the frozen
-# bitnamilegacy ones (#85, #203); mongodbCommunity below is the replacement
-# being introduced. Set deploy to false when enabling it.
-mongodb:
-  deploy: true
-  fullnameOverride: mongodb
-  persistence:
-    enabled: false
-  auth:
-    enabled: false
-  serviceAccount:
-    create: false
-  # Enable nodeSelector if needed to control where to deploy the mongodb instances
-  # nodeSelector:
-  #   node-role.aetherproject.org/5gc: "true"
-  # arbiter:
-  #   nodeSelector:
-  #     node-role.aetherproject.org/5gc: "true"
-  architecture: replicaset
-  # Two data members besides the arbiter, so that the replica set keeps a
-  # primary while one member is moved (a node drain or upgrade) and the moved
-  # one syncs back from the other. With persistence off, a single member loses
-  # its replica-set identity with the pod and never rejoins the arbiter (#180).
-  replicaCount: 2
-  # MongoDB is the control plane's shared datastore, and a single registration
-  # drives ~55 operations against it, so the Bitnami "small" preset (750m CPU /
-  # 768Mi) throttles attach throughput long before any NF is busy. Sizes below
-  # come from a CPU sweep against a live core: throughput scales hard up to
-  # ~4 CPU and then plateaus. The limit needs that much headroom even though the
-  # working set averages ~2 cores, because the per-attach operations arrive in
-  # bursts that a tighter limit throttles. Memory is raised to cover the ~1.6Gi
-  # working set the 768Mi default cannot hold.
-  resourcesPreset: "none"
-  resources:
-    requests:
-      cpu: 2
-      memory: 1Gi
-    limits:
-      cpu: 4
-      memory: 2Gi
-  # global:
-  #   security:
-  #     allowInsecureImages: true # set to true when using images from local repo/registry
-  image:
-    # registry: ""
-    repository: bitnamilegacy/mongodb # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/mongodb)
-    # tag: latest
-
 # MongoDB through MongoDB's own operator (MongoDB Controllers for Kubernetes,
-# https://github.com/mongodb/mongodb-kubernetes), instead of Bitnami's chart
-# (#203). Opt-in for now. Prerequisites and differences:
+# https://github.com/mongodb/mongodb-kubernetes) (#203). On by default; set
+# enabled to false to use the external MongoDB that config.mongodb.url and
+# authUrl point to instead. Prerequisites and differences:
 # - The operator and its CRDs are installed in the cluster first, watching
 #   this release's namespace, e.g.
 #   helm install mongodb-kubernetes mongodb/mongodb-kubernetes -n <ns>
@@ -271,15 +193,13 @@ mongodb:
 #   Secrets instead of ConfigMaps.
 # - Every member gets a persistent volume, so the cluster needs a default
 #   StorageClass; node drains need storage that can follow a pod.
-# - Set mongodb.deploy to false. There is no data to move from a default
-#   install, which runs Bitnami's MongoDB without persistence.
-mongodbCommunity:
-  enabled: false
+mongodb:
+  enabled: true
   # The MongoDBCommunity resource and replica set name; the Service is
   # <name>-svc.
   name: mongodb
   version: "8.0.13"
-  # Two data members and an arbiter, as with the Bitnami chart (#180).
+  # Two data members and an arbiter, so that the replica set keeps a primary while a member moves (#180).
   members: 2
   arbiters: 1
   # The user the network functions connect as, with readWrite and dbAdmin on
@@ -289,7 +209,7 @@ mongodbCommunity:
   # Secrets.
   password: ""
   resources:
-    # The sizes the Bitnami chart uses for MongoDB.
+    # MongoDB is the control plane's shared datastore; sized from a CPU sweep.
     mongod:
       requests:
         cpu: 2

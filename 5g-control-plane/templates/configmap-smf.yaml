@@ -25,7 +25,7 @@
 {{- $_ := .Values.config.upfadapter.deploy | set $smfcfg.configuration "enableUPFAdapter" -}}
 {{- end }}
 {{- if not (hasKey $smfcfg.configuration.kafkaInfo "enableKafka") -}}
-{{- $_ := .Values.kafka.deploy | set $smfcfg.configuration.kafkaInfo "enableKafka" -}}
+{{- $_ := .Values.kafka.enabled | set $smfcfg.configuration.kafkaInfo "enableKafka" -}}
 {{- end }}
 
 {{- end }}
