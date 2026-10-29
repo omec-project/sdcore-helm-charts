@@ -179,6 +179,35 @@ kafka:
     repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
     # tag: 4.0.0-debian-12-r10
 
+# Kafka through the Strimzi Kafka Operator (https://strimzi.io), the
+# maintained alternative to the Bitnami chart above, which is off by default
+# (kafka.deploy=false) and whose images are frozen. The operator and its CRDs
+# are a cluster prerequisite, installed once and watching this chart's
+# namespace, like cert-manager; this chart only declares the Kafka and
+# KafkaNodePool resources. Every network function's config hardcodes the
+# broker address "kafka:9092" (config.*.kafkaInfo.brokerUri/brokerPort), so
+# the chart also adds a plain Service named "kafka" in front of the
+# operator-managed broker pods, instead of changing that address. It cannot
+# be combined with kafka.deploy=true, which would create a second Service
+# named "kafka". This has no tested reference deployment yet (#203); treat it
+# as a starting point.
+kafkaStrimzi:
+  enabled: false
+  name: kafka
+  version: "4.0.0"
+  # A single dual-role (broker + controller) node, matching the Bitnami
+  # chart's single-broker default above.
+  replicas: 1
+  storage:
+    type: ephemeral
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
 # Bitnami's MongoDB chart, the default. Its images are the frozen
 # bitnamilegacy ones (#85, #203); mongodbCommunity below is the replacement
 # being introduced. Set deploy to false when enabling it.
