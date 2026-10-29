@@ -35,13 +35,6 @@ omec-sub-provision:
 
 5g-control-plane:
   enable5G: true
-  kafka:
-    deploy: false
-    persistence:
-      enabled: false
-    zookeeper:
-      persistence:
-        enabled: false
   #images:
   #  tags:
       #5G NF images

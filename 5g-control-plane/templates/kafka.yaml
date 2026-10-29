@@ -2,11 +2,8 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 */ -}}
-{{- if .Values.kafkaStrimzi.enabled }}
-{{- if .Values.kafka.deploy }}
-{{- fail "kafkaStrimzi.enabled replaces Bitnami's Kafka: set kafka.deploy to false" }}
-{{- end }}
-{{- $k := .Values.kafkaStrimzi }}
+{{- if .Values.kafka.enabled }}
+{{- $k := .Values.kafka }}
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
@@ -53,9 +50,8 @@ spec:
 ---
 # Every network function's config hardcodes the broker address "kafka:9092"
 # (config.*.kafkaInfo.brokerUri/brokerPort); this Service keeps that name
-# working against the operator-managed broker pods instead of the Bitnami
-# Service it replaces. The selector matches the broker-role label the
-# operator sets on Kafka pods.
+# working against the operator-managed broker pods. The selector matches the
+# broker-role label the operator sets on Kafka pods.
 apiVersion: v1
 kind: Service
 metadata:

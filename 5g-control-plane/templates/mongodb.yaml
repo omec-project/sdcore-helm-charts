@@ -2,11 +2,8 @@
 SPDX-FileCopyrightText: 2026-present Aether Project (Part of Linux Foundation) <dev@lists.aetherproject.org>
 SPDX-License-Identifier: Apache-2.0
 */ -}}
-{{- if .Values.mongodbCommunity.enabled }}
-{{- if .Values.mongodb.deploy }}
-{{- fail "mongodbCommunity.enabled replaces Bitnami's MongoDB: set mongodb.deploy to false" }}
-{{- end }}
-{{- $m := .Values.mongodbCommunity }}
+{{- if .Values.mongodb.enabled }}
+{{- $m := .Values.mongodb }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -15,7 +12,7 @@ metadata:
 {{ tuple "mongodb" . | include "5g-control-plane.metadata_labels" | indent 4 }}
 type: Opaque
 stringData:
-  password: {{ required "mongodbCommunity.password must be set when mongodbCommunity.enabled is true" $m.password | quote }}
+  password: {{ required "mongodb.password must be set when mongodb.enabled is true" $m.password | quote }}
 ---
 apiVersion: mongodbcommunity.mongodb.com/v1
 kind: MongoDBCommunity

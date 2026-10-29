@@ -22,9 +22,9 @@ spec:
     metadata:
       labels:
 {{ tuple "upfadapter" . | include "5g-control-plane.metadata_labels" | indent 8 }}
-    {{- if or .Values.config.upfadapter.podAnnotations .Values.mongodbCommunity.enabled }}
+    {{- if or .Values.config.upfadapter.podAnnotations .Values.mongodb.enabled }}
       annotations:
-    {{- if .Values.mongodbCommunity.enabled }}
+    {{- if .Values.mongodb.enabled }}
         checksum/mongodb-credentials: {{ include "5g-control-plane.mongodbCredentialsChecksum" . | quote }}
     {{- end }}
     {{- with .Values.config.upfadapter.podAnnotations }}
@@ -63,7 +63,7 @@ spec:
       {{- end }}
       volumes:
       - name: nf-config
-        {{- if .Values.mongodbCommunity.enabled }}
+        {{- if .Values.mongodb.enabled }}
         secret:
           secretName: upf-adapter
         {{- else }}

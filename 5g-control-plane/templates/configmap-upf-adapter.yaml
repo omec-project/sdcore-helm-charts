@@ -17,7 +17,7 @@
 {{- $_ := .Values.config.logger | set $upfadaptercfg "logger" -}}
 {{- end }}
 {{- if not (hasKey $upfadaptercfg.configuration.kafkaInfo "enableKafka") -}}
-{{- $_ := .Values.kafka.deploy | set $upfadaptercfg.configuration.kafkaInfo "enableKafka" -}}
+{{- $_ := .Values.kafka.enabled | set $upfadaptercfg.configuration.kafkaInfo "enableKafka" -}}
 {{- end }}
 
 {{- end }}

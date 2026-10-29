@@ -30,7 +30,7 @@ spec:
     spec:
     {{- tuple "metricfunc" . | include "5g-control-plane.pod_common" | trim | nindent 6 }}
       initContainers:
-      {{- if .Values.kafka.deploy }}
+      {{- if .Values.kafka.enabled }}
       - name: wait-kafka-module
         image: {{ .Values.images.repository }}{{ .Values.images.tags.init }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}

@@ -41,23 +41,34 @@ jobs:
           # the badge publisher on its own.
           persist-credentials: false
 
-      # The umbrella chart depends on its siblings by file:// reference and
-      # 5g-control-plane pulls MongoDB and Kafka from Bitnami, so both
-      # dependency sets are built before the suite installs the chart.
+      # The umbrella chart depends on its siblings by file:// reference, so its
+      # dependencies are built before the suite installs the chart.
       - name: Build chart dependencies
         run: |
           set -euo pipefail
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm dependency build 5g-control-plane
           helm dependency build sdcore-helm-charts
+
+      # The control plane's MongoDB runs through MongoDB's operator, a cluster
+      # prerequisite (see the README), so the cluster is created here and the
+      # operator installed in the release's namespace before the suite installs
+      # the chart. kind is preinstalled on the GitHub-hosted runners.
+      - name: Create cluster and install the MongoDB operator
+        run: |
+          set -euo pipefail
+          kind create cluster --name cnti-testsuite --config .github/cnti/kind.yaml
+          helm repo add mongodb https://mongodb.github.io/helm-charts
+          helm install mongodb-kubernetes mongodb/mongodb-kubernetes \
+            --version 1.14.0 \
+            --namespace sdcore --create-namespace \
+            --set operator.watchNamespace=sdcore \
+            --wait --timeout 5m
 
       - uses: lfn-cnti/testsuite-action@70536fda55fcb11f4f7463175fe9d57c86b85574 # v1.2.0
         with:
           version: v2.2.0
           cnf_config: .github/cnti/cnti-testsuite.yaml
-          # Three workers, so that MongoDB's two data members and its arbiter
-          # stay on separate nodes while the node_drain test drains them in turn.
-          kind_config: .github/cnti/kind.yaml
+          # The cluster, with three workers, is created above.
+          create_kind_cluster: false
           install_timeout: 900
           tests: cert
           badge_branch: badges

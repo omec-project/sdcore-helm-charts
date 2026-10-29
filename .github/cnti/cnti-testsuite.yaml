@@ -19,7 +19,6 @@ deployments:
         --set omec-user-plane.enable=false
         --set 5g-ran-sim.enable=false
         --set 5g-control-plane.enable5G=true
-        --set 5g-control-plane.kafka.deploy=false
         --set omec-sub-provision.enable=true
         --set 5g-control-plane.resources.amf.requests.cpu=200m
         --set 5g-control-plane.resources.ausf.requests.cpu=200m
@@ -32,4 +31,5 @@ deployments:
         --set 5g-control-plane.resources.webui.requests.cpu=200m
         --set 5g-control-plane.resources.upfadapter.requests.cpu=200m
         --set omec-sub-provision.resources.simapp.requests.cpu=100m
-        --set 5g-control-plane.mongodb.resources.requests.cpu=250m
+        --set 5g-control-plane.mongodb.password=cnti-ci-only
+        --set 5g-control-plane.mongodb.resources.mongod.requests.cpu=250m
