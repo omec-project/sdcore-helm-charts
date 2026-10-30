@@ -22,6 +22,7 @@ deployments:
         --set omec-sub-provision.enable=true
         --set 5g-control-plane.resources.amf.requests.cpu=200m
         --set 5g-control-plane.resources.ausf.requests.cpu=200m
+        --set 5g-control-plane.resources.af.requests.cpu=200m
         --set 5g-control-plane.resources.nrf.requests.cpu=200m
         --set 5g-control-plane.resources.nssf.requests.cpu=200m
         --set 5g-control-plane.resources.pcf.requests.cpu=200m

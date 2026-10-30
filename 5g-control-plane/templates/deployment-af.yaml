@@ -1,0 +1,77 @@
+{{/*
+# Copyright (C) 2026 Intel Corporation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+{{- if .Values.config.af.deploy }}
+{{ tuple "af" . | include "5g-control-plane.service_account" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: af
+  labels:
+{{ tuple "af" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+{{ tuple "af" . | include "5g-control-plane.metadata_labels" | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ tuple "af" . | include "5g-control-plane.metadata_labels" | indent 8 }}
+      annotations:
+    {{- tuple "af" . | include "5g-control-plane.certs_pod_annotations" | nindent 8 }}
+    {{- with .Values.config.af.podAnnotations }}
+    {{- toYaml . | nindent 8 }}
+    {{- end }}
+    spec:
+    {{- tuple "af" . | include "5g-control-plane.pod_common" | trim | nindent 6 }}
+      initContainers:
+      {{- tuple "wait-af-module" "af" . | include "5g-control-plane.wait_dns" | nindent 6 }}
+    {{ tuple "af" . | include "5g-control-plane.certs_init" | nindent 6 }}
+      {{ if .Values.config.coreDump.enabled }}
+{{ tuple "af" . | include "5g-control-plane.coredump_init" | nindent 6 }}
+      {{ end }}
+      containers:
+      - name: af
+        image: {{ .Values.images.repository }}{{ .Values.images.tags.af }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{ if .Values.config.coreDump.enabled }}
+        securityContext:
+          runAsUser: 0
+      {{ end }}
+        stdin: true
+        tty: true
+        command: ["/opt/af-run.sh"]
+        env:
+      {{- if eq .Values.config.GIN.mode "release" }}
+        - name: GIN_MODE
+          value: release
+      {{- end }}
+{{ tuple "af" . | include "5g-control-plane.certs_env" | indent 8 }}
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        {{- tuple .Values.config.af.sbi.port . | include "5g-control-plane.probes" | nindent 8 }}
+      {{- if .Values.resources.enabled }}
+        resources:
+{{ toYaml .Values.resources.af | indent 10 }}
+      {{- end }}
+        volumeMounts:
+        - name: nf-config
+          mountPath: /opt
+{{ tuple "af" . | include "5g-control-plane.certs_volume_mounts" | indent 8 }}
+      {{- if .Values.config.coreDump.enabled }}
+        - name: coredump
+          mountPath: /tmp/coredump
+      {{- end }}
+      volumes:
+      - name: nf-config
+        configMap:
+          name: af
+          defaultMode: 493
+      {{- tuple "af" . | include "5g-control-plane.certs_volumes" | nindent 6 }}
+{{- end }}

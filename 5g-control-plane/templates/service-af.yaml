@@ -1,0 +1,31 @@
+{{/*
+# Copyright (C) 2026 Intel Corporation
+
+# SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.config.af.deploy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: af
+  labels:
+{{ tuple "af" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+{{- with .Values.config.af.serviceAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+spec:
+  type: {{ .Values.config.af.serviceType }}
+{{- if .Values.config.af.externalIp }}
+  externalIPs:
+    - {{ .Values.config.af.externalIp }}
+{{- end }}
+  selector:
+{{ tuple "af" . | include "5g-control-plane.metadata_labels" | indent 4 }}
+  ports:
+{{- tuple "prometheus-exporter" .Values.config.af.prometheus "TCP" .Values.config.af.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- tuple "sbi" .Values.config.af.sbi "TCP" .Values.config.af.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- tuple "northbound" .Values.config.af.northbound "TCP" .Values.config.af.serviceType | include "5g-control-plane.service_port" | nindent 2 }}
+{{- end }}

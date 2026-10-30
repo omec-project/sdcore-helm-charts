@@ -1,4 +1,4 @@
-# Copyright (c) 2022-present Intel Corporation
+# Copyright (C) 2022-present Intel Corporation
 # Copyright 2020-present Open Networking Foundation
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -12,6 +12,7 @@ images:
     nrf: 5gc-nrf:rel-3.1.2
     nssf: 5gc-nssf:rel-3.1.2
     pcf: 5gc-pcf:rel-3.2.2
+    af: 5gc-af:rel-1.0.0
     smf: 5gc-smf:rel-4.3.3
     udm: 5gc-udm:rel-3.1.2
     udr: 5gc-udr:rel-3.1.2
@@ -114,6 +115,13 @@ resources:
       memory: 1Gi
     limits:
       cpu: 2
+      memory: 1Gi
+  af:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 1
       memory: 1Gi
   pcf:
     requests:
@@ -452,6 +460,80 @@ config:
               suppFeat: 3
             - serviceName: npcf-eventexposure
             - serviceName: npcf-ue-policy-control
+
+  # Application Function: the N5 consumer of the IMS.
+  # The P-CSCF reaches its northbound API at af:<northbound.port>; the AF creates
+  # the app sessions at the PCF (discovered through the NRF unless pcfUri is set).
+  # The AF has its own logger.level in cfgFiles; the per-NF config.logger above does not apply.
+  af:
+    deploy: true
+    podAnnotations:
+      field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":8080,"schema":"HTTP"}]'
+    serviceType: ClusterIP
+    # serviceAnnotations: annotations of the Service and of the af-certs Secret
+    # serviceAnnotations:
+    #   external-dns.alpha.kubernetes.io/hostname: "af.tenant-site.company.com"
+    # Optional external IP for the Service. It applies to every port of the Service
+    # (sbi, northbound and prometheus), not only northbound.
+    #externalIp:
+    prometheus:
+      port: 8080
+      # Provide nodePort when serviceType is NodePort
+      # nodePort:
+    sbi:
+      port: 29520
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30080
+    northbound:
+      port: 7782
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 30082
+    cfgFiles:
+      # https://github.com/omec-project/af/blob/main/configs/afcfg.yaml
+      afcfg.yaml:
+        info:
+          version: 1.0.0
+          description: AF initial local configuration
+        logger:
+          level: info # panic|fatal|error|warn|info|debug
+        configuration:
+          afName: AF
+          nrfUri: https://nrf:29510
+          # pcfUri: https://pcf:29507 # when set the PCF is not discovered through the NRF
+          sbi:
+            scheme: https
+            bindingIPv4: "0.0.0.0"
+            registerIPv4: af
+            tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
+          northbound:
+            bindingIPv4: "0.0.0.0"
+          metrics:
+            bindingIPv4: "0.0.0.0"
+          media:
+            dnn: ims
+            afAppId: '+g.3gpp.icsi-ref="urn%3Aurn-7%3A3gpp-service.ims.icsi.mmtel"'
+            # MediaComponentVersioning, IMS_SBI, NetLoc, EnhancedSubscriptionToNotification, AuthorizationWithRequiredQoS
+            suppFeat: "14034"
+            audio:
+              qosReference: qosVoNR
+              marBwDl: 128 Kbps
+              marBwUl: 128 Kbps
+              rtcpMarBwDl: 128 Kbps
+              rtcpMarBwUl: 128 Kbps
+            video:
+              qosReference: qosViNR
+              marBwDl: 2048 Kbps
+              marBwUl: 2048 Kbps
+              rtcpMarBwDl: 128 Kbps
+              rtcpMarBwUl: 128 Kbps
+            events:
+              - event: QOS_NOTIF
+                notifMethod: PERIODIC
+                repPeriod: 60 # seconds; required for PERIODIC
+              - event: ANI_REPORT
+                notifMethod: ONE_TIME
 
   nssf:
     deploy: true
