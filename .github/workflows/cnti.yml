@@ -52,10 +52,20 @@ jobs:
       # prerequisite (see the README), so the cluster is created here and the
       # operator installed in the release's namespace before the suite installs
       # the chart. kind is preinstalled on the GitHub-hosted runners.
+      # The operator gives every MongoDB member a persistent volume. kind's
+      # storage provisioner keeps each volume on one node, so the node_drain
+      # test could never move a member; in its shared mode, on the directory
+      # every node mounts (kind.yaml), volumes follow their pod as network
+      # storage does.
       - name: Create cluster and install the MongoDB operator
         run: |
           set -euo pipefail
+          mkdir -p /tmp/kind-shared-storage
           kind create cluster --name cnti-testsuite --config .github/cnti/kind.yaml
+          kubectl -n local-path-storage patch configmap local-path-config --type merge \
+            -p '{"data":{"config.json":"{\"nodePathMap\":[],\"sharedFileSystemPath\":\"/var/local-path-provisioner\"}"}}'
+          kubectl -n local-path-storage rollout restart deployment local-path-provisioner
+          kubectl -n local-path-storage rollout status deployment local-path-provisioner --timeout 2m
           helm repo add mongodb https://mongodb.github.io/helm-charts
           helm install mongodb-kubernetes mongodb/mongodb-kubernetes \
             --version 1.14.0 \
@@ -80,6 +90,7 @@ jobs:
         run: |
           set +e
           echo "::group::pods"; kubectl get pods -A -o wide; echo "::endgroup::"
+          echo "::group::volumes"; kubectl get pv -o custom-columns='PV:.metadata.name,CLAIM:.spec.claimRef.name,AFFINITY:.spec.nodeAffinity'; echo "::endgroup::"
           echo "::group::node allocation"; kubectl describe nodes | grep -A9 "Allocated resources"; echo "::endgroup::"
           for pod in $(kubectl get pods -n sdcore -o name); do
             echo "::group::describe $pod"; kubectl describe -n sdcore "$pod" | tail -60; echo "::endgroup::"
