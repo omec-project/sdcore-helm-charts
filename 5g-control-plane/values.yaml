@@ -172,7 +172,7 @@ resources:
 kafka:
   enabled: false
   name: kafka
-  version: "4.0.0"
+  version: "4.2.2"
   # A single dual-role (broker + controller) node.
   replicas: 1
   storage:
