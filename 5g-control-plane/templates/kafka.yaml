@@ -4,7 +4,7 @@
 */ -}}
 {{- if .Values.kafka.enabled }}
 {{- $k := .Values.kafka }}
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: KafkaNodePool
 metadata:
   name: dual
@@ -21,13 +21,10 @@ spec:
   resources:
     {{- toYaml $k.resources | nindent 4 }}
 ---
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: Kafka
 metadata:
   name: {{ $k.name }}
-  annotations:
-    strimzi.io/node-pools: enabled
-    strimzi.io/kraft: enabled
   labels:
 {{ tuple "kafka" . | include "5g-control-plane.metadata_labels" | indent 4 }}
 spec:
