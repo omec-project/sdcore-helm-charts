@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2026 Linux Foundation Networking
+# SPDX-FileCopyrightText: 2026-present Aether Project (Part of Linux Foundation) <dev@lists.aetherproject.org>
 # SPDX-License-Identifier: Apache-2.0
 
 # Installs the SD-Core control plane on a kind cluster every night, runs the
@@ -73,15 +73,18 @@ jobs:
             --set operator.watchNamespace=sdcore \
             --wait --timeout 5m
 
-      - uses: lfn-cnti/testsuite-action@70536fda55fcb11f4f7463175fe9d57c86b85574 # v1.2.0
+      - uses: lfn-cnti/testsuite-action@3c0e163cbbdde302cdd9abb9dbe8c2cbd6a72c71 # v1.4.0
         with:
-          version: v2.2.0
+          version: v2.4.1
           cnf_config: .github/cnti/cnti-testsuite.yaml
           # The cluster, with three workers, is created above.
           create_kind_cluster: false
           install_timeout: 900
           tests: cert
           badge_branch: badges
+          # Known results (.github/cnti/expected.yaml): a test whose result
+          # changes is reported in the job summary and as a warning.
+          expected_results: .github/cnti/expected.yaml
 
       # Why did a function not come up? Pod state, events and logs from the
       # kind cluster the action created; it lives until the job ends.

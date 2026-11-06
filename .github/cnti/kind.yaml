@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2026 Linux Foundation Networking
+# SPDX-FileCopyrightText: 2026-present Aether Project (Part of Linux Foundation) <dev@lists.aetherproject.org>
 # SPDX-License-Identifier: Apache-2.0
 # The kind cluster for the CNTi essential-tests job: a control plane and three
 # workers. Every node mounts the same runner directory where kind's storage
