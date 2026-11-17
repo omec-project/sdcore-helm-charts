@@ -59,7 +59,7 @@ Render init container for coredump.
   securityContext:
     privileged: true
     runAsUser: 0
-  command: ["bash", "-xc"]
+  command: ["sh", "-xc"]
   args:
     - echo '/tmp/coredump/core.%h.%e.%t' > /mnt/host-rootfs/proc/sys/kernel/core_pattern
   volumeMounts:
